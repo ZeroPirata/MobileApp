@@ -18,6 +18,7 @@
     "@expo-google-fonts/pt-sans-narrow": "^0.2.2",
     "@expo-google-fonts/signika-negative": "^0.2.2",
     "@expo/vector-icons": "^13.0.0",
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-firebase/app": "^17.0.0",
     "@react-native-firebase/auth": "^17.0.0",
     "@react-navigation/bottom-tabs": "^6.5.4",
