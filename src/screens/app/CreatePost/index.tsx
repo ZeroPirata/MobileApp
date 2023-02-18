@@ -1,13 +1,17 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  Alert,
-  Button,
-  FlatList,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { RFValue } from "react-native-responsive-fontsize";
+import { useNavigation } from "@react-navigation/native";
+import { addDoc, collection } from "firebase/firestore";
+import { MaterialIcons } from "@expo/vector-icons";
+import { uuidv4 } from "@firebase/util";
+import { useState } from "react";
+
+import { useAuthentication } from "../../../hooks/useAuthentication";
+import { IFiles } from "../../../interfaces/PostInterface";
+import { db, storage } from "../../../configs/firebase";
+import themes from "../../../styles/themes";
 import {
   ImageLeyoutUpload,
   Container,
@@ -28,49 +32,30 @@ import {
   ImageLoadingView,
   ButtonSendPostText,
 } from "./style";
-import { Btn } from "../../../components/button/index";
-import { MaterialIcons } from "@expo/vector-icons";
-import themes from "../../../styles/themes";
-import { db, storage } from "../../../configs/firebase";
-import {
-  getDownloadURL,
-  ref,
-  uploadBytes,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { useNavigation } from "@react-navigation/native";
-import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
-import { useState } from "react";
-import { useAuthentication } from "../../../hooks/useAuthentication";
-import { uuidv4 } from "@firebase/util";
-import { addDoc, collection } from "firebase/firestore";
-import { ICreatePost } from "../../../interfaces/CreatePost";
-import { RFValue } from "react-native-responsive-fontsize";
-let imageUuidv4: any = [];
-let imageUrl: any = [];
 
-interface ImageState {
-  item: string;
-  index: number;
-  uri: string;
-  id: string;
-  type: string;
-}
+let imageUuidv4: any = [];
+let data = Math.floor(Date.now() / 1000);
 const CreatePost = () => {
   const { user } = useAuthentication();
   const navigation = useNavigation();
 
-  const [loadingUpload, setLoadingUpload] = useState(false);
-  const [image, setImage] = useState<ImageState[]>([]);
   const [value, setValue] = useState({
     title: "",
     description: "",
   });
+
+  const [loadingUpload, setLoadingUpload] = useState(false);
   const [isLoading, setIsLoagind] = useState(false);
-  const [teste2, setTeste2] = useState(false);
-  const [teste, setTeste] = useState(false);
+  const [uploadImageProgress, setUploadImageProgress] = useState(false);
+  const [finalyUploadFile, setFinlalyUploadFile] = useState(false);
+
+  const [image, setImage] = useState<IFiles[]>([]);
   const [theArray, setTheArray] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
+
+  const handleHomeNavigation = () => {
+    navigation.navigate("TabsRoutes");
+  };
+
   const pickImage = async () => {
     setIsLoagind(true);
     let result: any = await launchImageLibraryAsync({
@@ -98,12 +83,18 @@ const CreatePost = () => {
       ]
     );
   };
-  const handleHomeNavigation = () => {
-    navigation.navigate("TabsRoutes");
-  };
 
   const uploadImage = async () => {
     if (image.length >= 1) {
+      if (value.title == "") {
+        Alert.alert("Value null", "please, make a title...", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ]);
+        return;
+      }
       setLoadingUpload(true);
       image.forEach(async (images, index) => {
         const id = uuidv4();
@@ -117,7 +108,7 @@ const CreatePost = () => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           if (lastIndex == index && progress == 100) {
-            setTeste(true);
+            setUploadImageProgress(true);
           }
         });
         setImage([]);
@@ -125,7 +116,18 @@ const CreatePost = () => {
       return;
     }
     if (image.length == 0) {
+      if (value.title == "" || value.description == "") {
+        Alert.alert("Value null", "please, make a title and description...", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ]);
+        return;
+      }
       await addDoc(collection(db, "post"), {
+        date: data,
+        user: user?.email,
         title: value?.title,
         description: value?.description,
       });
@@ -134,7 +136,7 @@ const CreatePost = () => {
     }
   };
 
-  if (teste) {
+  if (uploadImageProgress) {
     imageUuidv4.forEach(async (files: { id: any }, index: number) => {
       const lastIndex = imageUuidv4.length - 1;
       const refUrlImage = ref(storage, `images/${user?.email}/${files.id}`);
@@ -142,24 +144,26 @@ const CreatePost = () => {
         setTheArray((oldArray) => [...oldArray, url]);
       });
       if (index == lastIndex) {
-        setTeste(false);
-        setTeste2(true);
+        setUploadImageProgress(false);
+        setFinlalyUploadFile(true);
       }
     });
     imageUuidv4 = [];
   }
 
-  if (teste2) {
+  if (finalyUploadFile) {
     navigation.navigate("TabsRoutes");
     addDoc(collection(db, "post"), {
+      date: data,
       user: user?.email,
       title: value?.title,
       description: value?.description,
       files: theArray,
     });
-    setTeste2(false);
+    setFinlalyUploadFile(false);
     setIsLoagind(false);
   }
+
   return !loadingUpload ? (
     <Container>
       <HeaderBackButton>
@@ -209,10 +213,13 @@ const CreatePost = () => {
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 data={image}
-                renderItem={({ item, index }) => (
+                renderItem={({ index }) => (
                   <ImageLeyoutUpload>
                     <ButtonRemoveImage onPress={() => removeImage(index)}>
-                      <ImageLoading source={{ uri: item.uri }} key={index} />
+                      <ImageLoading
+                        source={{ uri: image[index].uri }}
+                        key={index}
+                      />
                     </ButtonRemoveImage>
                   </ImageLeyoutUpload>
                 )}
@@ -238,9 +245,6 @@ const CreatePost = () => {
         width: "100%",
       }}
     >
-      {/*   color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
-    font-family: ${({ theme }) => theme.FONTS.Poppins_600SemiBold_Italic};
-    font-size: ${RFValue(35)}px; */}
       <Text
         style={{
           color: themes.COLORS.HEXTECH_METAL_GOLD.GOLD3,

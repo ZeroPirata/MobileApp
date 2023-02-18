@@ -1,6 +1,6 @@
 import FontsLoadedFunction from "./src/utils/fontsLoaded";
 import { ThemeProvider } from "styled-components/native";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, LogBox, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 import "./src/configs/firebase";
@@ -10,6 +10,7 @@ import { Routes } from "./src/routes/index";
 import themes from "./src/styles/themes";
 import { NavigationContainer } from "@react-navigation/native";
 
+LogBox.ignoreAllLogs();
 export default function App() {
   const fontsLoaded = FontsLoadedFunction.FontsLoadedFunction();
   if (!fontsLoaded) {

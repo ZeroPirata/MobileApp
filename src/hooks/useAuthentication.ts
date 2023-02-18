@@ -1,5 +1,5 @@
 import React from "react";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth/react-native";
 import { reciveUserAttributes } from "../utils/querys";
 import { Usuario } from "../interfaces/UsuarioInterface";
 const auth = getAuth();

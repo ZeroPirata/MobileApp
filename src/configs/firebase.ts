@@ -1,8 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { GoogleAuthProvider } from "firebase/auth";
-import { authUrl } from "./google";
 import { getStorage } from "firebase/storage";
 
 // Firebase

@@ -1,3 +1,5 @@
+import { IPost, IImage } from "../interfaces/PostInterface";
+
 export declare global {
   namespace ReactNavigation {
     interface RootParamList {
@@ -5,6 +7,8 @@ export declare global {
       SignUp: undefined;
       CreatePost: undefined;
       TabsRoutes: undefined;
+      SeePost: IPost;
+      EditPost: IPost;
     }
   }
 }
