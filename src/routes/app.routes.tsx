@@ -7,7 +7,7 @@ const { Navigator, Screen } = createNativeStackNavigator();
 import { TabRoutes } from "./tabs.routes";
 import { CreatePost } from "../screens/app/CreatePost";
 import { SeePost } from "../screens/app/SeePost";
-import { EditPost } from "../screens/app/SeePost/EditPost";
+import { EditPost } from "../screens/app/EditPost";
 
 const AppRoutes: React.FC = () => {
   return (

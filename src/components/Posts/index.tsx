@@ -56,9 +56,6 @@ const PostView = ({ id, body }: IPost) => {
         ) : null} */
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} />}>
-        {user?.email == body.user ? (
-          <Button title="Editar" onPress={() => EditPost(id, body)} />
-        ) : null}
         <TitlePoster>{body.title}</TitlePoster>
         {body.description && <Description>{body.description}</Description>}
         {body.files && (
@@ -71,12 +68,18 @@ const PostView = ({ id, body }: IPost) => {
             ) : null}
           </ImageSettings>
         )}
-        {body.files && body.files[2] ? (
+        {body.files && body.files[0] ? (
           <ButtonSeeMore onPress={() => SeePost(id, body)}>
             <TextButtonSeeMore>See more</TextButtonSeeMore>
           </ButtonSeeMore>
         ) : null}
         <UserDomain>By: {body.user}</UserDomain>
+        {user?.email == body.user ? (
+          <Button title="Editar" onPress={() => EditPost(id, body)} />
+        ) : null}
+        {user?.email == body.user ? (
+          <Button title="Deletar" onPress={() => deletePost(id)} />
+        ) : null}
       </ScrollView>
     </Container>
   );
