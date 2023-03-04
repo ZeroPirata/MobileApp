@@ -1,9 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import { deleteDoc, doc } from "firebase/firestore";
-import { useState } from "react";
-import { Button, RefreshControl, ScrollView } from "react-native";
-import { db } from "../../configs/firebase";
+import {
+  set,
+  ref,
+  get,
+  child,
+  update,
+  increment,
+  onValue,
+  off,
+} from "firebase/database";
+import { useEffect, useState } from "react";
+import { Button, RefreshControl, ScrollView, View } from "react-native";
+import { db, database } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
+import { FontAwesome, EvilIcons } from "@expo/vector-icons";
 import { IPost } from "../../interfaces/PostInterface";
 import {
   Container,
@@ -14,13 +25,52 @@ import {
   UserDomain,
   ButtonSeeMore,
   TextButtonSeeMore,
+  LikeAndDeslikeButton,
+  TextButtonsView,
   DeletePostButton,
+  CointaienrButton,
   EditPostButton,
+  TextButtons,
 } from "./style";
 
 const PostView = ({ id, body }: IPost) => {
+  const startCountRef = ref(database, "/post/" + id + "/starCount");
+  const [likesCount, setLikesCount] = useState("");
+  const [listUserLikes, setListUserLikes] = useState([])
+  const refDatabase = ref(database);
+
+  useEffect(() => {
+    const postRef = ref(database, "/post/" + id);
+    const handleStar = (snapshot: any) => {
+      const numberOfStar = snapshot.val();
+      const star = numberOfStar ? numberOfStar.starCount : 0;
+      setLikesCount(star);
+
+    };
+    onValue(postRef, handleStar);
+  });
+
+  function addStarInPost(starCount: number) {
+    get(child(refDatabase, "/post/" + id))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const updates: any = {};
+          updates[`/post/${id}/starCount`] = increment(1);
+          return update(ref(database), updates);
+        } else {
+          set(ref(database, "/post/" + id), {
+            starCount: 1
+          });
+        }
+      })
+      .catch(({ err }) => {
+        console.log(err);
+      });
+  }
   const navigation = useNavigation();
   const { user } = useAuthentication();
+  const [editFocus, setIsEditFocused] = useState(false);
+  const [deleteFocus, setIsDeleteFocused] = useState(false);
   function SeePost(
     id: string,
     body: {
@@ -49,14 +99,40 @@ const PostView = ({ id, body }: IPost) => {
   ) {
     navigation.navigate("EditPost", { id: id, body: body });
   }
-
   return (
-    /*         {user?.email == body.user ? (
-          <Button title="Deletar" onPress={() => deletePost(id)} />
-        ) : null} */
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} />}>
         <TitlePoster>{body.title}</TitlePoster>
+        {user?.email == body.user ? (
+          <CointaienrButton>
+            <EditPostButton
+              onPressIn={() => setIsEditFocused(true)}
+              onPressOut={() => setIsEditFocused(false)}
+              onPress={() => EditPost(id, body)}
+            >
+              <FontAwesome name="edit" size={25} color="white" />
+              {editFocus && (
+                <>
+                  <TextButtonsView />
+                  <TextButtons>Editar</TextButtons>
+                </>
+              )}
+            </EditPostButton>
+            <DeletePostButton
+              onPress={() => deletePost(id)}
+              onPressIn={() => setIsDeleteFocused(true)}
+              onPressOut={() => setIsDeleteFocused(false)}
+            >
+              <FontAwesome name="trash-o" size={25} color="red" />
+              {deleteFocus && (
+                <>
+                  <TextButtonsView />
+                  <TextButtons>Deletar</TextButtons>
+                </>
+              )}
+            </DeletePostButton>
+          </CointaienrButton>
+        ) : null}
         {body.description && <Description>{body.description}</Description>}
         {body.files && (
           <ImageSettings>
@@ -74,12 +150,13 @@ const PostView = ({ id, body }: IPost) => {
           </ButtonSeeMore>
         ) : null}
         <UserDomain>By: {body.user}</UserDomain>
-        {user?.email == body.user ? (
-          <Button title="Editar" onPress={() => EditPost(id, body)} />
-        ) : null}
-        {user?.email == body.user ? (
-          <Button title="Deletar" onPress={() => deletePost(id)} />
-        ) : null}
+        <LikeAndDeslikeButton>
+          <Button onPress={() => addStarInPost(1)} title="Button" />
+
+          <EvilIcons name="like" size={25} />
+          <TextButtonSeeMore>{likesCount}</TextButtonSeeMore>
+          <EvilIcons name="retweet" size={25} />
+        </LikeAndDeslikeButton>
       </ScrollView>
     </Container>
   );

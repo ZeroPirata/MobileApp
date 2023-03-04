@@ -41,14 +41,48 @@ export const ImageConfig = styled.Image`
   object-fit: contain;
 `;
 export const ButtonSeeMore = styled(TouchableOpacity)``;
-export const DeletePostButton = styled(TouchableOpacity)``;
-export const EditPostButton = styled(TouchableOpacity)``;
+export const DeletePostButton = styled(TouchableOpacity)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+export const EditPostButton = styled(TouchableOpacity)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
 
 export const TextButtonSeeMore = styled.Text`
   margin: 5px 0;
   font-size: ${RFValue(10)}px;
   font-family: ${({ theme }) => theme.FONTS.DMSans_400Regular};
   color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE1};
+`;
+export const LikeAndDeslikeButton = styled.View`
+  margin-top: 3px;
+  border-top-width: 1px;
+  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
+`;
+export const TextButtons = styled.Text`
+  background-color: ${({ theme }) => theme.COLORS.GRAY2};
+`;
+export const CointaienrButton = styled.View`
+  justify-content: space-around;
+  margin: 10px 0;
+`;
+export const TextButtonsView = styled.View`
+  width: 0;
+  height: 0;
+  background-color: "transparent";
+  border-style: solid;
+  border-top-width: 10px;
+  border-right-width: 10px;
+  border-bottom-width: 10px;
+  border-left-width: 0px;
+  border-top-color: transparent;
+  border-right-color: ${({ theme }) => theme.COLORS.GRAY2};
+  border-bottom-color: transparent;
+  border-left-color: transparent;
 `;
 /* 
 export const  = styled.``

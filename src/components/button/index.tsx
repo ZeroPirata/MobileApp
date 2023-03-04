@@ -4,7 +4,7 @@ import { ActivityIndicator } from "react-native";
 import { ButtonProps } from "../../interfaces/ButtonInterfaces";
 import { Button, TextBtn, Content } from "./style";
 import { FontAwesome } from "@expo/vector-icons";
-import { variants } from "./variants";
+import { ButtonStyle, variants } from "./variants";
 
 const Btn: React.FC<ButtonProps> = ({
   variant = "LargeButtonGoldBorded",
@@ -22,7 +22,9 @@ const Btn: React.FC<ButtonProps> = ({
   ...rest
 }) => {
   const buttonVariant = variants[variant];
-  const buttonStyle = disabled ? buttonVariant.disabled : buttonVariant.enabled;
+  const buttonStyle: ButtonStyle = disabled
+    ? buttonVariant.disabled
+    : buttonVariant.enabled;
   return (
     <Button
       style={[buttonStyle.button, style]}

@@ -7,6 +7,7 @@ import Icon from "@expo/vector-icons/Ionicons";
 import { InputProps } from "../../interfaces/InputInterface";
 import { Container, InputContainer } from "./style";
 import themes from "../../styles/themes";
+import { TextInput } from "react-native-gesture-handler";
 
 const Input = ({
   width,
@@ -18,7 +19,7 @@ const Input = ({
   iconColor,
   secureTextEntry = true,
   ...rest
-}: InputProps) => {
+}: TextInput & InputProps) => {
   const { COLORS } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [secury, setSecury] = useState(secureTextEntry);
@@ -41,7 +42,6 @@ const Input = ({
         />
       )}
       <InputContainer
-        {...rest}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         underlineColorAndroid="transparent"

@@ -423,3 +423,4 @@ export const variants = {
   SmallButtonOutLine: SmallButtonOutLine,
   none: none,
 };
+export { ButtonStyle }
