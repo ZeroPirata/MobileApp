@@ -19,7 +19,7 @@ const Input = ({
   iconColor,
   secureTextEntry = true,
   ...rest
-}: TextInput & InputProps) => {
+}: InputProps) => {
   const { COLORS } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [secury, setSecury] = useState(secureTextEntry);

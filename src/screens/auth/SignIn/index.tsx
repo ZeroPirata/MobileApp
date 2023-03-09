@@ -16,6 +16,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, ScrollView } from "react-native";
 import * as WebBrowser from "expo-web-browser";
+import { uuidv4 } from "@firebase/util";
 
 import { Btn } from "../../../components/button/index";
 import { Input } from "../../../components/input/index";
@@ -61,6 +62,7 @@ const SignIn: React.FC = () => {
     try {
       await signInWithEmailAndPassword(
         authFirebase,
+
         value.email,
         value.password
       );
@@ -84,6 +86,7 @@ const SignIn: React.FC = () => {
           const user = result.user as UserResponse;
           if (!(await queryByEmail(user.email))) {
             await addDoc(collection(db, "users"), {
+              id: uuidv4(),
               name: user.displayName,
               email: user.email,
               assets: {
@@ -112,6 +115,7 @@ const SignIn: React.FC = () => {
           const user = result.user as UserResponse;
           if (!(await queryByEmail(user.email))) {
             await addDoc(collection(db, "users"), {
+              id: uuidv4(),
               name: user.displayName,
               email: user.email,
               assets: {

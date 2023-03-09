@@ -18,6 +18,8 @@ import {
   TextError,
 } from "./style";
 import { db } from "../../../configs/firebase";
+import { uuidv4 } from "@firebase/util";
+
 import { erroLogs } from "../../../utils/errors";
 
 const SignUp: React.FC = () => {
@@ -48,6 +50,7 @@ const SignUp: React.FC = () => {
     try {
       await createUserWithEmailAndPassword(auth, value.email, value.password);
       await addDoc(collection(db, "users"), {
+        id: uuidv4(),
         name: value.name,
         email: value.email,
       });
