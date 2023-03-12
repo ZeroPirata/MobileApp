@@ -4,12 +4,10 @@ type SeePost = {
   path?: string | undefined;
   params: {
     id: string;
-    body: {
-      user: string;
-      title: string;
-      description?: string;
-      files?: string[];
-    };
+    user: string;
+    title: string;
+    description?: string;
+    files?: string[];
   };
 };
 type EditPost = {
@@ -18,12 +16,10 @@ type EditPost = {
   path?: string | undefined;
   params: {
     id: string;
-    body: {
-      user: string;
-      title: string;
-      description?: string;
-      files?: string[];
-    };
+    user: string;
+    title: string;
+    description?: string;
+    files?: string[];
   };
 };
 type SeeImage = {

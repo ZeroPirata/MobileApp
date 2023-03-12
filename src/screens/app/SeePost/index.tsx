@@ -42,7 +42,7 @@ const SeePost = () => {
       <SafeAreaView>
         <HeaderProfile />
         <PostPub>
-          {user?.email == route.params.body.user ? (
+          {user?.email == route.params.user ? (
             <ViewButtons>
               <EditPostButton
                 onPressIn={() => setIsEditFocused(true)}
@@ -70,12 +70,12 @@ const SeePost = () => {
               </DeletePostButton>
             </ViewButtons>
           ) : null}
-          <TitlePoster>{route.params.body.title}</TitlePoster>
-          {route.params.body.description && (
-            <Description>{route.params.body.description}</Description>
+          <TitlePoster>{route.params.title}</TitlePoster>
+          {route.params.description && (
+            <Description>{route.params.description}</Description>
           )}
           <FlatList
-            data={route.params.body.files}
+            data={route.params.files}
             renderItem={({ item, index }) => {
               return (
                 <ImageSettings key={index}>
@@ -84,15 +84,7 @@ const SeePost = () => {
               );
             }}
           />
-          {/* {route.params.body.files &&
-              route.params.body.files.map((files) => {
-                return (
-                  <ImageSettings>
-                    <ImageConfig source={{ uri: files }} />
-                  </ImageSettings>
-                );
-              })} */}
-          <UserDomain>By: {route.params.body.user}</UserDomain>
+          <UserDomain>By: {route.params.user}</UserDomain>
         </PostPub>
       </SafeAreaView>
     </Container>

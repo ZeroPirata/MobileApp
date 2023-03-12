@@ -1,6 +1,8 @@
+import { async } from "@firebase/util";
 import { useNavigation } from "@react-navigation/native";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { getDownloadURL, getMetadata, ref } from "firebase/storage";
+import * as DataBase from "firebase/database";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
@@ -13,7 +15,7 @@ import {
 import { FlatList } from "react-native-gesture-handler";
 import { HeaderProfile } from "../../../components/HeaderProfile";
 import { PostView } from "../../../components/Posts";
-import { db, storage } from "../../../configs/firebase";
+import { database, db, storage } from "../../../configs/firebase";
 import { IPost } from "../../../interfaces/PostInterface";
 
 import { Container, ButtoSeeMore, TextSeeMore } from "./style";
@@ -40,21 +42,22 @@ const HomeTab = () => {
 
   const reciveUserAttributes = useCallback(
     async (QntOfPost: number) => {
-      let dados: any = [];
-      const collect = collection(db, "post");
-      const quertFilterDate = query(
-        collect,
-        orderBy("date", "desc"),
-        limit(QntOfPost)
+      const refDatabase = DataBase.ref(database, "posts/");
+      const PostInDataBase = DataBase.query(
+        refDatabase,
+        DataBase.orderByChild("data"),
+        DataBase.limitToLast(QntOfPost)
       );
-      const querySnapshot = await getDocs(quertFilterDate);
-      querySnapshot.forEach((doc) => {
-        dados.push({
-          id: doc.id,
-          body: doc.data(),
-        });
+      DataBase.onValue(PostInDataBase, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const PostList = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setPostInDataBase(PostList.reverse());
+        }
       });
-      setPostInDataBase(dados);
     },
     [setPostInDataBase]
   );
@@ -75,8 +78,11 @@ const HomeTab = () => {
             return (
               <PostView
                 id={items.id}
-                body={items.body}
                 key={items.id}
+                user={items.user}
+                title={items.title}
+                description={items.description}
+                files={items.files}
               ></PostView>
             );
           })}

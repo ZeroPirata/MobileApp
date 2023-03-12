@@ -1,23 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
 import { deleteDoc, doc } from "firebase/firestore";
-import {
-  set,
-  ref,
-  get,
-  child,
-  update,
-  increment,
-  onValue,
-  off,
-  remove,
-  push,
-  query,
-  orderByChild,
-  equalTo,
-  runTransaction,
-} from "firebase/database";
+import { ref, child, onValue, runTransaction, remove } from "firebase/database";
 import { useEffect, useState } from "react";
-import { Button, RefreshControl, ScrollView, View } from "react-native";
+import { Button, RefreshControl, ScrollView } from "react-native";
 import { db, database } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { FontAwesome, EvilIcons } from "@expo/vector-icons";
@@ -37,28 +22,46 @@ import {
   CointaienrButton,
   EditPostButton,
   TextButtons,
+  ButtonLike,
+  LikeCounts,
 } from "./style";
 
-const PostView = ({ id, body }: IPost) => {
+const PostView = ({ id, ...rest }: IPost) => {
   const { user } = useAuthentication();
-  const refDatabase = ref(database);
-  const navigation = useNavigation();
-  const [editFocus, setIsEditFocused] = useState(false);
-  const [deleteFocus, setIsDeleteFocused] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
-  const [liked, setLiked] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const postLikesRef = ref(database, `posts/${id}/likes`);
-    const handleSnapshot = (snapshot: any) => {
-      const likes = snapshot.val();
-      const likesCount = likes ? Object.keys(likes).length : 0;
-      setLikesCount(likesCount);
-      setLiked(likes && likes[String(user?.uid)]);
-    };
-    onValue(postLikesRef, handleSnapshot);
-  }, [id, user]);
+  const [deleteFocus, setIsDeleteFocused] = useState(false);
+  const [editFocus, setIsEditFocused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [liked, setLiked] = useState(false);
+
+  const [likesCount, setLikesCount] = useState(0);
+
+  const navigation = useNavigation();
+
+  function EditPost(
+    id: string,
+    user: string,
+    title: string,
+    description?: string | undefined,
+    files?: string[] | undefined
+  ) {
+    navigation.navigate("EditPost", { id: id, ...rest });
+  }
+
+  const deletePost = async (id: string) => {
+    await remove(ref(database, `posts/${id}`));
+    await deleteDoc(doc(db, "post", id));
+  };
+
+  function SeePost(
+    id: string,
+    user: string,
+    title: string,
+    description?: string | undefined,
+    files?: string[] | undefined
+  ) {
+    navigation.navigate("SeePost", { id: id, ...rest });
+  }
 
   const handleLike = () => {
     if (!user) {
@@ -78,47 +81,29 @@ const PostView = ({ id, body }: IPost) => {
       .catch((error) => {
         console.log(error);
       });
-  };  
-
-
-  function SeePost(
-    id: string,
-    body: {
-      user: string;
-      title: string;
-      description?: string | undefined;
-      files?: string[] | undefined;
-    }
-  ) {
-    navigation.navigate("SeePost", { id: id, body: body });
-  }
-
-  const deletePost = async (id: string) => {
-    await deleteDoc(doc(db, "post", id));
   };
 
-  function EditPost(
-    id: string,
-    body: {
-      user: string;
-      title: string;
-      description?: string | undefined;
-      files?: string[] | undefined;
-    }
-  ) {
-    navigation.navigate("EditPost", { id: id, body: body });
-  }
+  useEffect(() => {
+    const postLikesRef = ref(database, `posts/${id}/likes`);
+    const handleSnapshot = (snapshot: any) => {
+      const likes = snapshot.val();
+      const likesCount = likes ? Object.keys(likes).length : 0;
+      setLikesCount(likesCount);
+      setLiked(likes && likes[String(user?.uid)]);
+    };
+    onValue(postLikesRef, handleSnapshot);
+  }, [id, user]);
+
   return (
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} />}>
-        <TitlePoster>{body.title}</TitlePoster>
-        <TitlePoster>{id}</TitlePoster>
-        {user?.email == body.user ? (
+        <TitlePoster>{rest.title}</TitlePoster>
+        {user?.email == rest.user ? (
           <CointaienrButton>
             <EditPostButton
               onPressIn={() => setIsEditFocused(true)}
               onPressOut={() => setIsEditFocused(false)}
-              onPress={() => EditPost(id, body)}
+              onPress={() => EditPost(id, rest.user, rest.title)}
             >
               <FontAwesome name="edit" size={25} color="white" />
               {editFocus && (
@@ -143,26 +128,30 @@ const PostView = ({ id, body }: IPost) => {
             </DeletePostButton>
           </CointaienrButton>
         ) : null}
-        {body.description && <Description>{body.description}</Description>}
-        {body.files && (
+        {rest.description && <Description>{rest.description}</Description>}
+        {rest.files && (
           <ImageSettings>
-            {body.files[0] ? (
-              <ImageConfig source={{ uri: body.files[0] }} />
+            {rest.files[0] ? (
+              <ImageConfig source={{ uri: rest.files[0] }} />
             ) : null}
-            {body.files[1] ? (
-              <ImageConfig source={{ uri: body.files[1] }} />
+            {rest.files[1] ? (
+              <ImageConfig source={{ uri: rest.files[1] }} />
             ) : null}
           </ImageSettings>
         )}
-        <ButtonSeeMore onPress={() => SeePost(id, body)}>
+        <ButtonSeeMore onPress={() => SeePost(id, rest.title, rest.user)}>
           <TextButtonSeeMore>See more</TextButtonSeeMore>
         </ButtonSeeMore>
-        <UserDomain>By: {body.user}</UserDomain>
+        <UserDomain>By: {rest.user}</UserDomain>
         <LikeAndDeslikeButton>
-          <Button title="Button" onPress={handleLike} />
-          { liked ?  <EvilIcons name="like" size={25} /> : <EvilIcons name="sc-linkedin" size={25} /> }
-          <TextButtonSeeMore>{likesCount}</TextButtonSeeMore>
-          <EvilIcons name="retweet" size={25} />
+          <ButtonLike onPress={handleLike}>
+            {liked ? (
+              <EvilIcons color="gold" name="like" size={25} />
+            ) : (
+              <EvilIcons name="like" size={25} />
+            )}
+          </ButtonLike>
+          <LikeCounts>{likesCount}</LikeCounts>
         </LikeAndDeslikeButton>
       </ScrollView>
     </Container>
