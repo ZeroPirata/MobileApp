@@ -23,7 +23,7 @@ const HeaderProfile = () => {
       <ContainerPicture>
         <Photo
           source={{
-            uri: user?.assets?.profile,
+            uri: String(user?.photoURL)
           }}
         />
       </ContainerPicture>

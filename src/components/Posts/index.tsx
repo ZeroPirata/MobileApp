@@ -10,6 +10,11 @@ import {
   onValue,
   off,
   remove,
+  push,
+  query,
+  orderByChild,
+  equalTo,
+  runTransaction,
 } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Button, RefreshControl, ScrollView, View } from "react-native";
@@ -36,63 +41,46 @@ import {
 
 const PostView = ({ id, body }: IPost) => {
   const { user } = useAuthentication();
-  const startCountRef = ref(database, "/post/" + id + "/starCount");
-  const [likesCount, setLikesCount] = useState(0);
-  const [listUserLikes, setListUserLikes] = useState([]);
-  const [liked, setLiked] = useState(false);
   const refDatabase = ref(database);
-  /* 
-  useEffect(() => {
-    const postRef = ref(database, "/post/" + id);
-    const handleStar = (snapshot: any) => {
-      const numberOfStar = snapshot.val();
-      const star = numberOfStar ? numberOfStar.starCount : 0;
-      setLikesCount(star);
+  const navigation = useNavigation();
+  const [editFocus, setIsEditFocused] = useState(false);
+  const [deleteFocus, setIsDeleteFocused] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-    };
-    onValue(postRef, handleStar);
-  }); */
   useEffect(() => {
     const postLikesRef = ref(database, `posts/${id}/likes`);
     const handleSnapshot = (snapshot: any) => {
       const likes = snapshot.val();
       const likesCount = likes ? Object.keys(likes).length : 0;
       setLikesCount(likesCount);
-      setLiked(likes && likes[String(user.id)]);
+      setLiked(likes && likes[String(user?.uid)]);
     };
     onValue(postLikesRef, handleSnapshot);
-  });
+  }, [id, user]);
 
   const handleLike = () => {
-    const postRef = ref(database, `posts/${id}`);
-    update(postRef, { likes: { [String(user?.id)]: true } });
-  };
-
-  const handleUnlike = () => {
-    const likeRef = child(ref(database, `posts/${id}/likes`), String(user?.id));
-    remove(likeRef);
-  };
-
-  function addStarInPost(starCount: number) {
-    get(child(refDatabase, "/post/" + id))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const updates: any = {};
-          updates[`/post/${id}/starCount`] = increment(1);
-          return update(ref(database), updates);
-        } else {
-          set(ref(database, "/post/" + id), {
-            starCount: 1,
-          });
-        }
-      })
-      .catch(({ err }) => {
-        console.log(err);
+    if (!user) {
+      return;
+    }
+    const postLikesRef = ref(database, `posts/${id}/likes`);
+    const userLikeRef = child(postLikesRef, user.uid);
+    const handleTransaction = (currentData: any) => {
+      if (currentData === null) {
+        return { userId: user.uid };
+      } else {
+        return null;
+      }
+    };
+    runTransaction(userLikeRef, handleTransaction)
+      .then()
+      .catch((error) => {
+        console.log(error);
       });
-  }
-  const navigation = useNavigation();
-  const [editFocus, setIsEditFocused] = useState(false);
-  const [deleteFocus, setIsDeleteFocused] = useState(false);
+  };  
+
+
   function SeePost(
     id: string,
     body: {
@@ -104,7 +92,6 @@ const PostView = ({ id, body }: IPost) => {
   ) {
     navigation.navigate("SeePost", { id: id, body: body });
   }
-  const [refreshing, setRefreshing] = useState(false);
 
   const deletePost = async (id: string) => {
     await deleteDoc(doc(db, "post", id));
@@ -125,6 +112,7 @@ const PostView = ({ id, body }: IPost) => {
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} />}>
         <TitlePoster>{body.title}</TitlePoster>
+        <TitlePoster>{id}</TitlePoster>
         {user?.email == body.user ? (
           <CointaienrButton>
             <EditPostButton
@@ -171,8 +159,8 @@ const PostView = ({ id, body }: IPost) => {
         </ButtonSeeMore>
         <UserDomain>By: {body.user}</UserDomain>
         <LikeAndDeslikeButton>
-          <Button title="Button" onPress={liked ? handleUnlike : handleLike} />
-          <EvilIcons name="like" size={25} />
+          <Button title="Button" onPress={handleLike} />
+          { liked ?  <EvilIcons name="like" size={25} /> : <EvilIcons name="sc-linkedin" size={25} /> }
           <TextButtonSeeMore>{likesCount}</TextButtonSeeMore>
           <EvilIcons name="retweet" size={25} />
         </LikeAndDeslikeButton>
