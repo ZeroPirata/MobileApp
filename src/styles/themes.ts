@@ -106,6 +106,13 @@ export default {
     ATTENTION_LIGHT8: "rgba(232, 63, 91, 0.8)",
     ATTENTION_LIGHT9: "rgba(232, 63, 91, 0.9)",
 
+    ROYAL_BLUE: {
+      COLOR_1: "#4169e1",
+      COLOR_2: "#334690",
+      COLOR_3: "#3a57b8",
+      COLOR_4: "#2a356a",
+    },
+
     HEXTECH_MAGIC_BLUE: {
       BLUE1: "#CDFAFA",
       BLUE2: "#0AC8B9",

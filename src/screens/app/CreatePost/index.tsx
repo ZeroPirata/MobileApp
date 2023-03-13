@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import * as DataBase from "firebase/database";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -33,6 +34,7 @@ import {
   ButtonSendPostText,
 } from "./style";
 import { set } from "firebase/database";
+import { TypeOfFiles } from "../../../components/TypeFile";
 
 let data = Math.floor(Date.now() / 1000);
 const CreatePost = () => {
@@ -44,19 +46,31 @@ const CreatePost = () => {
     description: "",
   });
 
+  const ComponentFilesType = new TypeOfFiles();
+
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [isLoading, setIsLoagind] = useState(false);
 
   const [image, setImage] = useState<IFiles[]>([]);
+  const [files, setFiles] = useState<IFiles[]>([]);
 
   const handleHomeNavigation = () => {
     navigation.navigate("TabsRoutes");
+  };
+  
+  const pickFiles = async () => {
+    setIsLoagind(true);
+    let result: any = await DocumentPicker.getDocumentAsync();
+    setIsLoagind(false);
+    if (result.type === "success") {
+      setFiles(result);
+    }
   };
 
   const pickImage = async () => {
     setIsLoagind(true);
     let result: any = await launchImageLibraryAsync({
-      mediaTypes: MediaTypeOptions.All,
+      mediaTypes: MediaTypeOptions.Images,
       videoQuality: 1,
       allowsMultipleSelection: true,
       quality: 1,
@@ -171,11 +185,19 @@ const CreatePost = () => {
             <ButtonText>Files: {image.length} </ButtonText>
             <ButtonUploadFile onPress={pickImage}>
               <MaterialIcons
-                name="upload-file"
+                name="image-search"
                 size={24}
                 color={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
               />
-              <ButtonText>UploadFile </ButtonText>
+              <ButtonText>Images</ButtonText>
+            </ButtonUploadFile>
+            <ButtonUploadFile onPress={pickFiles}>
+              <MaterialIcons
+                name="file-upload"
+                size={24}
+                color={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
+              />
+              <ButtonText>Files</ButtonText>
             </ButtonUploadFile>
           </ButtonImage>
           <ImageLoadingView>
@@ -200,6 +222,19 @@ const CreatePost = () => {
                     </ButtonRemoveImage>
                   </ImageLeyoutUpload>
                 )}
+              />
+            )}
+            {files && (
+              <FlatListImage
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                data={files}
+                renderItem={({ index }) =>
+                  ComponentFilesType.typeOfFile(
+                    files[index].type,
+                    files[index].uri
+                  )
+                }
               />
             )}
           </ImageLoadingView>

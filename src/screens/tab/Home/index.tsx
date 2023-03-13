@@ -51,11 +51,13 @@ const HomeTab = () => {
       DataBase.onValue(PostInDataBase, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const PostList = Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-          }));
-          setPostInDataBase(PostList.reverse());
+          const PostList = Object.keys(data)
+            .map((key) => ({
+              id: key,
+              ...data[key],
+            }))
+            .sort((a, b) => b.data - a.data);
+          setPostInDataBase(PostList);
         }
       });
     },
@@ -83,6 +85,7 @@ const HomeTab = () => {
                 title={items.title}
                 description={items.description}
                 files={items.files}
+                data={items.data}
               ></PostView>
             );
           })}

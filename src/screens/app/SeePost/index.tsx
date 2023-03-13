@@ -3,9 +3,8 @@ import { Button, FlatList, SafeAreaView, ScrollView, Text } from "react-native";
 import { reciveUserAttributes } from "../../../utils/querys";
 import { useCallback, useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../../configs/firebase";
+import { database, db } from "../../../configs/firebase";
 import { doc, deleteDoc } from "firebase/firestore";
-const { Navigator, Screen } = createNativeStackNavigator();
 
 import {
   Container,
@@ -19,15 +18,32 @@ import {
   TextButtons,
   DeletePostButton,
   ViewButtons,
+  CommentSection,
+  CreateComentario,
+  ImageUserComment,
+  ButtonSendComment,
+  TextButtonSend,
 } from "./style";
 import { TabRoutes } from "../../../routes/tabs.routes";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HeaderProfile } from "../../../components/HeaderProfile";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { FontAwesome } from "@expo/vector-icons";
+import {
+  child,
+  increment,
+  onChildAdded,
+  push,
+  ref,
+  runTransaction,
+  update,
+} from "firebase/database";
 
 const SeePost = () => {
   const { user } = useAuthentication();
+  const [values, setValues] = useState({
+    comentario: "",
+  });
   const route = useRoute<SeePost>();
   const navigation = useNavigation();
   const [editFocus, setIsEditFocused] = useState(false);
@@ -35,6 +51,31 @@ const SeePost = () => {
   const deletePost = async (id: string) => {
     await deleteDoc(doc(db, "post", id));
     navigation.navigate("TabsRoutes");
+  };
+
+  const NewComentario = () => {
+    if (!user) {
+      return;
+    }
+    const createComentarioRef = ref(
+      database,
+      `posts/${route.params.id}/coments`
+    );
+    /* const userComentRef = child(, user.uid); */
+    const updates = {
+      email: user.email,
+      comentario: values.comentario,
+      data: Math.floor(Date.now() / 1000),
+    };
+    push(createComentarioRef, updates)
+      .then(() => {
+        setValues({
+          comentario: "",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -86,6 +127,16 @@ const SeePost = () => {
           />
           <UserDomain>By: {route.params.user}</UserDomain>
         </PostPub>
+        <CommentSection>
+          <ImageUserComment source={{ uri: String(user?.photoURL) }} />
+          <CreateComentario
+            value={values.comentario}
+            onChangeText={(text) => setValues({ ...values, comentario: text })}
+          />
+          <ButtonSendComment onPress={NewComentario}>
+            <TextButtonSend>Enviar</TextButtonSend>
+          </ButtonSendComment>
+        </CommentSection>
       </SafeAreaView>
     </Container>
   );

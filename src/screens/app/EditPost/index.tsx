@@ -17,8 +17,8 @@ const EditPost = () => {
   const route = useRoute<EditPost>();
   const docRef = doc(db, "post", route.params.id);
   const [value, setValue] = useState({
-    title: route.params.body.title,
-    description: route.params.body.description,
+    title: route.params.title,
+    description: route.params.description,
   });
 
   const UpdateInfoPost = async () => {
@@ -36,7 +36,7 @@ const EditPost = () => {
           <ControlerInput
             onChangeText={(text) => setValue({ ...value, title: text })}
           >
-            {route.params.body.title}
+            {route.params.title}
           </ControlerInput>
           <Description
             value={value?.description}
@@ -47,8 +47,8 @@ const EditPost = () => {
             numberOfLines={5}
             placeholder="Description"
           />
-          {route.params.body.files ? (
-            <TextEditPost>{route.params.body.files}</TextEditPost>
+          {route.params.files ? (
+            <TextEditPost>{route.params.files}</TextEditPost>
           ) : null}
           <Button title="Enviar" onPress={UpdateInfoPost} />
         </ControlerPost>
@@ -57,18 +57,3 @@ const EditPost = () => {
   );
 };
 export { EditPost };
-{
-  /* <ScrollView showsVerticalScrollIndicator={false}>
-        <PostPub>
-          <TextInput
-            value={value.title}
-            onChangeText={(text) => setValue({ ...value, title: text })}
-          />
-          <TextInput
-            value={value.description}
-            onChangeText={(text) => setValue({ ...value, description: text })}
-          />
-          <Button title="Enviar" onPress={UpdateInfoPost} />
-        </PostPub>
-      </ScrollView> */
-}

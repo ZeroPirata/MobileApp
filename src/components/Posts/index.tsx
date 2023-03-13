@@ -24,6 +24,10 @@ import {
   TextButtons,
   ButtonLike,
   LikeCounts,
+  DataView,
+  DateTime,
+  TextButtonsViewDireita,
+  TextButtonsViewEsquerda,
 } from "./style";
 
 const PostView = ({ id, ...rest }: IPost) => {
@@ -94,10 +98,19 @@ const PostView = ({ id, ...rest }: IPost) => {
     onValue(postLikesRef, handleSnapshot);
   }, [id, user]);
 
+  const date = new Date(rest.data * 1000);
+  const localeDate = date.toLocaleDateString();
+  const localeHours = date.toLocaleTimeString();
+
   return (
     <Container>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} />}>
         <TitlePoster>{rest.title}</TitlePoster>
+        <DataView>
+          <DateTime>
+            {localeDate} - {localeHours}{" "}
+          </DateTime>
+        </DataView>
         {user?.email == rest.user ? (
           <CointaienrButton>
             <EditPostButton
@@ -108,7 +121,7 @@ const PostView = ({ id, ...rest }: IPost) => {
               <FontAwesome name="edit" size={25} color="white" />
               {editFocus && (
                 <>
-                  <TextButtonsView />
+                  <TextButtonsViewDireita />
                   <TextButtons>Editar</TextButtons>
                 </>
               )}
@@ -118,13 +131,13 @@ const PostView = ({ id, ...rest }: IPost) => {
               onPressIn={() => setIsDeleteFocused(true)}
               onPressOut={() => setIsDeleteFocused(false)}
             >
-              <FontAwesome name="trash-o" size={25} color="red" />
               {deleteFocus && (
                 <>
-                  <TextButtonsView />
                   <TextButtons>Deletar</TextButtons>
+                  <TextButtonsViewEsquerda />
                 </>
               )}
+              <FontAwesome name="trash-o" size={25} color="red" />
             </DeletePostButton>
           </CointaienrButton>
         ) : null}

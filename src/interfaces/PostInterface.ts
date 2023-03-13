@@ -12,5 +12,6 @@ export interface IPost {
   user: string;
   title: string;
   description?: string;
+  data: number;
   files?: string[];
 }

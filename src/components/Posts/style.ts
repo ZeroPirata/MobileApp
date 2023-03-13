@@ -39,6 +39,17 @@ export const TextButtonSeeMore = styled.Text`
 
 export const ButtonSeeMore = styled(TouchableOpacity)``;
 
+/* Data Section */
+
+export const DataView = styled.View`
+  display: flex;
+  flex-direction: row;
+`;
+export const DateTime = styled.Text`
+  color: ${({ theme }) => theme.COLORS.ROYAL_BLUE.COLOR_4};
+  font-size: ${RFValue(10)}px;
+`;
+
 /* Image Section */
 
 export const ImageSettings = styled.View`
@@ -60,8 +71,10 @@ export const ImageConfig = styled.Image`
 /* Buttons Section Edit / Delete */
 
 export const CointaienrButton = styled.View`
-  justify-content: space-around;
-  margin: 10px 0;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  margin: 5px 0;
 `;
 
 export const TextButtons = styled.Text`
@@ -71,13 +84,16 @@ export const TextButtons = styled.Text`
 export const DeletePostButton = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   align-items: center;
+  width: 100px;
 `;
 
 export const EditPostButton = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100px;
 `;
 
 export const TextButtonsView = styled.View`
@@ -94,6 +110,34 @@ export const TextButtonsView = styled.View`
   border-bottom-color: transparent;
   border-left-color: transparent;
 `;
+export const TextButtonsViewDireita = styled.View`
+  width: 0;
+  height: 0;
+  background-color: "transparent";
+  border-style: solid;
+  border-top-width: 10px;
+  border-right-width: 10px;
+  border-bottom-width: 10px;
+  border-left-width: 0px;
+  border-top-color: transparent;
+  border-right-color: ${({ theme }) => theme.COLORS.GRAY2};
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+`;
+export const TextButtonsViewEsquerda = styled.View`
+  width: 0;
+  height: 0;
+  background-color: "transparent";
+  border-style: solid;
+  border-top-width: 10px;
+  border-right-width: 0px;
+  border-bottom-width: 10px;
+  border-left-width: 10px;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: ${({ theme }) => theme.COLORS.GRAY2};
+`;
 
 /* Likes Section */
 
@@ -107,7 +151,7 @@ export const LikeAndDeslikeButton = styled.View`
 `;
 
 export const LikeCounts = styled.Text`
-font-size: ${RFValue(15)}px;
+  font-size: ${RFValue(15)}px;
 `;
 export const ButtonLike = styled(TouchableOpacity)``;
 /* 
