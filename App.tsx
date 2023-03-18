@@ -18,7 +18,11 @@ export default function App() {
   }
   return (
     <ThemeProvider theme={themes}>
-      <StatusBar style="dark" translucent backgroundColor="transparent" />
+      <StatusBar
+        style="light"
+        translucent
+        backgroundColor={themes.COLORS.TEXT_and_BACKGROUND.GRAY3}
+      />
       <View
         style={{
           backgroundColor: themes.COLORS.TEXT_and_BACKGROUND.GRAY5,

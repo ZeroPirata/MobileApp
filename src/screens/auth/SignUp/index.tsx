@@ -134,13 +134,15 @@ const SignUp: React.FC = () => {
             <TextError>{passwordMessageErro}</TextError>
           ) : null}
           <Btn
-            IconColor={themes.COLORS.WHITE_100}
             title="Sign Up"
-            style={{
-              marginTop: 15,
-            }}
             variant="SmallButtonGoldBorded"
-            fontColor={themes.COLORS.WHITE_100}
+            fontColor={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
+            style={{
+              margin: 10,
+              borderWidth: 3,
+              borderColor: themes.COLORS.HEXTECH_METAL_GOLD.GOLD4,
+              backgroundColor: themes.COLORS.TEXT_and_BACKGROUND.GRAY4,
+            }}
             onPress={handleRegister}
           />
         </ContainerBody>
