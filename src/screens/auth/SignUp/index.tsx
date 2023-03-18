@@ -49,11 +49,6 @@ const SignUp: React.FC = () => {
     }
     try {
       await createUserWithEmailAndPassword(auth, value.email, value.password);
-      await addDoc(collection(db, "users"), {
-        id: uuidv4(),
-        name: value.name,
-        email: value.email,
-      });
     } catch (error: any) {
       error = erroLogs(error.code);
       setErrorMessage(error);

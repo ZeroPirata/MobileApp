@@ -131,6 +131,7 @@ const SeePost = () => {
         };
         comentariosArray.push(comentario);
       }
+      comentariosArray.sort((a, b) => b.data - a.data);
       setComentsCount(comentariosArray.length);
       setComments(comentariosArray);
     });

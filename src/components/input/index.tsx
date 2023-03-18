@@ -42,9 +42,12 @@ const Input = ({
         />
       )}
       <InputContainer
+        value={rest.value}
+        onChangeText={rest.onChangeText}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         underlineColorAndroid="transparent"
+        placeholder={rest.placeholder}
         placeholderTextColor={COLORS.GRAY3}
         secureTextEntry={secury}
       />

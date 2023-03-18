@@ -46,6 +46,7 @@ const CreatePost = () => {
     description: "",
   });
 
+
   const ComponentFilesType = new TypeOfFiles();
 
   const [loadingUpload, setLoadingUpload] = useState(false);
