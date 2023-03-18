@@ -1,8 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Button, FlatList, SafeAreaView, ScrollView, Text } from "react-native";
-import { reciveUserAttributes } from "../../../utils/querys";
-import { useCallback, useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
 import { database, db } from "../../../configs/firebase";
 import { doc, deleteDoc } from "firebase/firestore";
 
@@ -23,21 +21,26 @@ import {
   ImageUserComment,
   ButtonSendComment,
   TextButtonSend,
+  SessaoDeComentario,
+  Comentarios,
+  Textos,
+  TextSection,
+  ImageUsersComment,
+  UsuarioComentarioEmail,
+  TempoDoComentario,
+  ImageFlatListConfig,
+  ListagemDeComentarioNaPostagem,
+  FooterPostagem,
+  LikeButtonPost,
+  LikeButtonPostView,
+  LikeCounts,
+  QuantidadeDeComentario,
 } from "./style";
-import { TabRoutes } from "../../../routes/tabs.routes";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HeaderProfile } from "../../../components/HeaderProfile";
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { FontAwesome } from "@expo/vector-icons";
-import {
-  child,
-  increment,
-  onChildAdded,
-  push,
-  ref,
-  runTransaction,
-  update,
-} from "firebase/database";
+import { EvilIcons, FontAwesome } from "@expo/vector-icons";
+import { child, onValue, push, ref, runTransaction } from "firebase/database";
+import Comentario from "../../../interfaces/ComentarioInterface";
 
 const SeePost = () => {
   const { user } = useAuthentication();
@@ -61,8 +64,8 @@ const SeePost = () => {
       database,
       `posts/${route.params.id}/coments`
     );
-    /* const userComentRef = child(, user.uid); */
     const updates = {
+      userProfile: user.photoURL,
       email: user.email,
       comentario: values.comentario,
       data: Math.floor(Date.now() / 1000),
@@ -78,67 +81,180 @@ const SeePost = () => {
       });
   };
 
+  const [likesCount, setLikesCount] = useState(0);
+  const [comentsCount, setComentsCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [comment, setComments] = useState<Comentario[]>([]);
+
+  const handleLike = () => {
+    if (!user) {
+      return;
+    }
+    const postLikesRef = ref(database, `posts/${route.params.id}/likes`);
+    const userLikeRef = child(postLikesRef, user.uid);
+    const handleTransaction = (currentData: any) => {
+      if (currentData === null) {
+        return { userId: user.uid };
+      } else {
+        return null;
+      }
+    };
+    runTransaction(userLikeRef, handleTransaction)
+      .then()
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    const postLikesRef = ref(database, `posts/${route.params.id}/likes`);
+    const handleSnapshot = (snapshot: any) => {
+      const likes = snapshot.val();
+      const likesCount = likes ? Object.keys(likes).length : 0;
+      setLikesCount(likesCount);
+      setLiked(likes && likes[String(user?.uid)]);
+    };
+    onValue(postLikesRef, handleSnapshot);
+
+    const comentariosRef = ref(database, `posts/${route.params.id}/coments/`);
+    onValue(comentariosRef, (snapshot) => {
+      const comentariosFirebase = snapshot.val();
+      const comentariosArray = [];
+
+      for (const key in comentariosFirebase) {
+        const comentario: Comentario = {
+          id: key,
+          userProfile: comentariosFirebase[key].userProfile,
+          comentario: comentariosFirebase[key].comentario,
+          data: comentariosFirebase[key].data,
+          email: comentariosFirebase[key].email,
+        };
+        comentariosArray.push(comentario);
+      }
+      setComentsCount(comentariosArray.length);
+      setComments(comentariosArray);
+    });
+  }, [route.params.id, user]);
+
+  const date = new Date(route.params.data * 1000);
+  const localeDate = date.toLocaleDateString();
+  const localeHours = date.toLocaleTimeString();
+
   return (
     <Container>
-      <SafeAreaView>
-        <HeaderProfile />
-        <PostPub>
-          {user?.email == route.params.user ? (
-            <ViewButtons>
-              <EditPostButton
-                onPressIn={() => setIsEditFocused(true)}
-                onPressOut={() => setIsEditFocused(false)}
-                /* onPress={() => EditPost(id, body)} */
-              >
-                {editFocus && (
-                  <>
-                    <TextButtons>Editar</TextButtons>
-                  </>
-                )}
-                <FontAwesome name="edit" size={25} color="white" />
-              </EditPostButton>
-              <DeletePostButton
-                onPressIn={() => setIsDeleteFocused(true)}
-                onPressOut={() => setIsDeleteFocused(false)}
-                /* onPress={() => deletePost(id)} */
-              >
-                {deleteFocus && (
-                  <>
-                    <TextButtons>Deletar</TextButtons>
-                  </>
-                )}
-                <FontAwesome name="trash-o" size={25} color="red" />
-              </DeletePostButton>
-            </ViewButtons>
-          ) : null}
-          <TitlePoster>{route.params.title}</TitlePoster>
-          {route.params.description && (
-            <Description>{route.params.description}</Description>
-          )}
+      <HeaderProfile />
+      <PostPub>
+        <TitlePoster>{route.params.title}</TitlePoster>
+        {route.params.description && (
+          <Description>{route.params.description}</Description>
+        )}
+        {route.params.files && (
+          <ImageFlatListConfig>
+            <FlatList
+              data={route.params.files}
+              renderItem={({ item, index }) => {
+                return (
+                  <ImageSettings key={index}>
+                    <ImageConfig source={{ uri: item }} />
+                  </ImageSettings>
+                );
+              }}
+            />
+          </ImageFlatListConfig>
+        )}
+        <LikeButtonPostView>
+          <LikeButtonPost onPress={handleLike}>
+            {liked ? (
+              <EvilIcons color="gold" name="like" size={30} />
+            ) : (
+              <EvilIcons name="like" size={30} />
+            )}
+            <LikeCounts>{likesCount}</LikeCounts>
+          </LikeButtonPost>
+          <QuantidadeDeComentario>
+            <LikeCounts>{comentsCount}</LikeCounts>
+            <EvilIcons name="comment" size={30} />
+          </QuantidadeDeComentario>
+        </LikeButtonPostView>
+        <FooterPostagem>
+          <UserDomain>By: {route.params.user}</UserDomain>
+          <TempoDoComentario>
+            {localeDate} - {localeHours}
+          </TempoDoComentario>
+        </FooterPostagem>
+      </PostPub>
+      <ListagemDeComentarioNaPostagem>
+        <SessaoDeComentario>
           <FlatList
-            data={route.params.files}
-            renderItem={({ item, index }) => {
+            data={comment}
+            renderItem={({ item }) => {
+              const date = new Date(item.data * 1000);
+              const localeDate = date.toLocaleDateString();
+              const localeHours = date.toLocaleTimeString();
               return (
-                <ImageSettings key={index}>
-                  <ImageConfig source={{ uri: item }} />
-                </ImageSettings>
+                <Comentarios>
+                  <ImageUsersComment
+                    source={{ uri: String(item.userProfile) }}
+                  />
+                  <TextSection>
+                    <UsuarioComentarioEmail>
+                      {item.email}
+                    </UsuarioComentarioEmail>
+                    <TempoDoComentario>
+                      {localeDate} - {localeHours}
+                    </TempoDoComentario>
+                    <Textos>{item.comentario}</Textos>
+                  </TextSection>
+                </Comentarios>
               );
             }}
+            keyExtractor={(item) => item.id}
           />
-          <UserDomain>By: {route.params.user}</UserDomain>
-        </PostPub>
-        <CommentSection>
-          <ImageUserComment source={{ uri: String(user?.photoURL) }} />
-          <CreateComentario
-            value={values.comentario}
-            onChangeText={(text) => setValues({ ...values, comentario: text })}
-          />
-          <ButtonSendComment onPress={NewComentario}>
-            <TextButtonSend>Enviar</TextButtonSend>
-          </ButtonSendComment>
-        </CommentSection>
-      </SafeAreaView>
+        </SessaoDeComentario>
+      </ListagemDeComentarioNaPostagem>
+      <CommentSection>
+        <ImageUserComment source={{ uri: String(user?.photoURL) }} />
+        <CreateComentario
+          value={values.comentario}
+          placeholder="Text here"
+          onChangeText={(text) => setValues({ ...values, comentario: text })}
+        />
+        <ButtonSendComment onPress={NewComentario}>
+          <TextButtonSend>Enviar</TextButtonSend>
+        </ButtonSendComment>
+      </CommentSection>
     </Container>
   );
 };
 export { SeePost };
+/* 
+{user?.email == route.params.user ? (
+          <ViewButtons>
+            <EditPostButton
+              onPressIn={() => setIsEditFocused(true)}
+              onPressOut={() => setIsEditFocused(false)}
+              onPress={() => EditPost(id, body)}
+              >
+              {editFocus && (
+                <>
+                  <TextButtons>Editar</TextButtons>
+                </>
+              )}
+              <FontAwesome name="edit" size={25} color="white" />
+            </EditPostButton>
+            <DeletePostButton
+              onPressIn={() => setIsDeleteFocused(true)}
+              onPressOut={() => setIsDeleteFocused(false)}
+              onPress={() => deletePost(id)}
+            >
+              {deleteFocus && (
+                <>
+                  <TextButtons>Deletar</TextButtons>
+                </>
+              )}
+              <FontAwesome name="trash-o" size={25} color="red" />
+            </DeletePostButton>
+          </ViewButtons>
+        ) : null}
+
+*/
