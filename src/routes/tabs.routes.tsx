@@ -1,4 +1,3 @@
-import { RFValue } from "react-native-responsive-fontsize";
 import { Text, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HomeTab } from "../screens/tab/Home";
@@ -161,7 +160,7 @@ const style = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    borderTopWidth: 1,
+    borderTopWidth: 1.5,
     borderColor: themes.COLORS.HEXTECH_METAL_GOLD.GOLD3,
     height: "100%",
   },

@@ -11,6 +11,7 @@ import {
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { MaterialIcons } from "@expo/vector-icons";
 import themes from "../../styles/themes";
+import { uri } from "../../styles/image.json";
 import { useNavigation } from "@react-navigation/native";
 const HeaderProfile = () => {
   const { user } = useAuthentication();
@@ -23,7 +24,7 @@ const HeaderProfile = () => {
       <ContainerPicture>
         <Photo
           source={{
-            uri: String(user?.photoURL)
+            uri: String(user?.photoURL ? user?.photoURL : uri),
           }}
         />
       </ContainerPicture>

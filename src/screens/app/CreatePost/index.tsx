@@ -36,7 +36,6 @@ import {
 import { set } from "firebase/database";
 import { TypeOfFiles } from "../../../components/TypeFile";
 
-let data = Math.floor(Date.now() / 1000);
 const CreatePost = () => {
   const { user } = useAuthentication();
   const navigation = useNavigation();
@@ -124,7 +123,7 @@ const CreatePost = () => {
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
 
       await set(refDatabase, {
-        data: data,
+        data: Math.floor(Date.now() / 1000),
         user: user?.email,
         title: value.title,
         description: value.description,
@@ -146,7 +145,7 @@ const CreatePost = () => {
       }
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
       await set(refDatabase, {
-        data: data,
+        data: Math.floor(Date.now() / 1000),
         user: user?.email,
         title: value.title,
         description: value.description,

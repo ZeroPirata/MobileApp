@@ -1,8 +1,15 @@
 import { useNavigation } from "@react-navigation/native";
 import { deleteDoc, doc } from "firebase/firestore";
 import { ref, child, onValue, runTransaction, remove } from "firebase/database";
-import { useEffect, useState } from "react";
-import { Button, RefreshControl, ScrollView } from "react-native";
+import { SetStateAction, useEffect, useState } from "react";
+import {
+  Button,
+  RefreshControl,
+  ScrollView,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { db, database } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { FontAwesome, EvilIcons } from "@expo/vector-icons";
@@ -29,13 +36,18 @@ import {
   TextButtonsViewDireita,
   TextButtonsViewEsquerda,
 } from "./style";
+import themes from "../../styles/themes";
+import { TextSeeMore } from "../../screens/tab/Home/style";
+
+import { Modals } from "../Modals";
+import { ModalsProps, Option } from "../../interfaces/ModalInterface";
 
 const PostView = ({ id, ...rest }: IPost) => {
   const { user } = useAuthentication();
 
   const [deleteFocus, setIsDeleteFocused] = useState(false);
   const [editFocus, setIsEditFocused] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+
   const [liked, setLiked] = useState(false);
 
   const [likesCount, setLikesCount] = useState(0);
@@ -51,11 +63,6 @@ const PostView = ({ id, ...rest }: IPost) => {
   ) {
     navigation.navigate("EditPost", { id: id, ...rest });
   }
-
-  const deletePost = async (id: string) => {
-    await remove(ref(database, `posts/${id}`));
-    await deleteDoc(doc(db, "post", id));
-  };
 
   function SeePost(
     id: string,
@@ -102,17 +109,68 @@ const PostView = ({ id, ...rest }: IPost) => {
   const localeDate = date.toLocaleDateString();
   const localeHours = date.toLocaleTimeString();
 
+  const options: Option[] = [
+    {
+      name: "Editar Postagem",
+      function: () => EditPost(id, rest.user, rest.title),
+    },
+    { name: "Excluir Postagem", function: () => handleDeletePost(id) },
+  ];
+
+  const handleDeletePost = (id: string) => {
+    deletePost(id);
+  };
+
+  const deletePost = async (id: string) => {
+    await remove(ref(database, `posts/${id}`));
+  };
+
   return (
     <Container>
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} />}>
+      <ScrollView>
         <TitlePoster>{rest.title}</TitlePoster>
         <DataView>
           <DateTime>
             {localeDate} - {localeHours}{" "}
           </DateTime>
+          {user?.email == rest.user ? <Modals options={options} /> : null}
         </DataView>
-        {user?.email == rest.user ? (
-          <CointaienrButton>
+        {rest.description && <Description>{rest.description}</Description>}
+        {rest.files && (
+          <ImageSettings>
+            {rest.files[0] ? (
+              <ImageConfig source={{ uri: rest.files[0] }} />
+            ) : null}
+            {rest.files[1] ? (
+              <ImageConfig source={{ uri: rest.files[1] }} />
+            ) : null}
+          </ImageSettings>
+        )}
+        <ButtonSeeMore onPress={() => SeePost(id, rest.title, rest.user)}>
+          <TextButtonSeeMore>See more</TextButtonSeeMore>
+        </ButtonSeeMore>
+        <UserDomain>By: {rest.user}</UserDomain>
+        <LikeAndDeslikeButton>
+          <ButtonLike onPress={handleLike}>
+            {liked ? (
+              <EvilIcons color="gold" name="like" size={25} />
+            ) : (
+              <EvilIcons
+                color={themes.COLORS.COLORS_CONSTRAT.ROSA_CLARO}
+                name="like"
+                size={25}
+              />
+            )}
+          </ButtonLike>
+          <LikeCounts>{likesCount}</LikeCounts>
+        </LikeAndDeslikeButton>
+      </ScrollView>
+    </Container>
+  );
+};
+export { PostView };
+/* 
+<CointaienrButton>
             <EditPostButton
               onPressIn={() => setIsEditFocused(true)}
               onPressOut={() => setIsEditFocused(false)}
@@ -140,34 +198,4 @@ const PostView = ({ id, ...rest }: IPost) => {
               <FontAwesome name="trash-o" size={25} color="red" />
             </DeletePostButton>
           </CointaienrButton>
-        ) : null}
-        {rest.description && <Description>{rest.description}</Description>}
-        {rest.files && (
-          <ImageSettings>
-            {rest.files[0] ? (
-              <ImageConfig source={{ uri: rest.files[0] }} />
-            ) : null}
-            {rest.files[1] ? (
-              <ImageConfig source={{ uri: rest.files[1] }} />
-            ) : null}
-          </ImageSettings>
-        )}
-        <ButtonSeeMore onPress={() => SeePost(id, rest.title, rest.user)}>
-          <TextButtonSeeMore>See more</TextButtonSeeMore>
-        </ButtonSeeMore>
-        <UserDomain>By: {rest.user}</UserDomain>
-        <LikeAndDeslikeButton>
-          <ButtonLike onPress={handleLike}>
-            {liked ? (
-              <EvilIcons color="gold" name="like" size={25} />
-            ) : (
-              <EvilIcons name="like" size={25} />
-            )}
-          </ButtonLike>
-          <LikeCounts>{likesCount}</LikeCounts>
-        </LikeAndDeslikeButton>
-      </ScrollView>
-    </Container>
-  );
-};
-export { PostView };
+           */

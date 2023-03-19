@@ -139,6 +139,18 @@ export default {
       GRAY5: "#010A13",
     },
 
+    COLORS_CONSTRAT: { 
+      AZUL_MARINHO: "#0A2A5A",
+      VERDE_AZULADO: "#008080",
+      CINZA_CLARO: "#D3D3D3",
+      ROXO_CLARO: "#663399",
+      ROSA_CLARO: "#FFC0CB",
+      LARANJA:"#FFA500",
+      MARRON: "#964B00",
+      AMARELO_PALIDO: "#FFFF99",
+      VERDE_AZUL_CLARO: "#00CED1"
+    },
+
     GOOGLE: {
       GREEN: "#34a853",
       RED: "#ea4335",

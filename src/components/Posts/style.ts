@@ -4,9 +4,9 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   background-color: ${({ theme }) => theme.COLORS.TEXT_and_BACKGROUND.GRAY4};
-  margin: 15px 0;
-  border-width: 1px;
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
+  margin: 10px 0;
+  border-width: 1px;
   align-self: center;
   width: 80%;
   padding: 10px;
@@ -15,38 +15,43 @@ export const Container = styled.View`
 export const TitlePoster = styled.Text`
   font-family: ${({ theme }) => theme.FONTS.DMSans_700Bold};
   color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
+  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
   font-size: ${RFValue(25)}px;
   border-bottom-width: 1px;
-  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
 
 export const UserDomain = styled.Text`
-  margin-top: 3px;
+  padding: 3px 0;
   border-top-width: 1px;
+  font-size: ${RFValue(10)}px;
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.CINZA_CLARO};
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
 
 export const Description = styled.Text`
-  margin-top: 5px;
+  font-size: ${RFValue(15)}px;
+  color: ${({ theme }) => theme.COLORS.WHITE_100}
 `;
 
 export const TextButtonSeeMore = styled.Text`
-  margin: 5px 0;
-  font-size: ${RFValue(10)}px;
+  font-size: ${RFValue(15)}px;
   font-family: ${({ theme }) => theme.FONTS.DMSans_400Regular};
   color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE1};
 `;
 
-export const ButtonSeeMore = styled(TouchableOpacity)``;
+export const ButtonSeeMore = styled(TouchableOpacity)`
+`;
 
 /* Data Section */
 
 export const DataView = styled.View`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-direction: row;
 `;
 export const DateTime = styled.Text`
-  color: ${({ theme }) => theme.COLORS.ROYAL_BLUE.COLOR_4};
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.VERDE_AZULADO};
   font-size: ${RFValue(10)}px;
 `;
 
@@ -64,7 +69,7 @@ export const ImageSettings = styled.View`
 export const ImageConfig = styled.Image`
   width: 50%;
   height: 100%;
-  margin: 5px;
+  margin: 0 5px;
   object-fit: contain;
 `;
 
@@ -74,10 +79,10 @@ export const CointaienrButton = styled.View`
   justify-content: space-between;
   display: flex;
   flex-direction: row;
-  margin: 5px 0;
 `;
 
 export const TextButtons = styled.Text`
+  color: ${({ theme }) => theme.COLORS.WHITE};
   background-color: ${({ theme }) => theme.COLORS.GRAY2};
 `;
 
@@ -142,7 +147,6 @@ export const TextButtonsViewEsquerda = styled.View`
 /* Likes Section */
 
 export const LikeAndDeslikeButton = styled.View`
-  margin-top: 3px;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -151,6 +155,7 @@ export const LikeAndDeslikeButton = styled.View`
 `;
 
 export const LikeCounts = styled.Text`
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.ROSA_CLARO};
   font-size: ${RFValue(15)}px;
 `;
 export const ButtonLike = styled(TouchableOpacity)``;

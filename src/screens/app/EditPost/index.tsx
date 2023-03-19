@@ -2,6 +2,7 @@ import { useRoute } from "@react-navigation/native";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { Button, ScrollView, TextInput } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { db } from "../../../configs/firebase";
 import {
   Container,
@@ -27,7 +28,8 @@ const EditPost = () => {
       description: value.description,
     });
   };
-  console.log(value.title);
+
+  const navigation = useNavigation();
 
   return (
     <Container>
@@ -50,7 +52,10 @@ const EditPost = () => {
           {route.params.files ? (
             <TextEditPost>{route.params.files}</TextEditPost>
           ) : null}
-          <Button title="Enviar" onPress={UpdateInfoPost} />
+          <Button
+            title="Enviar"
+            onPress={() => navigation.navigate("TabsRoutes")}
+          />
         </ControlerPost>
       </ScrollView>
     </Container>
