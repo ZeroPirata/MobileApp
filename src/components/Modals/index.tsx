@@ -1,3 +1,4 @@
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import { ModalsProps } from "../../interfaces/ModalInterface";
 import {
@@ -15,7 +16,7 @@ import {
   ViewModalInsideSettings,
 } from "./style";
 
-const Modals = ({ options }: ModalsProps) => {
+const Modals = ({ options, icon_size }: ModalsProps) => {
   const [modalView, setModalView] = useState(false);
   const modalRef = useRef(null);
 
@@ -52,7 +53,7 @@ const Modals = ({ options }: ModalsProps) => {
                   </TouchModalOptions>
                 );
               })}
-              <TouchModalClose>
+              <TouchModalClose onPress={handleModalClose}>
                 <TextModalClose>Fechar</TextModalClose>
               </TouchModalClose>
             </ViewModalInsideSettings>
@@ -60,7 +61,7 @@ const Modals = ({ options }: ModalsProps) => {
         </ModalSettings>
       </TouchModal>
       <TouchModalOpen onPress={handleModalOpen}>
-        <TextModalIcon style={{ color: "white" }}>...</TextModalIcon>
+        <Feather name="settings" size={icon_size} color="white" />
       </TouchModalOpen>
     </ViewModal>
   );

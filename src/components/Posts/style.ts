@@ -30,7 +30,7 @@ export const UserDomain = styled.Text`
 
 export const Description = styled.Text`
   font-size: ${RFValue(15)}px;
-  color: ${({ theme }) => theme.COLORS.WHITE_100}
+  color: ${({ theme }) => theme.COLORS.WHITE_100};
 `;
 
 export const TextButtonSeeMore = styled.Text`
@@ -39,8 +39,7 @@ export const TextButtonSeeMore = styled.Text`
   color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE1};
 `;
 
-export const ButtonSeeMore = styled(TouchableOpacity)`
-`;
+export const ButtonSeeMore = styled(TouchableOpacity)``;
 
 /* Data Section */
 

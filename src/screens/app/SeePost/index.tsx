@@ -35,12 +35,24 @@ import {
   LikeButtonPostView,
   LikeCounts,
   QuantidadeDeComentario,
+  ViewTitleEdit,
+  TouchDeleteComment,
 } from "./style";
 import { HeaderProfile } from "../../../components/HeaderProfile";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { EvilIcons, FontAwesome } from "@expo/vector-icons";
-import { child, onValue, push, ref, runTransaction } from "firebase/database";
+import {
+  child,
+  onValue,
+  push,
+  ref,
+  remove,
+  runTransaction,
+} from "firebase/database";
 import Comentario from "../../../interfaces/ComentarioInterface";
+import { Modals } from "../../../components/Modals";
+import { Option } from "../../../interfaces/ModalInterface";
+import themes from "../../../styles/themes";
 
 const SeePost = () => {
   const { user } = useAuthentication();
@@ -141,11 +153,30 @@ const SeePost = () => {
   const localeDate = date.toLocaleDateString();
   const localeHours = date.toLocaleTimeString();
 
+  const options: Option[] = [
+    {
+      name: "Editar Postagem",
+      function: () => console.log("Pão"),
+    },
+    { name: "Excluir Postagem", function: () => console.log("Pão") },
+  ];
+
+  const deleteComment = async (idComment: string) => {
+    await remove(
+      ref(database, `posts/${route.params.id}/coments/${idComment}`)
+    );
+  };
+
   return (
     <Container>
       <HeaderProfile />
       <PostPub>
-        <TitlePoster>{route.params.title}</TitlePoster>
+        <ViewTitleEdit>
+          <TitlePoster>{route.params.title}</TitlePoster>
+          {user?.email == route.params.user ? (
+            <Modals options={options} icon_size={20} />
+          ) : null}
+        </ViewTitleEdit>
         {route.params.description && (
           <Description>{route.params.description}</Description>
         )}
@@ -166,15 +197,15 @@ const SeePost = () => {
         <LikeButtonPostView>
           <LikeButtonPost onPress={handleLike}>
             {liked ? (
-              <EvilIcons color="gold" name="like" size={30} />
+              <EvilIcons color={"gold"} name="like" size={30} />
             ) : (
-              <EvilIcons name="like" size={30} />
+              <EvilIcons color={"white"} name="like" size={30} />
             )}
             <LikeCounts>{likesCount}</LikeCounts>
           </LikeButtonPost>
           <QuantidadeDeComentario>
             <LikeCounts>{comentsCount}</LikeCounts>
-            <EvilIcons name="comment" size={30} />
+            <EvilIcons color={"white"} name="comment" size={30} />
           </QuantidadeDeComentario>
         </LikeButtonPostView>
         <FooterPostagem>
@@ -205,6 +236,21 @@ const SeePost = () => {
                       {localeDate} - {localeHours}
                     </TempoDoComentario>
                     <Textos>{item.comentario}</Textos>
+                    {item.email == user?.email ? (
+                      <TouchDeleteComment
+                        onPress={() => deleteComment(item.id)}
+                      >
+                        <EvilIcons name="trash" size={24} color="white" />
+                      </TouchDeleteComment>
+                    ) : null || route.params.user == user?.email ? (
+                      <TouchDeleteComment
+                        onPress={() => deleteComment(item.id)}
+                      >
+                        <EvilIcons name="trash" size={24} color="white" />
+                      </TouchDeleteComment>
+                    ) : (
+                      null
+                    )}
                   </TextSection>
                 </Comentarios>
               );
@@ -216,6 +262,7 @@ const SeePost = () => {
       <CommentSection>
         <ImageUserComment source={{ uri: String(user?.photoURL) }} />
         <CreateComentario
+          placeholderTextColor={themes.COLORS.COLORS_CONSTRAT.CINZA_CLARO}
           value={values.comentario}
           placeholder="Text here"
           onChangeText={(text) => setValues({ ...values, comentario: text })}

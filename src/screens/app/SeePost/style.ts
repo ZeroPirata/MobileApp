@@ -29,10 +29,20 @@ export const TitlePoster = styled.Text`
   color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
+
+export const ViewTitleEdit = styled.View`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+`;
+
 export const UserDomain = styled.Text`
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.CINZA_CLARO};
   font-size: ${RFValue(10)}px;
 `;
 export const Description = styled.Text`
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.CINZA_CLARO};
   font-size: ${RFValue(15)}px;
   padding: 10px;
   border-top-width: 1px;
@@ -59,6 +69,7 @@ export const QuantidadeDeComentario = styled.View`
   align-items: center;
 `;
 export const LikeCounts = styled.Text`
+  color: ${({ theme }) => theme.COLORS.WHITE};
   font-size: ${RFValue(25)}px;
 `;
 
@@ -120,6 +131,7 @@ export const CreateComentario = styled.TextInput`
   width: 60%;
   padding: 10px;
   border-width: 1px;
+  color: ${({ theme }) => theme.COLORS.WHITE};
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
 export const ImageUserComment = styled.Image`
@@ -170,14 +182,18 @@ export const TextSection = styled.View`
 export const UsuarioComentarioEmail = styled.Text`
   margin-top: 3px;
   border-bottom-width: 1px;
+  color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE1};
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
 export const TempoDoComentario = styled.Text`
-  color: ${({ theme }) => theme.COLORS.ROYAL_BLUE.COLOR_4};
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.VERDE_AZULADO};
   font-size: ${RFValue(10)}px;
 `;
 export const Textos = styled.Text`
-  font-size: ${RFValue(18)}px;
+  color: ${({ theme }) => theme.COLORS.WHITE};
+  border-bottom-width: 1px;
+  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
+  font-size: ${RFValue(15)}px;
 `;
 export const ImageUsersComment = styled.Image`
   border-radius: 50px;
@@ -185,6 +201,8 @@ export const ImageUsersComment = styled.Image`
   height: 35px;
   align-self: center;
   margin: 10px;
+`;
+export const TouchDeleteComment = styled(TouchableOpacity)`
 `;
 
 /* 

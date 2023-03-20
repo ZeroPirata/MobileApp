@@ -5,4 +5,5 @@ export interface Option {
 
 export interface ModalsProps {
   options: Option[];
+  icon_size: number ;
 }

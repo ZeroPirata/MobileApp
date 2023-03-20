@@ -133,7 +133,9 @@ const PostView = ({ id, ...rest }: IPost) => {
           <DateTime>
             {localeDate} - {localeHours}{" "}
           </DateTime>
-          {user?.email == rest.user ? <Modals options={options} /> : null}
+          {user?.email == rest.user ? (
+            <Modals options={options} icon_size={15} />
+          ) : null}
         </DataView>
         {rest.description && <Description>{rest.description}</Description>}
         {rest.files && (
