@@ -27,10 +27,10 @@ const queryByEmail = async (email: string | null) => {
   }
 };
 
-const reciveUserAttributes = async (email: string | null) => {
+const reciveUserAttributes = async (uid: string | null) => {
   let dados: any = {};
   const collect = collection(db, "users");
-  const quertEmail = query(collect, where("email", "==", email));
+  const quertEmail = query(collect, where("id", "==", uid));
   const querySnapshot = await getDocs(quertEmail);
   querySnapshot.forEach((doc) => {
     dados = doc.data();

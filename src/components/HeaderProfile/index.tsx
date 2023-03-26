@@ -8,17 +8,34 @@ import {
   TextInputSearch,
   ButtonCreatePost,
 } from "./style";
+import { View } from "react-native";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { MaterialIcons } from "@expo/vector-icons";
 import themes from "../../styles/themes";
 import { uri } from "../../styles/image.json";
 import { useNavigation } from "@react-navigation/native";
+import { ModalsProps, Option } from "../../interfaces/ModalInterface";
+import { Modals } from "../Modals";
+
 const HeaderProfile = () => {
   const { user } = useAuthentication();
   const navigation = useNavigation();
   const postCreateButton = () => {
     navigation.navigate("CreatePost");
   };
+
+  const options: Option[] = [
+    {
+      name: "Criar Postagem",
+      function: () => postCreateButton(),
+    },
+    {
+      name: "Criar Grupo",
+      function: () => console.log("Loading"),
+    },
+  ];
+
+  console.log(user?.uid);
   return (
     <HeaderView>
       <ContainerPicture>
@@ -37,9 +54,12 @@ const HeaderProfile = () => {
           <MaterialIcons name="search" size={30} color="white" />
         </SearchBarIcon>
         <PlusIcon>
-          <ButtonCreatePost onPress={postCreateButton}>
-            <MaterialIcons name="add" size={45} color="white" />
-          </ButtonCreatePost>
+          <Modals
+            options={options}
+            key={"modal"}
+            iconSize={35}
+            iconNameFeater={"plus-square"}
+          />
         </PlusIcon>
       </ContainerIcone>
     </HeaderView>

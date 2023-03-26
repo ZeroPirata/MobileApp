@@ -16,9 +16,8 @@ import {
   ViewModalInsideSettings,
 } from "./style";
 
-const Modals = ({ options, icon_size }: ModalsProps) => {
+const Modals = ({ options, iconSize, iconNameFeater }: ModalsProps) => {
   const [modalView, setModalView] = useState(false);
-  const modalRef = useRef(null);
 
   const handleModalOpen = () => {
     setModalView(true);
@@ -61,7 +60,7 @@ const Modals = ({ options, icon_size }: ModalsProps) => {
         </ModalSettings>
       </TouchModal>
       <TouchModalOpen onPress={handleModalOpen}>
-        <Feather name="settings" size={icon_size} color="white" />
+        <Feather name={iconNameFeater} size={iconSize} color="white" />
       </TouchModalOpen>
     </ViewModal>
   );

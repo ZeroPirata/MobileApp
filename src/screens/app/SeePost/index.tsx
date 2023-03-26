@@ -174,7 +174,7 @@ const SeePost = () => {
         <ViewTitleEdit>
           <TitlePoster>{route.params.title}</TitlePoster>
           {user?.email == route.params.user ? (
-            <Modals options={options} icon_size={20} />
+            <Modals options={options} iconSize={20} />
           ) : null}
         </ViewTitleEdit>
         {route.params.description && (
@@ -248,9 +248,7 @@ const SeePost = () => {
                       >
                         <EvilIcons name="trash" size={24} color="white" />
                       </TouchDeleteComment>
-                    ) : (
-                      null
-                    )}
+                    ) : null}
                   </TextSection>
                 </Comentarios>
               );
@@ -275,34 +273,3 @@ const SeePost = () => {
   );
 };
 export { SeePost };
-/* 
-{user?.email == route.params.user ? (
-          <ViewButtons>
-            <EditPostButton
-              onPressIn={() => setIsEditFocused(true)}
-              onPressOut={() => setIsEditFocused(false)}
-              onPress={() => EditPost(id, body)}
-              >
-              {editFocus && (
-                <>
-                  <TextButtons>Editar</TextButtons>
-                </>
-              )}
-              <FontAwesome name="edit" size={25} color="white" />
-            </EditPostButton>
-            <DeletePostButton
-              onPressIn={() => setIsDeleteFocused(true)}
-              onPressOut={() => setIsDeleteFocused(false)}
-              onPress={() => deletePost(id)}
-            >
-              {deleteFocus && (
-                <>
-                  <TextButtons>Deletar</TextButtons>
-                </>
-              )}
-              <FontAwesome name="trash-o" size={25} color="red" />
-            </DeletePostButton>
-          </ViewButtons>
-        ) : null}
-
-*/

@@ -7,11 +7,11 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { uuidv4 } from "@firebase/util";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { IFiles } from "../../../interfaces/PostInterface";
-import { database, storage } from "../../../configs/firebase";
+import { database, db, storage } from "../../../configs/firebase";
 import themes from "../../../styles/themes";
 import {
   ImageLeyoutUpload,
@@ -35,16 +35,42 @@ import {
 } from "./style";
 import { set } from "firebase/database";
 import { TypeOfFiles } from "../../../components/TypeFile";
+import { Picker } from "@react-native-picker/picker";
+import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { GrupoInterface } from "../../../interfaces/GruposInterface";
+import { Usuario } from "../../../interfaces/UsuarioInterface";
+import { User } from "firebase/auth/react-native";
 
 const CreatePost = () => {
+  const [grupos, setGrupos] = useState<GrupoInterface[]>([]);
+  const [selectGrup, setSelectGrup] = useState();
+
+  const gruposUser = async (uid: string) => {
+    const createCollection = collection(db, "users");
+    const queryBuild = query(createCollection, where("id", "==", uid));
+    try {
+      const querySnapshot = await getDocs(queryBuild);
+      querySnapshot.docs.map((docs) => {
+        const user = docs.data();
+        const grupos = user.grupos.map((grups: any) => ({
+          ...grups,
+        }));
+        setGrupos(grupos);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const { Item } = Picker;
   const { user } = useAuthentication();
+
   const navigation = useNavigation();
 
   const [value, setValue] = useState({
     title: "",
     description: "",
   });
-
 
   const ComponentFilesType = new TypeOfFiles();
 
@@ -57,7 +83,7 @@ const CreatePost = () => {
   const handleHomeNavigation = () => {
     navigation.navigate("TabsRoutes");
   };
-  
+
   const pickFiles = async () => {
     setIsLoagind(true);
     let result: any = await DocumentPicker.getDocumentAsync();
@@ -95,8 +121,24 @@ const CreatePost = () => {
     );
   };
 
+  const uploadImage = async (images: IFiles[]) => {
+    const uploadPromise = images.map(async (image: any) => {
+      const id = uuidv4();
+      const response = await fetch(image.uri);
+      const blob = await response.blob();
+      const imageRef = ref(storage, `images/${user?.email}/${id}`);
+      const uploadStatus = uploadBytesResumable(imageRef, blob);
+      const snapshot = await uploadStatus;
+      return {
+        id,
+        url: await getDownloadURL(snapshot.ref),
+      };
+    });
+    return Promise.all(uploadPromise);
+  };
+
   const SendingPost = async () => {
-    if (image.length >= 1) {
+    if (image.length >= 1 && selectGrup == null) {
       if (value.title == "") {
         Alert.alert("Value null", "please, make a title...", [
           {
@@ -107,21 +149,8 @@ const CreatePost = () => {
         return;
       }
       setLoadingUpload(true);
-      const uploadPromise = image.map(async (images) => {
-        const id = uuidv4();
-        const response = await fetch(images.uri);
-        const blob = await response.blob();
-        const imageRef = ref(storage, `images/${user?.email}/${id}`);
-        const uploadStatus = uploadBytesResumable(imageRef, blob);
-        const snapshot = await uploadStatus;
-        return {
-          id,
-          url: await getDownloadURL(snapshot.ref),
-        };
-      });
-      const uploadedImages = await Promise.all(uploadPromise);
+      const uploadedImages = await uploadImage(image);
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
-
       await set(refDatabase, {
         data: Math.floor(Date.now() / 1000),
         user: user?.email,
@@ -130,6 +159,23 @@ const CreatePost = () => {
         files: uploadedImages.map((img) => img.url),
       });
       navigation.navigate("TabsRoutes");
+      setLoadingUpload(false);
+      return;
+    }
+    if (selectGrup != null) {
+      setLoadingUpload(true);
+      const uploadedImages = await uploadImage(image);
+      const refDatabase = DataBase.ref(
+        database,
+        `grupos/${selectGrup}/posts/${uuidv4()}`
+      );
+      await set(refDatabase, {
+        data: Math.floor(Date.now() / 1000),
+        user: user?.email,
+        title: value.title,
+        description: value.description,
+        files: uploadedImages.map((img) => img.url),
+      });
       setLoadingUpload(false);
       return;
     }
@@ -154,6 +200,12 @@ const CreatePost = () => {
       return;
     }
   };
+
+  useEffect(() => {
+    if (user?.uid != null) {
+      gruposUser(user?.uid);
+    }
+  }, [user?.uid]);
 
   return !loadingUpload ? (
     <Container>
@@ -180,7 +232,19 @@ const CreatePost = () => {
             placeholder="Description"
             placeholderTextColor={themes.COLORS.TEXT_and_BACKGROUND.GRAY2}
           />
-
+          <Picker
+            selectedValue={selectGrup}
+            onValueChange={(grupValue, itemIndex) => setSelectGrup(grupValue)}
+            style={{
+              color: "white",
+            }}
+          >
+            <Item label="Feed normal" value={null} />
+            {grupos &&
+              grupos.map((gps) => {
+                return <Item key={gps.id} value={gps.id} label={gps.nome} />;
+              })}
+          </Picker>
           <ButtonImage>
             <ButtonText>Files: {image.length} </ButtonText>
             <ButtonUploadFile onPress={pickImage}>

@@ -50,7 +50,7 @@ export const DataView = styled.View`
   flex-direction: row;
 `;
 export const DateTime = styled.Text`
-  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.VERDE_AZULADO};
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.CINZA_CLARO};
   font-size: ${RFValue(10)}px;
 `;
 

@@ -1,6 +1,7 @@
 export interface IFiles {
   type: string;
   uri: string;
+  id: string;
 }
 export interface ICreatePost {
   title: string;

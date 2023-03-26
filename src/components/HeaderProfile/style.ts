@@ -55,8 +55,10 @@ export const SearchBarIcon = styled(TouchableOpacity)`
   width: 70%;
 `;
 export const PlusIcon = styled(TouchableOpacity)`
-  align-items: center;
-
+  justify-content: center;
+  justify-items: center;
+  display: flex;
+  flex-direction: row;
   width: 25%;
 `;
 export const TextInputSearch = styled.TextInput`

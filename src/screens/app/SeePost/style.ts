@@ -186,7 +186,7 @@ export const UsuarioComentarioEmail = styled.Text`
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
 export const TempoDoComentario = styled.Text`
-  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.VERDE_AZULADO};
+  color: ${({ theme }) => theme.COLORS.COLORS_CONSTRAT.CINZA_CLARO};
   font-size: ${RFValue(10)}px;
 `;
 export const Textos = styled.Text`

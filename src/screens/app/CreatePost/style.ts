@@ -112,6 +112,7 @@ export const ButtonSendPost = styled(TouchableOpacity)`
 `;
 export const ButtonSendPostText = styled.Text`
   text-align: center;
+  color: white;
   font-size: ${RFValue(35)}px;
   font-family: ${({ theme }) => theme.FONTS.DMSans_500Medium};
 `;
