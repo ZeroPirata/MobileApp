@@ -1,16 +1,12 @@
-import { Feather } from "@expo/vector-icons";
-import { async } from "@firebase/util";
 import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
 import {
   collection,
   doc,
   DocumentData,
   getDoc,
-  getDocs,
   onSnapshot,
   query,
   setDoc,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import {
@@ -23,36 +19,65 @@ import { useCallback, useEffect, useState } from "react";
 import { db, storage } from "../../../configs/firebase";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { IFiles } from "../../../interfaces/PostInterface";
-import { reciveUserAttributes } from "../../../utils/querys";
 import { uuidv4 } from "@firebase/util";
 
 import {
-  Container,
   ContainerHead,
-  BackGroundImageView,
-  ProfilePicture,
-  ProfilePictureView,
   BackGroundImage,
-  PrimaryInfo,
-  SecondaryInfo,
-  AboutInfo,
-  EditButton,
   FeatherIcons,
-  IconView,
-  FeatherIconsEditName,
-  NameTag,
+  MainContaienr,
+  SectionLeyoutUser,
+  EditBackGroundButton,
+  BackGroundIconView,
+  EditAvatarButton,
+  AvatarImage,
+  AvatarIconView,
+  SectionUserInfo,
+  UserInfo,
+  SectionEditNameUser,
+  UserTextInputName,
+  ButtonSettings,
+  TextButtons,
+  NameUser,
+  EmailUser,
+  EditUser,
+  SectionEditDescricaoUser,
+  UserTextInputDescription,
+  UserDescricao,
 } from "./style";
 import { getAuth, updateProfile } from "firebase/auth";
-import { TouchableOpacity, Alert, TextInput, View, Button } from "react-native";
+import {
+  TouchableOpacity,
+  Alert,
+  TextInput,
+  View,
+  Button,
+  Text,
+} from "react-native";
 
 const Profile = () => {
   const auth = getAuth();
   const { user } = useAuthentication();
+
   const [userInfo, setUserInfo] = useState<DocumentData[]>([]);
+  const [imageSelect, setImageSelect] = useState<IFiles>();
+
+  const [BackGround, setBackGround] = useState(false);
+  const [onFocusBackGround, setOnfocusBackGround] = useState(false);
+
+  const [ProfilePick, setProfilePick] = useState(false);
+  const [onFocusProfile, setOnfocusProfile] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const [newUserInfo, setNewUserInfo] = useState({
     nome: "",
     descricao: "",
+  });
+
+  const [editUserInfo, setEditUserInfo] = useState({
+    nome: false,
+    descricao: false,
   });
 
   const getUserInfo = useCallback(
@@ -71,14 +96,6 @@ const Profile = () => {
     [user?.uid]
   );
 
-  useEffect(() => {
-    if (user?.uid != null) {
-      getUserInfo(user.uid);
-    }
-  }, [user?.uid]);
-
-  const [imageSelect, setImageSelect] = useState<IFiles>();
-  const [loading, setLoading] = useState(false);
   const pickImage = async () => {
     let result: any = await launchImageLibraryAsync({
       mediaTypes: MediaTypeOptions.Images,
@@ -86,8 +103,12 @@ const Profile = () => {
       allowsMultipleSelection: false,
       quality: 1,
     });
-    setImageSelect(result.assets[0]);
-    setLoading(true);
+    if (result.canceled) {
+      return;
+    } else {
+      setImageSelect(result.assets[0]);
+      setLoading(true);
+    }
   };
 
   const uploadImage = async (image: IFiles) => {
@@ -105,12 +126,13 @@ const Profile = () => {
 
   const BackGroundUpdate = async () => {
     setLoading(false);
+    setBackGround(false);
     if (imageSelect) {
       const uploadedImage = await uploadImage(imageSelect);
       deleteObject(
         ref(storage, `images/${user?.email}/${userInfo[0].background.id}`)
       )
-        .then(() => console.log("Never diference in this microfone"))
+        .then()
         .catch((err) => console.log(err));
       const refDatabase = doc(collection(db, "users"), user?.uid);
       const documentSnapshot = await getDoc(refDatabase);
@@ -131,10 +153,24 @@ const Profile = () => {
     }
   };
 
-  const [editUserInfo, setEditUserInfo] = useState({
-    nome: false,
-    descricao: false,
-  });
+  const ProfileUpdate = async () => {
+    setLoading(false);
+    setProfilePick(false);
+    if (imageSelect && auth.currentUser != null) {
+      const uploadedImage = await uploadImage(imageSelect);
+      deleteObject(
+        ref(storage, `images/${user?.email}/${userInfo[0].background.id}`)
+      )
+        .then()
+        .catch((err) => console.log(err));
+      updateProfile(auth.currentUser, {
+        photoURL: uploadedImage.url,
+      })
+        .then(() => console.log("Concluido"))
+        .catch((err) => console.log(err));
+    }
+  };
+
   const updateUser = () => {
     if (auth.currentUser != null) {
       Alert.alert(
@@ -189,102 +225,154 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (loading) {
+    if (loading && BackGround) {
       BackGroundUpdate();
+    }
+    if (loading && ProfilePick) {
+      ProfileUpdate();
     }
   }, [loading]);
 
-  const [onFocus, setOnfocus] = useState(false);
+  useEffect(() => {
+    if (user?.uid != null) {
+      getUserInfo(user.uid);
+    }
+  }, [getUserInfo]);
+
   return (
-    <Container>
+    <MainContaienr>
       <ContainerHead>
-        <ProfilePictureView>
-          <EditButton
-            onPress={pickImage}
-            onPressIn={() => setOnfocus(true)}
-            onPressOut={() => setOnfocus(false)}
+        <SectionLeyoutUser>
+          <EditBackGroundButton
+            onPress={() => {
+              pickImage();
+              setBackGround(true);
+            }}
+            onPressIn={() => setOnfocusBackGround(true)}
+            onPressOut={() => setOnfocusBackGround(false)}
           >
-            {onFocus ? (
-              <IconView>
-                <FeatherIcons name={"edit"} />
-              </IconView>
+            {onFocusBackGround ? (
+              <BackGroundIconView>
+                <FeatherIcons size={65} name={"edit"} />
+              </BackGroundIconView>
             ) : null}
             <BackGroundImage
               source={{
                 uri: String(
                   userInfo[0]?.background
                     ? userInfo[0]?.background.url
-                    : "https://pbs.twimg.com/media/FlmgV-4XwAMDm6j.jpg  "
+                    : "https://pbs.twimg.com/media/FlmgV-4XwAMDm6j.jpg"
                 ),
               }}
-              style={{ resizeMode: "cover" }}
+              style={{ resizeMode: "stretch" }}
             />
-          </EditButton>
-          <ProfilePicture
-            source={{
-              uri: String(
-                user?.photoURL
-                  ? user?.photoURL
-                  : "https://static-cdn.jtvnw.net/jtv_user_pictures/50a9a0bd-7f1a-4879-bd18-7f1d76db46aa-profile_image-300x300.png"
-              ),
+          </EditBackGroundButton>
+          <EditAvatarButton
+            onPress={() => {
+              pickImage();
+              setProfilePick(true);
             }}
-          />
-        </ProfilePictureView>
-        <AboutInfo>
-          <NameTag>
+            onPressIn={() => setOnfocusProfile(true)}
+            onPressOut={() => setOnfocusProfile(false)}
+          >
+            {onFocusProfile ? (
+              <AvatarIconView>
+                <FeatherIcons size={35} name={"edit"} />
+              </AvatarIconView>
+            ) : null}
+            <AvatarImage
+              source={{
+                uri: String(
+                  user?.photoURL
+                    ? user?.photoURL
+                    : "https://static-cdn.jtvnw.net/jtv_user_pictures/50a9a0bd-7f1a-4879-bd18-7f1d76db46aa-profile_image-300x300.png"
+                ),
+              }}
+            />
+          </EditAvatarButton>
+        </SectionLeyoutUser>
+        <SectionUserInfo>
+          <UserInfo>
             {editUserInfo.nome ? (
-              <View>
-                <TextInput
+              <SectionEditNameUser>
+                <UserTextInputName
+                  maxLength={150}
                   onChangeText={(text) =>
                     setNewUserInfo({ ...newUserInfo, nome: text })
                   }
                   placeholder="Digite o novo nome"
                 />
-                <Button title="Atualizar" onPress={editarUsuario} />
-                <Button
-                  title="Cancelar"
+                <ButtonSettings
+                  style={{
+                    backgroundColor: "white",
+                  }}
+                  onPress={editarUsuario}
+                >
+                  <TextButtons>Atualizar</TextButtons>
+                </ButtonSettings>
+                <ButtonSettings
+                  style={{
+                    backgroundColor: "red",
+                  }}
                   onPress={() =>
                     setEditUserInfo({ nome: false, descricao: false })
                   }
-                />
-              </View>
+                >
+                  <TextButtons style={{ color: "white" }}>Cancelar</TextButtons>
+                </ButtonSettings>
+              </SectionEditNameUser>
             ) : user?.displayName ? (
-              <PrimaryInfo>{user?.displayName} </PrimaryInfo>
+              <NameUser>{user?.displayName} </NameUser>
             ) : (
-              <PrimaryInfo>{user?.email} </PrimaryInfo>
+              <EmailUser>{user?.email} </EmailUser>
             )}
-            <TouchableOpacity onPress={updateUser}>
-              <FeatherIconsEditName name={"edit"} />
-            </TouchableOpacity>
-          </NameTag>
+            <EditUser onPress={updateUser}>
+              <FeatherIcons size={25} name={"edit"} />
+            </EditUser>
+          </UserInfo>
 
           {editUserInfo.descricao ? (
-            <View>
-              <TextInput
+            <SectionEditDescricaoUser>
+              <UserTextInputDescription
+                numberOfLines={5}
+                multiline={true}
+                textAlign={"left"}
+                style={{ textAlignVertical: "top" }}
                 maxLength={250}
                 onChangeText={(text) =>
                   setNewUserInfo({ ...newUserInfo, descricao: text })
                 }
                 placeholder="Digite o novo nome"
               />
-              <Button title="Atualizar" onPress={editarUsuario} />
-              <Button
-                title="Cancelar"
+              <ButtonSettings
+                style={{
+                  backgroundColor: "white",
+                }}
+                onPress={editarUsuario}
+              >
+                <TextButtons>Atualizar</TextButtons>
+              </ButtonSettings>
+              <ButtonSettings
+                style={{
+                  backgroundColor: "red",
+                }}
                 onPress={() =>
                   setEditUserInfo({ nome: false, descricao: false })
                 }
-              />
-            </View>
+              >
+                <TextButtons style={{ color: "white" }}>Cancelar</TextButtons>
+              </ButtonSettings>
+            </SectionEditDescricaoUser>
           ) : userInfo[0] ? (
-            <SecondaryInfo>{userInfo[0]?.descricao}</SecondaryInfo>
+            <UserDescricao>{userInfo[0]?.descricao}</UserDescricao>
           ) : (
-            <SecondaryInfo>
+            <UserDescricao>
               ¯\_(ツ)_/¯ Personalize seu perfil adicionando uma descrição
-            </SecondaryInfo>
+            </UserDescricao>
           )}
-        </AboutInfo>
+        </SectionUserInfo>
       </ContainerHead>
-    </Container>
+    </MainContaienr>
   );
 };
 
