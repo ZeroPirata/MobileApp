@@ -89,9 +89,7 @@ const SignIn: React.FC = () => {
               id: uuidv4(),
               name: user.displayName,
               email: user.email,
-              assets: {
-                profile: user.photoURL,
-              },
+              avatar: user.photoURL,
             });
           }
         })
@@ -118,9 +116,7 @@ const SignIn: React.FC = () => {
               id: uuidv4(),
               name: user.displayName,
               email: user.email,
-              assets: {
-                profile: user.photoURL,
-              },
+              avatar: user.photoURL,
             });
           }
         })

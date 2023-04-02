@@ -8,6 +8,7 @@ import { TabRoutes } from "./tabs.routes";
 import { CreatePost } from "../screens/app/CreatePost";
 import { SeePost } from "../screens/app/SeePost";
 import { EditPost } from "../screens/app/EditPost";
+import { ListSearchedUser } from "../screens/app/ListUsers/intex";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const AppRoutes: React.FC = () => {
       <Screen name="CreatePost" component={CreatePost} />
       <Screen name="TabsRoutes" component={TabRoutes} />
       <Screen name="EditPost" component={EditPost} />
+      <Screen name="ListSearchedUser" component={ListSearchedUser} />
     </Navigator>
   );
 };

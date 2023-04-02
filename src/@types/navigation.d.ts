@@ -9,6 +9,7 @@ export declare global {
       TabsRoutes: undefined;
       SeePost: IPost;
       EditPost: IPost;
+      ListSearchedUser: ListSearchedUsers[];
     }
   }
 }

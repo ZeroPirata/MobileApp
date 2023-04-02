@@ -232,6 +232,8 @@ const Profile = () => {
           [{ text: "Ok", style: "destructive" }]
         );
       });
+      setRefreshing(true);
+      setTimeout(() => setRefreshing(false), 2000);
     }
     if (editUserInfo.descricao && auth.currentUser != null) {
       const refDatabase = doc(collection(db, "users"), user?.uid);

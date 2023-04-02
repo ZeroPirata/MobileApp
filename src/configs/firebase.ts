@@ -13,10 +13,11 @@ const firebaseConfig = {
   storageBucket: "leagueofzero-da338.appspot.com",
   messagingSenderId: "339065098005",
   appId: "1:339065098005:web:1bd91afd5e9eb554d9e31c",
-  databaseUrl: "https://leagueofzero-da338-default-rtdb.firebaseio.com"
+  databaseUrl: "https://leagueofzero-da338-default-rtdb.firebaseio.com",
 };
 
 const app = initializeApp(firebaseConfig);
+
 export const db = getFirestore(app);
 export const authFirebase = getAuth(app);
 export const storage = getStorage(app);
