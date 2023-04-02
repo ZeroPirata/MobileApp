@@ -84,9 +84,9 @@ const HomeTab = () => {
                 user={items.user}
                 title={items.title}
                 description={items.description}
-                files={items.files}
+                images={items?.images}
                 data={items.data}
-              ></PostView>
+              />
             );
           })}
         <ButtoSeeMore onPress={endScrollView}>

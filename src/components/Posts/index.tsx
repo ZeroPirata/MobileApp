@@ -138,13 +138,13 @@ const PostView = ({ id, ...rest }: IPost) => {
           ) : null}
         </DataView>
         {rest.description && <Description>{rest.description}</Description>}
-        {rest.files && (
+        {rest.images && (
           <ImageSettings>
-            {rest.files[0] ? (
-              <ImageConfig source={{ uri: rest.files[0] }} />
+            {rest.images[0] ? (
+              <ImageConfig source={{ uri: rest.images[0].url }} />
             ) : null}
-            {rest.files[1] ? (
-              <ImageConfig source={{ uri: rest.files[1] }} />
+            {rest.images[1] ? (
+              <ImageConfig source={{ uri: rest.images[1].url }} />
             ) : null}
           </ImageSettings>
         )}

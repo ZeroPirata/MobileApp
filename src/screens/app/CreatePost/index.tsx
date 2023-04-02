@@ -10,7 +10,7 @@ import { uuidv4 } from "@firebase/util";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { IArquivos, IFiles } from "../../../interfaces/PostInterface";
+import { IFiles, ISendFiles } from "../../../interfaces/PostInterface";
 import { database, db, storage } from "../../../configs/firebase";
 import themes from "../../../styles/themes";
 import {
@@ -40,10 +40,99 @@ import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
 import { GrupoInterface } from "../../../interfaces/GruposInterface";
 import { Usuario } from "../../../interfaces/UsuarioInterface";
 import { User } from "firebase/auth/react-native";
+import {
+  FliesUpload,
+  ImageArrayUpload,
+  sendPost,
+} from "../../../utils/functions";
 
 const CreatePost = () => {
   const [grupos, setGrupos] = useState<GrupoInterface[]>([]);
   const [selectGrup, setSelectGrup] = useState();
+
+  const { Item } = Picker;
+  const { user } = useAuthentication();
+
+  const navigation = useNavigation();
+
+  const [value, setValue] = useState({
+    title: "",
+    description: "",
+  });
+
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [isLoading, setIsLoagind] = useState(false);
+
+  const [images, setImages] = useState<ISendFiles[]>([]);
+  const [files, setFiles] = useState<ISendFiles>();
+
+  const handleHomeNavigation = () => {
+    navigation.navigate("TabsRoutes");
+  };
+
+  const pickFiles = async () => {
+    setIsLoagind(true);
+    let result: any = await DocumentPicker.getDocumentAsync({
+      type: ["application/*", "text/*"],
+    });
+    setIsLoagind(false);
+    if (!result.canceled) {
+      setFiles(result);
+    }
+  };
+
+  const pickImage = async () => {
+    setIsLoagind(true);
+    let result: any = await launchImageLibraryAsync({
+      mediaTypes: MediaTypeOptions.Images,
+      videoQuality: 1,
+      allowsMultipleSelection: true,
+      quality: 1,
+    });
+    setIsLoagind(false);
+    if (!result.canceled) {
+      setImages(result.assets);
+    }
+  };
+
+  const removeImage = (index: any) => {
+    Alert.alert(
+      "Remover a imagem",
+      `Você tem certeza que deseja deletar: ${images[index].type}`,
+      [
+        { text: "Cencel", style: "cancel" },
+        {
+          text: "Remove",
+          onPress: () => setImages(images.filter((image, i) => i !== index)),
+        },
+      ]
+    );
+  };
+
+  const SendingPost = async () => {
+    if (value.title == "") {
+      Alert.alert("Titulo Vazio", "Escreva pelo menos o titulo ψ(._. )>", [
+        {
+          text: "Ok",
+          style: "cancel",
+        },
+      ]);
+      return;
+    }
+    setLoadingUpload(true);
+    const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
+    sendPost(
+      refDatabase,
+      String(user?.email),
+      value.title,
+      value.description,
+      images,
+      files
+    );
+    navigation.navigate("TabsRoutes");
+    setLoadingUpload(false);
+    return;
+  };
 
   const gruposUser = async (uid: string) => {
     const createCollection = collection(db, "users");
@@ -61,175 +150,6 @@ const CreatePost = () => {
       });
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const { Item } = Picker;
-  const { user } = useAuthentication();
-
-  const navigation = useNavigation();
-
-  const [value, setValue] = useState({
-    title: "",
-    description: "",
-  });
-
-  const ComponentFilesType = new TypeOfFiles();
-
-  const [loadingUpload, setLoadingUpload] = useState(false);
-  const [isLoading, setIsLoagind] = useState(false);
-
-  const [image, setImage] = useState<IFiles[]>([]);
-  const [files, setFiles] = useState<IArquivos>();
-
-  const handleHomeNavigation = () => {
-    navigation.navigate("TabsRoutes");
-  };
-
-  const pickFiles = async () => {
-    setIsLoagind(true);
-    let result: any = await DocumentPicker.getDocumentAsync();
-    setIsLoagind(false);
-    if (result.type === "success") {
-      setFiles(result);
-    }
-  };
-
-  const pickImage = async () => {
-    setIsLoagind(true);
-    let result: any = await launchImageLibraryAsync({
-      mediaTypes: MediaTypeOptions.Images,
-      videoQuality: 1,
-      allowsMultipleSelection: true,
-      quality: 1,
-    });
-    setIsLoagind(false);
-    if (!result.canceled) {
-      setImage(result.assets);
-    }
-  };
-
-  const removeImage = (index: any) => {
-    Alert.alert(
-      "Remover a imagem",
-      `Você tem certeza que deseja deletar: ${image[index].type}`,
-      [
-        { text: "Cencel", style: "cancel" },
-        {
-          text: "Remove",
-          onPress: () => setImage(image.filter((image, i) => i !== index)),
-        },
-      ]
-    );
-  };
-
-  const uploadImage = async (images: IFiles[]) => {
-    const uploadPromise = images.map(async (image: any) => {
-      const id = uuidv4();
-      const response = await fetch(image.uri);
-      const blob = await response.blob();
-      const imageRef = ref(storage, `images/${user?.email}/${id}`);
-      const uploadStatus = uploadBytesResumable(imageRef, blob);
-      const snapshot = await uploadStatus;
-      return {
-        id,
-        url: await getDownloadURL(snapshot.ref),
-      };
-    });
-    return Promise.all(uploadPromise);
-  };
-
-  const uploadFile = async (file?: IArquivos) => {
-    const id = uuidv4();
-    if (file) {
-      const response = await fetch(file.uri);
-      const blob = await response.blob();
-      const fileUpload = ref(storage, `arquivos/${user?.email}/${id}`);
-      const uploadStatus = uploadBytesResumable(fileUpload, blob);
-      const snapshot = await uploadStatus;
-      return {
-        id,
-        url: await getDownloadURL(snapshot.ref),
-      };
-    }
-  };
-
-  const SendingPost = async () => {
-    if (image.length >= 1 && selectGrup == null) {
-      if (value.title == "") {
-        Alert.alert("Value null", "please, make a title...", [
-          {
-            text: "Ok",
-            style: "cancel",
-          },
-        ]);
-        return;
-      }
-      setLoadingUpload(true);
-      const uploadedImages = await uploadImage(image);
-      const uploadFiles = await uploadFile(files);
-      const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
-      await set(refDatabase, {
-        data: Math.floor(Date.now() / 1000),
-        user: user?.email,
-        title: value.title,
-        description: value.description,
-        files: uploadedImages.map((img) => ({ id: img.id, url: img.url })),
-        arquivos: {
-          id: uploadFiles?.id,
-          uri: uploadFiles?.url,
-        },
-      });
-      navigation.navigate("TabsRoutes");
-      setLoadingUpload(false);
-      return;
-    }
-    if (selectGrup != null) {
-      setLoadingUpload(true);
-      const uploadFiles = await uploadFile(files);
-      const uploadedImages = await uploadImage(image);
-      const refDatabase = DataBase.ref(
-        database,
-        `grupos/${selectGrup}/posts/${uuidv4()}`
-      );
-      await set(refDatabase, {
-        data: Math.floor(Date.now() / 1000),
-        user: user?.email,
-        title: value.title,
-        description: value.description,
-        files: uploadedImages.map((img) => img.url),
-        arquivos: {
-          id: uploadFiles?.id,
-          uri: uploadFiles?.url,
-        },
-      });
-      setLoadingUpload(false);
-      return;
-    }
-    if (image.length == 0) {
-      if (value.title == "" || value.description == "") {
-        Alert.alert("Value null", "please, make a title and description...", [
-          {
-            text: "Ok",
-            style: "cancel",
-          },
-        ]);
-        return;
-      }
-      const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
-      const uploadFiles = await uploadFile(files);
-      await set(refDatabase, {
-        data: Math.floor(Date.now() / 1000),
-        user: user?.email,
-        title: value.title,
-        description: value.description,
-        arquivos: {
-          id: uploadFiles?.id,
-          uri: uploadFiles?.url,
-        },
-      });
-      navigation.navigate("TabsRoutes");
-      return;
     }
   };
 
@@ -278,7 +198,7 @@ const CreatePost = () => {
               })}
           </Picker>
           <ButtonImage>
-            <ButtonText>Images: {Number(image.length)} </ButtonText>
+            <ButtonText>Images: {Number(images.length)} </ButtonText>
             <ButtonUploadFile onPress={pickImage}>
               <MaterialIcons
                 name="image-search"
@@ -306,16 +226,16 @@ const CreatePost = () => {
                 <ActivityIndicator size={"large"} />
               </ViewLoading>
             ) : null}
-            {image && (
+            {images && (
               <FlatListImage
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
-                data={image}
+                data={images}
                 renderItem={({ index }) => (
                   <ImageLeyoutUpload>
                     <ButtonRemoveImage onPress={() => removeImage(index)}>
                       <ImageLoading
-                        source={{ uri: image[index].uri }}
+                        source={{ uri: images[index].uri }}
                         key={index}
                       />
                     </ButtonRemoveImage>

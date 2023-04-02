@@ -18,7 +18,7 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { database, db, storage } from "../../../configs/firebase";
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { IFiles, IPost } from "../../../interfaces/PostInterface";
+import { IFiles, IPost, ISendFiles } from "../../../interfaces/PostInterface";
 import { uuidv4 } from "@firebase/util";
 import {
   ref as RealTimeReference,
@@ -66,13 +66,14 @@ import {
 import { PostView } from "../../../components/Posts";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import themes from "../../../styles/themes";
+import { UploadSingleImage } from "../../../utils/functions";
 
 const Profile = () => {
   const auth = getAuth();
   const { user } = useAuthentication();
 
   const [userInfo, setUserInfo] = useState<DocumentData[]>([]);
-  const [imageSelect, setImageSelect] = useState<IFiles>();
+  const [imageSelect, setImageSelect] = useState<ISendFiles>();
   const [postUser, setPostUser] = useState<IPost[]>([]);
 
   const [BackGround, setBackGround] = useState(false);
@@ -151,24 +152,14 @@ const Profile = () => {
     }
   };
 
-  const uploadImage = async (image: IFiles) => {
-    const id = uuidv4();
-    const response = await fetch(image.uri);
-    const blob = await response.blob();
-    const imageRef = ref(storage, `images/${user?.email}/${id}`);
-    const uploadStatus = uploadBytesResumable(imageRef, blob);
-    const snapshot = await uploadStatus;
-    return {
-      id,
-      url: await getDownloadURL(snapshot.ref),
-    };
-  };
-
   const BackGroundUpdate = async () => {
     setLoading(false);
     setBackGround(false);
     if (imageSelect) {
-      const uploadedImage = await uploadImage(imageSelect);
+      const uploadedImage = await UploadSingleImage(
+        String(user?.email),
+        imageSelect
+      );
       if (!userInfo[0].background) {
         deleteObject(
           ref(storage, `images/${user?.email}/${userInfo[0].background.id}`)
@@ -199,13 +190,16 @@ const Profile = () => {
     setLoading(false);
     setProfilePick(false);
     if (imageSelect && auth.currentUser != null) {
-      const uploadedImage = await uploadImage(imageSelect);
+      const uploadedImage = await UploadSingleImage(
+        String(user?.email),
+        imageSelect
+      );
       updateProfile(auth.currentUser, {
         photoURL: uploadedImage.url,
-      })
-        .then(() => console.log("Concluido"))
-        .catch((err) => console.log(err));
+      }).catch((err) => console.log(err));
     }
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 2000);
   };
 
   const updateUser = () => {
@@ -460,7 +454,7 @@ const Profile = () => {
                 data={data.data}
                 id={data.id}
                 title={data.title}
-                files={data.files}
+                images={data.images}
                 user={data.user}
                 description={data.description}
               />

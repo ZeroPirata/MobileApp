@@ -1,19 +1,19 @@
-export interface IFiles {
-  type: string;
-  uri: string;
-  id: string;
-}
-export interface IArquivos {
+export interface ISendFiles {
   mimeType: string;
   name: string;
   size: number;
   type: string;
   uri: string;
 }
+export interface IFiles {
+  id: string;
+  url: string;
+  type: string;
+}
 export interface ICreatePost {
   title: string;
   description: string;
-  file?: IFiles;
+  file?: ISendFiles;
 }
 export interface IPost {
   id: string;
@@ -21,5 +21,6 @@ export interface IPost {
   title: string;
   description?: string;
   data: number;
-  files?: string[];
+  images?: IFiles[];
+  arquivos?: IFiles;
 }

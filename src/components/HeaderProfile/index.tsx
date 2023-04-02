@@ -35,7 +35,6 @@ const HeaderProfile = () => {
     },
   ];
 
-  console.log(user?.uid);
   return (
     <HeaderView>
       <ContainerPicture>
