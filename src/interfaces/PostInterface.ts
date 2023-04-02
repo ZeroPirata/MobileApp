@@ -3,6 +3,13 @@ export interface IFiles {
   uri: string;
   id: string;
 }
+export interface IArquivos {
+  mimeType: string;
+  name: string;
+  size: number;
+  type: string;
+  uri: string;
+}
 export interface ICreatePost {
   title: string;
   description: string;

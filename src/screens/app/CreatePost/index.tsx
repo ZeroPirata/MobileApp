@@ -10,7 +10,7 @@ import { uuidv4 } from "@firebase/util";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { IFiles } from "../../../interfaces/PostInterface";
+import { IArquivos, IFiles } from "../../../interfaces/PostInterface";
 import { database, db, storage } from "../../../configs/firebase";
 import themes from "../../../styles/themes";
 import {
@@ -51,11 +51,13 @@ const CreatePost = () => {
     try {
       const querySnapshot = await getDocs(queryBuild);
       querySnapshot.docs.map((docs) => {
-        const user = docs.data();
-        const grupos = user.grupos.map((grups: any) => ({
-          ...grups,
-        }));
-        setGrupos(grupos);
+        if (docs.data().grupos) {
+          const user = docs.data();
+          const grupos = user.grupos.map((grups: any) => ({
+            ...grups,
+          }));
+          setGrupos(grupos);
+        }
       });
     } catch (error) {
       console.log(error);
@@ -78,7 +80,7 @@ const CreatePost = () => {
   const [isLoading, setIsLoagind] = useState(false);
 
   const [image, setImage] = useState<IFiles[]>([]);
-  const [files, setFiles] = useState<IFiles[]>([]);
+  const [files, setFiles] = useState<IArquivos>();
 
   const handleHomeNavigation = () => {
     navigation.navigate("TabsRoutes");
@@ -137,6 +139,21 @@ const CreatePost = () => {
     return Promise.all(uploadPromise);
   };
 
+  const uploadFile = async (file?: IArquivos) => {
+    const id = uuidv4();
+    if (file) {
+      const response = await fetch(file.uri);
+      const blob = await response.blob();
+      const fileUpload = ref(storage, `arquivos/${user?.email}/${id}`);
+      const uploadStatus = uploadBytesResumable(fileUpload, blob);
+      const snapshot = await uploadStatus;
+      return {
+        id,
+        url: await getDownloadURL(snapshot.ref),
+      };
+    }
+  };
+
   const SendingPost = async () => {
     if (image.length >= 1 && selectGrup == null) {
       if (value.title == "") {
@@ -150,6 +167,7 @@ const CreatePost = () => {
       }
       setLoadingUpload(true);
       const uploadedImages = await uploadImage(image);
+      const uploadFiles = await uploadFile(files);
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
       await set(refDatabase, {
         data: Math.floor(Date.now() / 1000),
@@ -157,6 +175,10 @@ const CreatePost = () => {
         title: value.title,
         description: value.description,
         files: uploadedImages.map((img) => ({ id: img.id, url: img.url })),
+        arquivos: {
+          id: uploadFiles?.id,
+          uri: uploadFiles?.url,
+        },
       });
       navigation.navigate("TabsRoutes");
       setLoadingUpload(false);
@@ -164,6 +186,7 @@ const CreatePost = () => {
     }
     if (selectGrup != null) {
       setLoadingUpload(true);
+      const uploadFiles = await uploadFile(files);
       const uploadedImages = await uploadImage(image);
       const refDatabase = DataBase.ref(
         database,
@@ -175,6 +198,10 @@ const CreatePost = () => {
         title: value.title,
         description: value.description,
         files: uploadedImages.map((img) => img.url),
+        arquivos: {
+          id: uploadFiles?.id,
+          uri: uploadFiles?.url,
+        },
       });
       setLoadingUpload(false);
       return;
@@ -190,11 +217,16 @@ const CreatePost = () => {
         return;
       }
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
+      const uploadFiles = await uploadFile(files);
       await set(refDatabase, {
         data: Math.floor(Date.now() / 1000),
         user: user?.email,
         title: value.title,
         description: value.description,
+        arquivos: {
+          id: uploadFiles?.id,
+          uri: uploadFiles?.url,
+        },
       });
       navigation.navigate("TabsRoutes");
       return;
@@ -246,7 +278,7 @@ const CreatePost = () => {
               })}
           </Picker>
           <ButtonImage>
-            <ButtonText>Files: {image.length} </ButtonText>
+            <ButtonText>Images: {Number(image.length)} </ButtonText>
             <ButtonUploadFile onPress={pickImage}>
               <MaterialIcons
                 name="image-search"
@@ -264,6 +296,9 @@ const CreatePost = () => {
               <ButtonText>Files</ButtonText>
             </ButtonUploadFile>
           </ButtonImage>
+          <ButtonText>
+            File: {files?.name} - Tamanho: {files?.size}{" "}
+          </ButtonText>
           <ImageLoadingView>
             {isLoading ? (
               <ViewLoading>
@@ -288,7 +323,7 @@ const CreatePost = () => {
                 )}
               />
             )}
-            {files && (
+            {/* {files && (
               <FlatListImage
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
@@ -300,7 +335,7 @@ const CreatePost = () => {
                   )
                 }
               />
-            )}
+            )} */}
           </ImageLoadingView>
           <ButtonSendPost onPress={SendingPost}>
             <ButtonSendPostText>Post</ButtonSendPostText>

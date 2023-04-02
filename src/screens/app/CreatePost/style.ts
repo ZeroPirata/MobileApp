@@ -41,6 +41,7 @@ export const CreateBody = styled.TextInput`
 `;
 
 export const ButtonText = styled.Text`
+
   font-size: ${RFValue(15)}px;
   color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
 `;
