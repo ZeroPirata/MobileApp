@@ -156,7 +156,7 @@ const CreatePost = () => {
         user: user?.email,
         title: value.title,
         description: value.description,
-        files: uploadedImages.map((img) => img.url),
+        files: uploadedImages.map((img) => ({ id: img.id, url: img.url })),
       });
       navigation.navigate("TabsRoutes");
       setLoadingUpload(false);

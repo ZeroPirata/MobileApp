@@ -3,7 +3,7 @@ import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { Button, ScrollView, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { db } from "../../../configs/firebase";
+import { database, db } from "../../../configs/firebase";
 import {
   Container,
   ButtonControler,
@@ -13,20 +13,26 @@ import {
   ControlerInput,
   ControlerPost,
 } from "./style";
+import { ref, update } from "firebase/database";
 
 const EditPost = () => {
   const route = useRoute<EditPost>();
-  const docRef = doc(db, "post", route.params.id);
+
   const [value, setValue] = useState({
     title: route.params.title,
     description: route.params.description,
   });
 
-  const UpdateInfoPost = async () => {
-    await updateDoc(docRef, {
+  const updatePost = () => {
+    const refDatabase = ref(database, `posts/${route.params.id}`);
+    update(refDatabase, {
       title: value.title,
       description: value.description,
-    });
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
   };
 
   const navigation = useNavigation();
@@ -49,12 +55,15 @@ const EditPost = () => {
             numberOfLines={5}
             placeholder="Description"
           />
-          {route.params.files ? (
+          {/* {route.params.files ? (
             <TextEditPost>{route.params.files}</TextEditPost>
-          ) : null}
+          ) : null} */}
           <Button
             title="Enviar"
-            onPress={() => navigation.navigate("TabsRoutes")}
+            onPress={() => {
+              updatePost();
+              navigation.navigate("TabsRoutes");
+            }}
           />
         </ControlerPost>
       </ScrollView>

@@ -117,10 +117,10 @@ export const ButtonSettings = styled(TouchableOpacity)`
   border-radius: 25px;
   align-items: center;
   justify-content: center;
-  height: 35;
-  width: 75;
-  margin-left: 10;
-  margin-right: 10;
+  height: 35px;
+  width: 75px;
+  margin-left: 10px;
+  margin-right: 10px;
 `;
 
 export const TextButtons = styled.Text``;
@@ -158,3 +158,14 @@ export const UserDescricao = styled.Text`
 /* Button Edit User */
 
 export const EditUser = styled(TouchableOpacity)``;
+
+/* PostView */
+
+export const PostUserView = styled.View``;
+
+export const SettingsButtonDescription = styled.View`
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  top: 50px;
+`;

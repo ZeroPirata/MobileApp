@@ -7,6 +7,7 @@ export const Container = styled.View`
   width: 100%;
   height: 100%;
   padding-top: ${RFValue(25)}px;
+  background: white;
   align-items: center;
   display: flex;
   flex-direction: row;
