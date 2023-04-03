@@ -4,9 +4,11 @@ import {
   doc,
   DocumentData,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import {
@@ -222,42 +224,51 @@ const Profile = () => {
     }
   };
   const editarUsuario = async () => {
-    if (editUserInfo.nome && auth.currentUser != null) {
-      updateProfile(auth.currentUser, {
-        displayName: newUserInfo.nome,
-      }).then(() => {
-        Alert.alert(
-          "Concluido",
-          `Parabens, agora você se chama ${user?.displayName}`,
-          [{ text: "Ok", style: "destructive" }]
-        );
-      });
-      setRefreshing(true);
-      setTimeout(() => setRefreshing(false), 2000);
-    }
-    if (editUserInfo.descricao && auth.currentUser != null) {
-      const refDatabase = doc(collection(db, "users"), user?.uid);
-      const documentSnapshot = await getDoc(refDatabase);
-      const updatedData = {
-        ...documentSnapshot.data(),
-        id: user?.uid,
-        descricao: newUserInfo.descricao,
-      };
-      try {
-        await setDoc(refDatabase, updatedData)
-          .then((data) => {
-            console.log(data);
-          })
-          .catch((err) => {
-            console.log(err);
+    const getIdReference = collection(db, "users");
+    const queryOne = query(getIdReference, where("id", "==", user?.uid));
+    const insertLoggedUser = await getDocs(queryOne);
+    if (insertLoggedUser) {
+      const refCloudFireStore = doc(db, "users", insertLoggedUser.docs[0].id);
+      if (editUserInfo.nome && auth.currentUser != null) {
+        updateProfile(auth.currentUser, {
+          displayName: newUserInfo.nome,
+        }).then(() => {
+          updateDoc(refCloudFireStore, {
+            name: newUserInfo.nome,
           });
-        Alert.alert(
-          "Concluido",
-          `Parabens, agora você tem uma descrição INSANA (👉ﾟヮﾟ)👉`,
-          [{ text: "Ok", style: "destructive" }]
-        );
-      } catch (error) {
-        console.log(error);
+          Alert.alert(
+            "Concluido",
+            `Parabens, agora você se chama ${user?.displayName}`,
+            [{ text: "Ok", style: "destructive" }]
+          );
+        });
+        setRefreshing(true);
+        setTimeout(() => setRefreshing(false), 2000);
+      }
+      if (editUserInfo.descricao && auth.currentUser != null) {
+        const refDatabase = doc(collection(db, "users"));
+        const documentSnapshot = await getDoc(refDatabase);
+        const updatedData = {
+          ...documentSnapshot.data(),
+          id: user?.uid,
+          descricao: newUserInfo.descricao,
+        };
+        try {
+          await setDoc(refCloudFireStore, updatedData, { merge: true })
+            .then((data) => {
+              console.log(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          Alert.alert(
+            "Concluido",
+            `Parabens, agora você tem uma descrição INSANA (👉ﾟヮﾟ)👉`,
+            [{ text: "Ok", style: "destructive" }]
+          );
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
     setEditUserInfo({ nome: false, descricao: false });

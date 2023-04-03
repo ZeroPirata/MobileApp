@@ -54,7 +54,7 @@ const HeaderProfile = () => {
   const [usuarios, setUsuarios] = useState<any[]>([]);
 
   const handleKeyPress = async (text: string) => {
-    let letPostData: IListSearchedUsers[] = [];
+    let letPostData: any[] = [];
     const referenceCloudFiresStorage = collection(db, "users");
     const queryBuilder = query(
       referenceCloudFiresStorage,
@@ -65,7 +65,7 @@ const HeaderProfile = () => {
     const getUserts = await getDocs(queryBuilder);
     getUserts.docs.map((itens) => {
       letPostData.push({
-        id: itens.id,
+        id: itens.data().id,
         name: itens.data().name,
         avatar: itens.data().avatar,
         email: itens.data().email,

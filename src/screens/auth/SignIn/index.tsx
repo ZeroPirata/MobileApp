@@ -86,7 +86,7 @@ const SignIn: React.FC = () => {
           const user = result.user as UserResponse;
           if (!(await queryByEmail(user.email))) {
             await addDoc(collection(db, "users"), {
-              id: uuidv4(),
+              id: prevUser?.uid,
               name: user.displayName,
               email: user.email,
               avatar: user.photoURL,

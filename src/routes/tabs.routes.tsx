@@ -1,17 +1,51 @@
-import { Text, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { HomeTab } from "../screens/tab/Home";
-import themes from "../styles/themes";
 import { AntDesign } from "@expo/vector-icons";
-import { View } from "react-native";
-import { Chat } from "../screens/tab/chat";
-import { Settings } from "../screens/tab/settings";
-import { Profile } from "../screens/tab/profile";
-const { Navigator, Screen, Group } = createBottomTabNavigator();
+import themes from "../styles/themes";
+import {
+  HomeTab,
+  Profile,
+  Chat,
+  Grupos,
+  Notification,
+  Settings,
+} from "../screens/tab";
+
+interface TabBarIconProps {
+  focused: boolean;
+}
+
+const Tab = createBottomTabNavigator();
 
 const TabRoutes: React.FC = () => {
+  const renderTabBarIcon = (
+    name: keyof typeof AntDesign.glyphMap,
+    focused: boolean,
+    nameScreen: string
+  ) => (
+    <View style={[style.view, focused && style.focus]}>
+      <AntDesign
+        name={name}
+        size={20}
+        color={
+          focused ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3 : themes.COLORS.GRAY4
+        }
+      />
+      <Text
+        style={{
+          color: focused
+            ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
+            : themes.COLORS.GRAY4,
+        }}
+      >
+        {nameScreen}
+      </Text>
+    </View>
+  );
+
   return (
-    <Navigator
+    <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
@@ -27,125 +61,64 @@ const TabRoutes: React.FC = () => {
         },
       }}
     >
-      <Screen
+      <Tab.Screen
+        key={"home"}
         name="Home"
         component={HomeTab}
         options={{
-          tabBarLabel: "Home",
-          tabBarIcon: ({ focused }) => (
-            <View style={focused ? style.focus : style.view}>
-              <AntDesign
-                name="home"
-                size={20}
-                color={
-                  focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4
-                }
-              />
-              <Text
-                style={{
-                  color: focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4,
-                }}
-              >
-                Home
-              </Text>
-            </View>
-          ),
+          tabBarIcon: ({ focused }: TabBarIconProps) =>
+            renderTabBarIcon("home", focused, "home"),
         }}
       />
-      <Screen
+      <Tab.Screen
         name="Profile"
         component={Profile}
         options={{
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ focused }) => (
-            <View style={focused ? style.focus : style.view}>
-              <AntDesign
-                name="user"
-                size={20}
-                color={
-                  focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4
-                }
-              />
-              <Text
-                style={{
-                  color: focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4,
-                }}
-              >
-                Profile
-              </Text>
-            </View>
-          ),
+          tabBarIcon: ({ focused }: TabBarIconProps) =>
+            renderTabBarIcon("profile", focused, "profile"),
         }}
       />
-      <Screen
+      <Tab.Screen
         name="Chat"
+        key={"chat"}
         component={Chat}
         options={{
-          tabBarLabel: "Chat",
-          tabBarIcon: ({ focused }) => (
-            <View style={focused ? style.focus : style.view}>
-              <AntDesign
-                name="message1"
-                size={20}
-                color={
-                  focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4
-                }
-              />
-              <Text
-                style={{
-                  color: focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4,
-                }}
-              >
-                Chat
-              </Text>
-            </View>
-          ),
+          tabBarIcon: ({ focused }: TabBarIconProps) =>
+            renderTabBarIcon("message1", focused, "chat"),
         }}
       />
-      <Screen
+      <Tab.Screen
+        name="Grupos"
+        key={"grupos"}
+        component={Grupos}
+        options={{
+          tabBarIcon: ({ focused }: TabBarIconProps) =>
+            renderTabBarIcon("notification", focused, "grups"),
+          unmountOnBlur: true,
+        }}
+      />
+      <Tab.Screen
+        name="Notifications"
+        key={"notificacao"}
+        component={Notification}
+        options={{
+          tabBarIcon: ({ focused }: TabBarIconProps) =>
+            renderTabBarIcon("heart", focused, "alerts"),
+        }}
+      />
+      <Tab.Screen
+        key={"settings"}
         name="Settings"
         component={Settings}
         options={{
-          tabBarLabel: "Settings",
-          tabBarIcon: ({ focused }) => (
-            <View style={focused ? style.focus : style.view}>
-              <AntDesign
-                name="setting"
-                size={20}
-                color={
-                  focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4
-                }
-              />
-              <Text
-                style={{
-                  color: focused
-                    ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3
-                    : themes.COLORS.GRAY4,
-                }}
-              >
-                Settings
-              </Text>
-            </View>
-          ),
+          tabBarIcon: ({ focused }: TabBarIconProps) =>
+            renderTabBarIcon("setting", focused, "Config"),
         }}
       />
-    </Navigator>
+    </Tab.Navigator>
   );
 };
+
 export { TabRoutes };
 
 const style = StyleSheet.create({
