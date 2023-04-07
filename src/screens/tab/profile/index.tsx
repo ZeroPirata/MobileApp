@@ -191,7 +191,16 @@ const Profile = () => {
       );
       updateProfile(auth.currentUser, {
         photoURL: uploadedImage.url,
-      }).catch((err) => console.log(err));
+      })
+        .then(async () => {
+          const refDatabase = doc(collection(db, "users"), user?.uid);
+          await setDoc(
+            refDatabase,
+            { avatar: uploadedImage.url },
+            { merge: true }
+          );
+        })
+        .catch((err) => console.log(err));
     }
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 2000);

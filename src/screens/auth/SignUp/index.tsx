@@ -48,7 +48,20 @@ const SignUp: React.FC = () => {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, value.email, value.password);
+      await createUserWithEmailAndPassword(
+        auth,
+        value.email,
+        value.password
+      ).then(async (result) => {
+        console.log(result);
+        const prevUser = auth.currentUser;
+        await addDoc(collection(db, "users"), {
+          id: prevUser?.uid,
+          name: value.name,
+          email: value.email,
+          avatar: "",
+        });
+      });
     } catch (error: any) {
       error = erroLogs(error.code);
       setErrorMessage(error);

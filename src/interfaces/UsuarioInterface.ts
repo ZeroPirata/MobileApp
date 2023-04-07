@@ -10,4 +10,5 @@ export interface Usuario {
     url: string;
   };
   friends: IFriendRequest[];
+  chats?: string[];
 }

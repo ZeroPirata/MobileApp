@@ -31,11 +31,9 @@ import {
 import { uuidv4 } from "@firebase/util";
 import { Usuario } from "../../interfaces/UsuarioInterface";
 import { User } from "firebase/auth";
-interface ListUser {
-  name: string;
-  id: string;
-  userLogged: string;
-}
+import { ListUser } from "../../interfaces/ListUser";
+import { InsertChatUser } from "../../utils/functions";
+
 export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
   const navigate = useNavigation();
 
@@ -94,6 +92,7 @@ export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
         users: { persoOne: userLogged, persoTwo: id },
       });
       boolean = { bool: true, id: newId };
+      await InsertChatUser(userLogged, id, newId);
     }
     if (boolean["id"]) {
       return navigate.navigate("ChatBeetwen", {
@@ -130,7 +129,7 @@ export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
         }}
       />
       <View style={{ width: "70%" }}>
-        <Text>{name}</Text>
+        <Text>{user[0]?.name}</Text>
       </View>
       <View>
         <TouchableOpacity onPress={handleStartChatUsers}>

@@ -1,11 +1,26 @@
-import { DatabaseReference, set } from "firebase/database";
+import { DatabaseReference, onValue, set } from "firebase/database";
 import { IFiles, ISendFiles } from "../interfaces/PostInterface";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { db, storage } from "../configs/firebase";
+import {
+  FirebaseStorage,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { ref as refRT, query as queryRT } from "firebase/database";
+import { database, db, storage } from "../configs/firebase";
 import { uuidv4 } from "@firebase/util";
 import { useEffect, useState } from "react";
 import { Usuario } from "../interfaces/UsuarioInterface";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { User } from "firebase/auth";
 
 export const sendPost = async (
   ref: DatabaseReference,
@@ -112,3 +127,39 @@ export const useListFriends = (uid: string) => {
 
   return listFriends;
 };
+
+export const FindUserChats = (idChat: string[], idUserLogged: string) => {
+  const valores: any[] = [];
+  for (let index in idChat) {
+    let refRealTime = refRT(database, `chat/${idChat[index]}`);
+    onValue(refRealTime, (onSnapshot) => {
+      if (onSnapshot.exists()) {
+        if (onSnapshot.child("users").val()) {
+          valores.push({
+            id: idChat[index],
+            user:
+              idUserLogged == onSnapshot.child("users").val().persoOne
+                ? onSnapshot.child("users").val().persoTwo
+                : onSnapshot.child("users").val().persoOne,
+          });
+        }
+      }
+    });
+  }
+  return valores;
+};
+
+export async function InsertChatUser(
+  userOne: string,
+  userTwo: string,
+  idChat: string
+) {
+  let collection = doc(db, "users", userOne);
+  await updateDoc(collection, {
+    chats: arrayUnion(idChat),
+  });
+  collection = doc(db, "users", userTwo);
+  await updateDoc(collection, {
+    chats: arrayUnion(idChat),
+  });
+}

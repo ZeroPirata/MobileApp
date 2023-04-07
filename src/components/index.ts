@@ -7,7 +7,8 @@ import { PostView } from "./Posts";
 import { TypeOfFiles } from "./TypeFile";
 import { Btn } from "./button";
 import { Input } from "./input";
-import { ValidarLista } from "./validar";
+import { ValidarLista, ValidarChat } from "./validar";
+import { ChatExist } from "./chatExist";
 
 export {
   Btn,
@@ -20,4 +21,6 @@ export {
   PostView,
   TypeOfFiles,
   ValidarLista,
+  ValidarChat,
+  ChatExist,
 };
