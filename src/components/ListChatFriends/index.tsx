@@ -38,6 +38,7 @@ interface ListUser {
 }
 export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
   const navigate = useNavigation();
+
   const [user, setState] = useState<Usuario[]>([]);
   useEffect(() => {
     const refCollection = collection(db, "users");
@@ -94,7 +95,13 @@ export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
       });
       boolean = { bool: true, id: newId };
     }
-    return navigate.navigate("ChatBeetwen");
+    if (boolean["id"]) {
+      return navigate.navigate("ChatBeetwen", {
+        id: id,
+        idChat: boolean["id"],
+        user: name,
+      });
+    }
   };
   return (
     <View

@@ -1,3 +1,4 @@
+import { IChat } from "../interfaces/Chat";
 import { IPost, IImage } from "../interfaces/PostInterface";
 
 export declare global {
@@ -10,7 +11,7 @@ export declare global {
       SeePost: IPost;
       EditPost: IPost;
       ListSearchedUser: ListSearchedUsers[];
-      ChatBeetwen: undefined;
+      ChatBeetwen: IChat;
     }
   }
 }
