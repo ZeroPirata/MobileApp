@@ -16,7 +16,7 @@ import {
   ViewModalInsideSettings,
 } from "./style";
 
-const Modals = ({ options, iconSize, iconNameFeater }: ModalsProps) => {
+export const Modals = ({ options, iconSize, iconNameFeater }: ModalsProps) => {
   const [modalView, setModalView] = useState(false);
 
   const handleModalOpen = () => {
@@ -65,4 +65,3 @@ const Modals = ({ options, iconSize, iconNameFeater }: ModalsProps) => {
     </ViewModal>
   );
 };
-export { Modals };

@@ -9,7 +9,7 @@ import { Container, InputContainer } from "./style";
 import themes from "../../styles/themes";
 import { TextInput } from "react-native-gesture-handler";
 
-const Input = ({
+export const Input = ({
   width,
   marginTop,
   RightIcon,
@@ -64,5 +64,3 @@ const Input = ({
     </Container>
   );
 };
-
-export { Input };

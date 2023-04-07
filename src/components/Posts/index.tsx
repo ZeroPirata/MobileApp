@@ -42,7 +42,7 @@ import { TextSeeMore } from "../../screens/tab/Home/style";
 import { Modals } from "../Modals";
 import { ModalsProps, Option } from "../../interfaces/ModalInterface";
 
-const PostView = ({ id, ...rest }: IPost) => {
+export const PostView = ({ id, ...rest }: IPost) => {
   const { user } = useAuthentication();
 
   const [deleteFocus, setIsDeleteFocused] = useState(false);
@@ -134,7 +134,11 @@ const PostView = ({ id, ...rest }: IPost) => {
             {localeDate} - {localeHours}{" "}
           </DateTime>
           {user?.email == rest.user ? (
-            <Modals options={options} iconSize={15} iconNameFeater={"settings"}/>
+            <Modals
+              options={options}
+              iconSize={15}
+              iconNameFeater={"settings"}
+            />
           ) : null}
         </DataView>
         {rest.description && <Description>{rest.description}</Description>}
@@ -170,34 +174,3 @@ const PostView = ({ id, ...rest }: IPost) => {
     </Container>
   );
 };
-export { PostView };
-/* 
-<CointaienrButton>
-            <EditPostButton
-              onPressIn={() => setIsEditFocused(true)}
-              onPressOut={() => setIsEditFocused(false)}
-              onPress={() => EditPost(id, rest.user, rest.title)}
-            >
-              <FontAwesome name="edit" size={25} color="white" />
-              {editFocus && (
-                <>
-                  <TextButtonsViewDireita />
-                  <TextButtons>Editar</TextButtons>
-                </>
-              )}
-            </EditPostButton>
-            <DeletePostButton
-              onPress={() => deletePost(id)}
-              onPressIn={() => setIsDeleteFocused(true)}
-              onPressOut={() => setIsDeleteFocused(false)}
-            >
-              {deleteFocus && (
-                <>
-                  <TextButtons>Deletar</TextButtons>
-                  <TextButtonsViewEsquerda />
-                </>
-              )}
-              <FontAwesome name="trash-o" size={25} color="red" />
-            </DeletePostButton>
-          </CointaienrButton>
-           */

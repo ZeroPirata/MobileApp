@@ -1,8 +1,11 @@
 import { DatabaseReference, set } from "firebase/database";
 import { IFiles, ISendFiles } from "../interfaces/PostInterface";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage } from "../configs/firebase";
+import { db, storage } from "../configs/firebase";
 import { uuidv4 } from "@firebase/util";
+import { useEffect, useState } from "react";
+import { Usuario } from "../interfaces/UsuarioInterface";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 
 export const sendPost = async (
   ref: DatabaseReference,
@@ -92,4 +95,20 @@ export const UploadSingleImage = async (email: string, image: ISendFiles) => {
     id,
     url: await getDownloadURL(snapshot.ref),
   };
+};
+export const useListFriends = (uid: string) => {
+  const [listFriends, setListFriends] = useState<Usuario[]>([]);
+
+  useEffect(() => {
+    const collect = collection(db, "users");
+    const queryUser = query(collect, where("id", "==", uid));
+    const unsubscribe = onSnapshot(queryUser, (querySnapshot) => {
+      const dados: any = querySnapshot.docs.map((doc) => doc.data());
+      setListFriends(dados);
+    });
+
+    return unsubscribe;
+  }, [uid]);
+
+  return listFriends;
 };

@@ -1,11 +1,51 @@
-import { useCallback, useState, useEffect } from "react";
-import { Modals } from "../../../components/Modals";
-import { Option } from "../../../interfaces/ModalInterface";
+import { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Container } from "./style";
-import { child, get, onValue, ref, runTransaction } from "firebase/database";
-import { database } from "../../../configs/firebase";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuthentication } from "../../../hooks/useAuthentication";
+import { ValidarLista } from "../../../components/index";
+import { useListFriends } from "../../../utils/functions";
 
 const Chat = () => {
-  return <Container></Container>;
+  const [showList, setShowList] = useState(false);
+  const { user } = useAuthentication();
+
+  const listFriends = useListFriends(String(user?.uid));
+
+  const handleListShow = () => {
+    setShowList((prevShowList) => !prevShowList);
+  };
+
+  return (
+    <Container style={{ paddingTop: 25 }}>
+      <View style={styles.headerChat}>
+        <TouchableOpacity style={styles.iconDisplay} onPress={handleListShow}>
+          <Text>Iniciar conversa</Text>
+          <MaterialCommunityIcons
+            name={showList ? "chat-minus" : "chat-plus"}
+            size={35}
+          />
+        </TouchableOpacity>
+        {showList
+          ? listFriends && (
+              <ValidarLista list={listFriends[0].friends} user={user} />
+            )
+          : null}
+      </View>
+    </Container>
+  );
 };
 export { Chat };
+
+const styles = StyleSheet.create({
+  headerChat: {
+    display: "flex",
+  },
+  iconDisplay: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+});

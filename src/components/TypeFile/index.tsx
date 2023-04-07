@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { IFiles } from "../../interfaces/PostInterface";
 
-class TypeOfFiles {
+export class TypeOfFiles {
   typeOfFile(type: string, uri: string) {
     if (type === "image") {
       return <Text>{uri}</Text>;
@@ -14,4 +14,3 @@ class TypeOfFiles {
     }
   }
 }
-export { TypeOfFiles };

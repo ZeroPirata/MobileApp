@@ -6,7 +6,7 @@ import { Button, TextBtn, Content } from "./style";
 import { FontAwesome } from "@expo/vector-icons";
 import { ButtonStyle, variants } from "./variants";
 
-const Btn: React.FC<ButtonProps> = ({
+export const Btn: React.FC<ButtonProps> = ({
   variant = "LargeButtonGoldBorded",
   disabled,
   title,
@@ -60,5 +60,3 @@ const Btn: React.FC<ButtonProps> = ({
     </Button>
   );
 };
-
-export { Btn };

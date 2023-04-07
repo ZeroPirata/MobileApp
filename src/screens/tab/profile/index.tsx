@@ -162,13 +162,6 @@ const Profile = () => {
         String(user?.email),
         imageSelect
       );
-      if (!userInfo[0].background) {
-        deleteObject(
-          ref(storage, `images/${user?.email}/${userInfo[0].background.id}`)
-        )
-          .then()
-          .catch((err) => console.log(err));
-      }
       const refDatabase = doc(collection(db, "users"), user?.uid);
       const documentSnapshot = await getDoc(refDatabase);
       const updatedData = {
@@ -180,7 +173,7 @@ const Profile = () => {
         },
       };
       try {
-        await setDoc(refDatabase, updatedData);
+        await setDoc(refDatabase, updatedData, { merge: true });
         setImageSelect(undefined);
       } catch (error) {
         console.log(error);

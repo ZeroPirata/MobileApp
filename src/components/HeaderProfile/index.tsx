@@ -29,7 +29,7 @@ import {
 } from "firebase/firestore";
 import { IListSearchedUsers } from "../../interfaces/ListagemDeUsuario";
 
-const HeaderProfile = () => {
+export const HeaderProfile = () => {
   const { user } = useAuthentication();
   const navigation = useNavigation();
   const postCreateButton = () => {
@@ -106,4 +106,3 @@ const HeaderProfile = () => {
     </HeaderView>
   );
 };
-export { HeaderProfile };

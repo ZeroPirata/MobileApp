@@ -10,6 +10,7 @@ export declare global {
       SeePost: IPost;
       EditPost: IPost;
       ListSearchedUser: ListSearchedUsers[];
+      ChatBeetwen: undefined;
     }
   }
 }

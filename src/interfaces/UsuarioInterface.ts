@@ -1,9 +1,13 @@
 import { User } from "firebase/auth/react-native";
-export interface Usuario extends User {
-  displayName: string;
+import { IFriendRequest } from "./Notification";
+export interface Usuario {
+  avatar?: string;
+  name: string;
   email: string;
-  assets?: {
-    profile: string;
-    background: string;
+  id: string;
+  background: {
+    id: string;
+    url: string;
   };
+  friends: IFriendRequest[];
 }

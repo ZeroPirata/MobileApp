@@ -7,7 +7,7 @@ import { useAuthentication } from "../../hooks/useAuthentication";
 import { ref, set } from "firebase/database";
 import { database } from "../../configs/firebase";
 
-const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
+export const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
   const { user } = useAuthentication();
 
   const handlerAdicionarUsuario = (uid: string) => {
@@ -68,4 +68,3 @@ const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
     </View>
   );
 };
-export { ListUsersComponent };

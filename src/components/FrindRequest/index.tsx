@@ -5,17 +5,16 @@ import {
   arrayUnion,
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
-  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
 import { database, db } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { ref, remove } from "firebase/database";
-const FriendRequest = ({ ...rest }: IFriendRequest) => {
+
+export const FriendRequest = ({ ...rest }: IFriendRequest) => {
   const { user } = useAuthentication();
   const FriendAccept = async () => {
     const getIdReference = collection(db, "users");
@@ -30,7 +29,6 @@ const FriendRequest = ({ ...rest }: IFriendRequest) => {
           id: rest?.id,
           name: rest?.name,
           email: rest?.email,
-          avatar: rest?.avatar,
         }),
       });
     }
@@ -45,7 +43,6 @@ const FriendRequest = ({ ...rest }: IFriendRequest) => {
           id: user?.uid,
           name: user?.displayName,
           email: user?.email,
-          avatar: user?.photoURL,
         }),
       });
     }
@@ -89,4 +86,3 @@ const FriendRequest = ({ ...rest }: IFriendRequest) => {
     </View>
   );
 };
-export { FriendRequest };
