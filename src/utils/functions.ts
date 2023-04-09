@@ -15,6 +15,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDocs,
   onSnapshot,
   query,
   updateDoc,
@@ -154,12 +155,21 @@ export async function InsertChatUser(
   userTwo: string,
   idChat: string
 ) {
-  let collection = doc(db, "users", userOne);
-  await updateDoc(collection, {
-    chats: arrayUnion(idChat),
-  });
-  collection = doc(db, "users", userTwo);
-  await updateDoc(collection, {
-    chats: arrayUnion(idChat),
-  });
+  const getIdReference = collection(db, "users");
+  const queryOne = query(getIdReference, where("id", "==", userOne));
+  const queryTwo = query(getIdReference, where("id", "==", userTwo));
+  const insertLoggedUser = await getDocs(queryOne);
+  const insertFriendRequest = await getDocs(queryTwo);
+  if (insertLoggedUser) {
+    const refCloudFireStore = doc(db, "users", insertLoggedUser.docs[0].id);
+    await updateDoc(refCloudFireStore, {
+      chats: arrayUnion(idChat),
+    });
+  }
+  if (insertLoggedUser) {
+    const refCloudFireStore = doc(db, "users", insertFriendRequest.docs[0].id);
+    await updateDoc(refCloudFireStore, {
+      chats: arrayUnion(idChat),
+    });
+  }
 }

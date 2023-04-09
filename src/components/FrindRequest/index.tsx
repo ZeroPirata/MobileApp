@@ -27,8 +27,6 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
       await updateDoc(refCloudFireStore, {
         friends: arrayUnion({
           id: rest?.id,
-          name: rest?.name,
-          email: rest?.email,
         }),
       });
     }
@@ -41,8 +39,6 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
       await updateDoc(refCloudFireStore, {
         friends: arrayUnion({
           id: user?.uid,
-          name: user?.displayName,
-          email: user?.email,
         }),
       });
     }
@@ -68,7 +64,6 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
     >
       <Text>{rest.email}</Text>
       <Text>{rest.id}</Text>
-      <Text>{rest.avatar}</Text>
       <Text>{rest.date}</Text>
       <View>
         <TouchableOpacity onPress={() => FriendAccept()}>
