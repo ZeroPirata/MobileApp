@@ -16,7 +16,6 @@ export const ViewModalInsideSettings = styled.View`
 export const TouchModal = styled(TouchableOpacity)``;
 export const TouchModalOptions = styled(TouchableOpacity)``;
 export const TouchModalOpen = styled(TouchableOpacity)`
-  flex: 1;
 `;
 export const ModalSettings = styled(Modal)``;
 export const TextModal = styled.Text`

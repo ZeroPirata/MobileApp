@@ -59,6 +59,7 @@ export const PlusIcon = styled(TouchableOpacity)`
   justify-items: center;
   display: flex;
   flex-direction: row;
+  height: 100%;
   width: 25%;
 `;
 export const TextInputSearch = styled.TextInput`

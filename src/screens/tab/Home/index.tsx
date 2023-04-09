@@ -68,13 +68,13 @@ const HomeTab = () => {
     reciveUserAttributes(numberOfPost);
   }, []);
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <Container>
-        <HeaderProfile />
+    <Container>
+      <HeaderProfile />
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {postInDataBase &&
           postInDataBase.map((items) => {
             return (
@@ -89,11 +89,11 @@ const HomeTab = () => {
               />
             );
           })}
-        <ButtoSeeMore onPress={endScrollView}>
-          <TextSeeMore>Ver mais</TextSeeMore>
-        </ButtoSeeMore>
-      </Container>
-    </ScrollView>
+      </ScrollView>
+      <ButtoSeeMore onPress={endScrollView}>
+        <TextSeeMore>Ver mais</TextSeeMore>
+      </ButtoSeeMore>
+    </Container>
   );
 };
 
