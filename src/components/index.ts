@@ -9,6 +9,7 @@ import { Btn } from "./button";
 import { Input } from "./input";
 import { ValidarLista, ValidarChat } from "./validar";
 import { ChatExist } from "./chatExist";
+import { GrupRequest } from "./GrupRequest";
 
 export {
   Btn,
@@ -23,4 +24,5 @@ export {
   ValidarLista,
   ValidarChat,
   ChatExist,
+  GrupRequest,
 };

@@ -1,3 +1,5 @@
+import { IListSearchedUsers } from "./ListagemDeUsuario";
+
 export interface ISendFiles {
   mimeType: string;
   name: string;
@@ -23,4 +25,11 @@ export interface IPost {
   data: number;
   images?: IFiles[];
   arquivos?: IFiles;
+}
+
+export interface ICreateGrupo {
+  nome: string;
+  descricao: string;
+  image: ISendFiles;
+  membros: IListSearchedUsers[];
 }

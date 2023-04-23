@@ -1,5 +1,5 @@
 import { useRoute } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, Image, ScrollView, TextInput } from "react-native";
 import { Usuario } from "../../../interfaces/UsuarioInterface";
 import { Entypo, Feather } from "@expo/vector-icons";
@@ -91,6 +91,12 @@ const ChatBeetwen = () => {
     });
   };
 
+  const ScrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    ScrollViewRef.current?.scrollToEnd({ animated: true });
+  }, [chatHistory]);
+
   return (
     <View>
       <View style={{ paddingTop: 25 }}>
@@ -131,7 +137,7 @@ const ChatBeetwen = () => {
             backgroundColor: themes.COLORS.BACKGROUND,
           }}
         >
-          <ScrollView>
+          <ScrollView ref={ScrollViewRef}>
             <View style={{}}>
               {chatHistory.map((history) => {
                 const date = new Date(history.data * 1000);
@@ -177,13 +183,7 @@ const ChatBeetwen = () => {
                             }
                       }
                     >
-                      <Text
-                        style={{
-                          width: "100%",
-                        }}
-                      >
-                        {history.msg}
-                      </Text>
+                      <Text style={{ maxWidth: "70%" }}>{history.msg}</Text>
                       <Text>
                         {localeDate} - {localeHours}
                       </Text>

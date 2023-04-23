@@ -35,6 +35,9 @@ export const HeaderProfile = () => {
   const postCreateButton = () => {
     navigation.navigate("CreatePost");
   };
+  const grupoCreateButton = () => {
+    navigation.navigate("CreateGrupo");
+  };
 
   const options: Option[] = [
     {
@@ -43,7 +46,7 @@ export const HeaderProfile = () => {
     },
     {
       name: "Criar Grupo",
-      function: () => console.log("Loading"),
+      function: () => grupoCreateButton(),
     },
   ];
 

@@ -53,7 +53,6 @@ const SignUp: React.FC = () => {
         value.email,
         value.password
       ).then(async (result) => {
-        console.log(result);
         const prevUser = auth.currentUser;
         await addDoc(collection(db, "users"), {
           id: prevUser?.uid,

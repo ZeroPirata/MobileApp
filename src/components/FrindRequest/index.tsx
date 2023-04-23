@@ -19,14 +19,14 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
   const FriendAccept = async () => {
     const getIdReference = collection(db, "users");
     const queryOne = query(getIdReference, where("id", "==", user?.uid));
-    const queryTwo = query(getIdReference, where("id", "==", rest.id));
+    const queryTwo = query(getIdReference, where("id", "==", rest.idUser));
     const insertLoggedUser = await getDocs(queryOne);
     const InsertFriendRequest = await getDocs(queryTwo);
     if (insertLoggedUser) {
       const refCloudFireStore = doc(db, "users", insertLoggedUser.docs[0].id);
       await updateDoc(refCloudFireStore, {
         friends: arrayUnion({
-          id: rest?.id,
+          id: rest?.idUser,
         }),
       });
     }
@@ -41,11 +41,11 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
           id: user?.uid,
         }),
       });
+      FriendRecused(rest.idRequest);
     }
-    FriendRecused(rest.index);
   };
 
-  const FriendRecused = async (index: number) => {
+  const FriendRecused = async (index: string) => {
     await remove(
       ref(database, `user/${user?.uid}/alerts/requestfriends/${index}`)
     );
@@ -63,8 +63,8 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
       }}
     >
       <Text>{rest.email}</Text>
-      <Text>{rest.id}</Text>
-      <Text>{rest.date}</Text>
+      <Text>{rest.idUser}</Text>
+      <Text>{rest.data}</Text>
       <View>
         <TouchableOpacity onPress={() => FriendAccept()}>
           <Entypo name="check" size={24} color={"black"} />
@@ -74,7 +74,7 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
             name="cross"
             size={24}
             color={"black"}
-            onPress={() => FriendRecused(rest.index)}
+            onPress={() => FriendRecused(rest.idRequest)}
           />
         </TouchableOpacity>
       </View>

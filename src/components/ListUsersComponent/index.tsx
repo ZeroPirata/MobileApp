@@ -4,7 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import themes from "../../styles/themes";
 import { useAuthentication } from "../../hooks/useAuthentication";
-import { ref, set } from "firebase/database";
+import { push, ref, set } from "firebase/database";
 import { database } from "../../configs/firebase";
 
 export const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
@@ -12,15 +12,13 @@ export const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
 
   const handlerAdicionarUsuario = (uid: string) => {
     const refRealTime = ref(database, `user/${uid}/alerts/requestfriends`);
-    set(refRealTime, [
-      {
-        date: Math.floor(Date.now() / 1000),
-        id: user?.uid,
-        name: user?.displayName,
-        email: user?.email,
-        avatar: user?.photoURL,
-      },
-    ]);
+    push(refRealTime, {
+      date: Math.floor(Date.now() / 1000),
+      id: user?.uid,
+      name: user?.displayName,
+      email: user?.email,
+      avatar: user?.photoURL,
+    });
   };
 
   return (
@@ -47,7 +45,7 @@ export const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
             color: themes.COLORS.COLORS_CONSTRAT.ROSA_CLARO,
           }}
         >
-          {rest.id}
+          {rest.name}
         </Text>
         <Text style={{ fontSize: 15 }}>{rest.email}</Text>
       </View>

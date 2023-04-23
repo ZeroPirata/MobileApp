@@ -89,10 +89,10 @@ const HomeTab = () => {
               />
             );
           })}
-      </ScrollView>
       <ButtoSeeMore onPress={endScrollView}>
         <TextSeeMore>Ver mais</TextSeeMore>
       </ButtoSeeMore>
+      </ScrollView>
     </Container>
   );
 };

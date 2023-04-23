@@ -8,6 +8,7 @@ export declare global {
       SignUp: undefined;
       CreatePost: undefined;
       TabsRoutes: undefined;
+      CreateGrupo: undefined;
       SeePost: IPost;
       EditPost: IPost;
       ListSearchedUser: ListSearchedUsers[];
