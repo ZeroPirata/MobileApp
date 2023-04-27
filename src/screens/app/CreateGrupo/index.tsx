@@ -93,9 +93,6 @@ export const CreateGrupo = () => {
       },
       membros: [{ id: user?.uid }],
     });
-    await push(refRealTime, {
-      id: user?.uid,
-    });
     EnviarSolicataoParaEntrarNoGrupo(GUID, imageUrl);
   };
   return (

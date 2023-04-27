@@ -1,18 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
-import { deleteDoc, doc } from "firebase/firestore";
 import { ref, child, onValue, runTransaction, remove } from "firebase/database";
-import { SetStateAction, useEffect, useState } from "react";
-import {
-  Button,
-  RefreshControl,
-  ScrollView,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { db, database } from "../../configs/firebase";
+import { useEffect, useState } from "react";
+import { ScrollView } from "react-native";
+import { database } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
-import { FontAwesome, EvilIcons } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
 import { IPost } from "../../interfaces/PostInterface";
 import {
   Container,
@@ -24,23 +16,15 @@ import {
   ButtonSeeMore,
   TextButtonSeeMore,
   LikeAndDeslikeButton,
-  TextButtonsView,
-  DeletePostButton,
-  CointaienrButton,
-  EditPostButton,
-  TextButtons,
   ButtonLike,
   LikeCounts,
   DataView,
   DateTime,
-  TextButtonsViewDireita,
-  TextButtonsViewEsquerda,
 } from "./style";
 import themes from "../../styles/themes";
-import { TextSeeMore } from "../../screens/tab/Home/style";
 
 import { Modals } from "../Modals";
-import { ModalsProps, Option } from "../../interfaces/ModalInterface";
+import { Option } from "../../interfaces/ModalInterface";
 
 export const PostView = ({ id, ...rest }: IPost) => {
   const { user } = useAuthentication();

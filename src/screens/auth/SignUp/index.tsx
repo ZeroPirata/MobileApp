@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 import { Btn } from "../../../components/button";
 import { Input } from "../../../components/input";
@@ -48,19 +48,21 @@ const SignUp: React.FC = () => {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(
-        auth,
-        value.email,
-        value.password
-      ).then(async (result) => {
-        const prevUser = auth.currentUser;
-        await addDoc(collection(db, "users"), {
-          id: prevUser?.uid,
-          name: value.name,
-          email: value.email,
-          avatar: "",
-        });
-      });
+      await createUserWithEmailAndPassword(auth, value.email, value.password)
+        .then(async (result) => {
+          const prevUser = auth.currentUser;
+          const usersRef = doc(db, "users", String(prevUser?.uid));
+          await setDoc(usersRef, {
+            id: String(prevUser?.uid),
+            name: value.name,
+            email: value.email,
+            avatar:
+              "https://imgs.search.brave.com/CdaS8i6ytuf3Fpumjswpqorq_K_Mfa_M6YOppDmFN0w/rs:fit:325:297:1/g:ce/aHR0cHM6Ly9lbS53/YXR0cGFkLmNvbS84/ZjE5YjQxMmYyMjIz/YWZlNDI4OGVkMDkw/NDEyMGE0OGI3YTM4/Y2UxLzY4NzQ3NDcw/NzMzYTJmMmY3MzMz/MmU2MTZkNjE3YTZm/NmU2MTc3NzMyZTYz/NmY2ZDJmNzc2MTc0/NzQ3MDYxNjQyZDZk/NjU2NDY5NjEyZDcz/NjU3Mjc2Njk2MzY1/MmY1Mzc0NmY3Mjc5/NDk2ZDYxNjc2NTJm/NTY1MDcyMmQzODQ2/NGUyZDc0NGE1MTUz/NDk2NzNkM2QyZDMy/MzQzMjM5MzEzNTM4/MzEzMDJlMzEzNDM0/MzM2NTM5NjMzMTYx/NjMzNzY0MzgzNDM3/NjUyZTZhNzA2Nz9z/PWZpdCZ3PTcyMCZo/PTcyMA",
+          })
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
     } catch (error: any) {
       error = erroLogs(error.code);
       setErrorMessage(error);

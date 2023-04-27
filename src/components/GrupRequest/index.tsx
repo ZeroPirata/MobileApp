@@ -2,19 +2,38 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { IGrupo } from "../../interfaces/Notification";
 import { Entypo } from "@expo/vector-icons";
 import { push, ref, remove } from "firebase/database";
-import { database } from "../../configs/firebase";
+import { database, db } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
 const GrupRequest = ({ ...rest }: IGrupo) => {
   const { user } = useAuthentication();
-  const AceitarGrupo = () => {
+  const AceitarGrupo = async () => {
     const refRealTime = ref(database, `grupos/${rest.idGroup}/membros`);
     push(refRealTime, {
       id: user?.uid,
     });
+    const collect = collection(db, "users");
+    const queryOne = query(collect, where("id", "==", user?.uid));
+    const InsertGrupRequest = await getDocs(queryOne);
+    if (InsertGrupRequest) {
+      const refCloudFireStore = doc(db, "users", InsertGrupRequest.docs[0].id);
+      await updateDoc(refCloudFireStore, {
+        grupos: arrayUnion({
+          id: rest?.idGroup,
+        }),
+      });
+    }
     RecusarGrupo();
-    /* Fazer Lógica de aceitar no Database */
-    console.log("Aceito");
   };
   const RecusarGrupo = () => {
     const refRealTime = ref(

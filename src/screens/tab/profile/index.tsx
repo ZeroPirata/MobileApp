@@ -73,6 +73,7 @@ import { UploadSingleImage } from "../../../utils/functions";
 const Profile = () => {
   const auth = getAuth();
   const { user } = useAuthentication();
+  console.log(user?.uid );
 
   const [userInfo, setUserInfo] = useState<DocumentData[]>([]);
   const [imageSelect, setImageSelect] = useState<ISendFiles>();

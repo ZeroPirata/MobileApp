@@ -1,6 +1,15 @@
 import { async } from "@firebase/util";
 import { useNavigation } from "@react-navigation/native";
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import {
+  DocumentData,
+  collection,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { getDownloadURL, getMetadata, ref } from "firebase/storage";
 import * as DataBase from "firebase/database";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -12,61 +21,77 @@ import {
   ScrollView,
   Button,
 } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import { HeaderProfile } from "../../../components/HeaderProfile";
 import { PostView } from "../../../components/Posts";
 import { database, db, storage } from "../../../configs/firebase";
 import { IPost } from "../../../interfaces/PostInterface";
 
 import { Container, ButtoSeeMore, TextSeeMore } from "./style";
+import { useAuthentication } from "../../../hooks/useAuthentication";
 
 const HomeTab = () => {
   const navigation = useNavigation();
-  const [postInDataBase, setPostInDataBase] = useState<IPost[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
 
+  const { user } = useAuthentication();
+  const [userInfo, setUserInfo] = useState<DocumentData>();
+  const [postInDataBase, setPostInDataBase] = useState<IPost[]>([]);
   const [numberOfPost, setNumberOfPost] = useState(5);
+  useEffect(() => {
+    if (user?.uid != undefined) {
+      const collect = collection(db, "users");
+      const queryUser = query(collect, where("id", "==", user?.uid));
+      const unsubscribe = onSnapshot(queryUser, (querySnapshot) => {
+        const dados: any = [];
+        querySnapshot.docs.map((doc) => {
+          dados.push(doc.data());
+        });
+        setUserInfo(dados);
+      });
+      return unsubscribe;
+    }
+  }, [user?.uid]);
+  const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setNumberOfPost(5);
     setRefreshing(true);
     setTimeout(() => {
-      reciveUserAttributes(5);
       setRefreshing(false);
     }, 1000);
   }, []);
 
   function endScrollView() {
     setNumberOfPost(numberOfPost + 1);
-    reciveUserAttributes(numberOfPost);
   }
 
-  const reciveUserAttributes = useCallback(
-    async (QntOfPost: number) => {
-      const refDatabase = DataBase.ref(database, "posts/");
-      const PostInDataBase = DataBase.query(
-        refDatabase,
-        DataBase.orderByChild("data"),
-        DataBase.limitToLast(QntOfPost)
-      );
-      DataBase.onValue(PostInDataBase, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const PostList = Object.keys(data)
-            .map((key) => ({
-              id: key,
-              ...data[key],
-            }))
-            .sort((a, b) => b.data - a.data);
-          setPostInDataBase(PostList);
-        }
-      });
-    },
-    [setPostInDataBase]
-  );
-
   useEffect(() => {
-    reciveUserAttributes(numberOfPost);
+    const listOfFriends =
+      userInfo && userInfo[0]?.friends?.map((friend: any) => friend.id);
+    const refDatabase = DataBase.ref(database, "posts/");
+    const PostInDataBase = DataBase.query(
+      refDatabase,
+      DataBase.orderByChild("data"),
+      DataBase.limitToLast(numberOfPost)
+    );
+    DataBase.onValue(PostInDataBase, (snapshot) => {
+      const data = snapshot.val();
+      const PostList = Object.keys(data)
+        .map((key) => {
+          const post = data[key];
+          const isFriend =
+            listOfFriends && listOfFriends.includes(post.user_id);
+          const postDono = post.user_id == user?.uid;
+          if (isFriend || (postDono && post !== undefined)) {
+            return {
+              id: key,
+              ...post,
+            };
+          }
+        })
+        .sort((a, b) => b.data - a.data);
+      setPostInDataBase(PostList);
+    });
   }, []);
+
   return (
     <Container>
       <HeaderProfile />
@@ -77,21 +102,23 @@ const HomeTab = () => {
       >
         {postInDataBase &&
           postInDataBase.map((items) => {
-            return (
-              <PostView
-                id={items.id}
-                key={items.id}
-                user={items.user}
-                title={items.title}
-                description={items.description}
-                images={items?.images}
-                data={items.data}
-              />
-            );
+            if (items != undefined) {
+              return (
+                <PostView
+                  id={items.id}
+                  key={items.id}
+                  user={items.user}
+                  title={items.title}
+                  description={items.description}
+                  images={items?.images}
+                  data={items.data}
+                />
+              );
+            }
           })}
-      <ButtoSeeMore onPress={endScrollView}>
-        <TextSeeMore>Ver mais</TextSeeMore>
-      </ButtoSeeMore>
+        <ButtoSeeMore onPress={endScrollView}>
+          <TextSeeMore>Ver mais</TextSeeMore>
+        </ButtoSeeMore>
       </ScrollView>
     </Container>
   );

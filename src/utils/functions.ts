@@ -29,12 +29,14 @@ export const sendPost = async (
   title: string,
   descricao: string | null,
   images: ISendFiles[],
-  arquivos: ISendFiles | undefined
+  arquivos: ISendFiles | undefined,
+  user_id: string
 ): Promise<void> => {
   try {
     const uploadedImages = await ImageArrayUpload(user, images);
     if (arquivos == undefined) {
       const postData = {
+        user_id: user_id,
         data: Math.floor(Date.now() / 1000),
         user: user,
         title: title,
@@ -49,6 +51,7 @@ export const sendPost = async (
       const uploadFiles = await FliesUpload(user, arquivos);
       const postData = {
         data: Math.floor(Date.now() / 1000),
+        user_id: user_id,
         user: user,
         title: title,
         description: descricao,

@@ -127,7 +127,8 @@ const CreatePost = () => {
       value.title,
       value.description,
       images,
-      files
+      files,
+      String(user?.uid)
     );
     navigation.navigate("TabsRoutes");
     setLoadingUpload(false);

@@ -12,7 +12,7 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
 } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView, ScrollView } from "react-native";
 import * as WebBrowser from "expo-web-browser";
@@ -85,7 +85,7 @@ const SignIn: React.FC = () => {
           const prevUser = auth.currentUser;
           const user = result.user as UserResponse;
           if (!(await queryByEmail(user.email))) {
-            await addDoc(collection(db, "users"), {
+            await setDoc(doc(db, `users/${String(prevUser?.uid)}`), {
               id: prevUser?.uid,
               name: user.displayName,
               email: user.email,
@@ -110,10 +110,11 @@ const SignIn: React.FC = () => {
       const credential = FacebookAuthProvider.credential(access_token);
       signInWithCredential(auth, credential)
         .then(async (result) => {
+          const prevUser = auth.currentUser;
           const user = result.user as UserResponse;
           if (!(await queryByEmail(user.email))) {
-            await addDoc(collection(db, "users"), {
-              id: uuidv4(),
+            await setDoc(doc(db, `users/${String(prevUser?.uid)}`), {
+              id: prevUser?.uid,
               name: user.displayName,
               email: user.email,
               avatar: user.photoURL,
