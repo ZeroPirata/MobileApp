@@ -74,7 +74,6 @@ const ChatBeetwen = () => {
       setChatHistory(chatArray);
     });
 
-    // Return a cleanup function to remove the listener when the component unmounts
     return () => {
       if (listener) {
         off(refRealTime, "value", listener);

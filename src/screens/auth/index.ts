@@ -1,4 +1,5 @@
 import { SignIn } from "./SignIn";
 import { SignUp } from "./SignUp";
+import { EmailVerifed } from "./EmailVerified";
 
-export { SignIn, SignUp };
+export { SignIn, SignUp, EmailVerifed };

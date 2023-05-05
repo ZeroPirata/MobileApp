@@ -1,39 +1,56 @@
 import React, { useEffect, useState } from "react";
-
-import { RFValue } from "react-native-responsive-fontsize";
 import * as Google from "expo-auth-session/providers/google";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import { ResponseType } from "expo-auth-session";
-
 import {
   getAuth,
   signInWithEmailAndPassword,
   signInWithCredential,
   GoogleAuthProvider,
   FacebookAuthProvider,
+  updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView, ScrollView } from "react-native";
 import * as WebBrowser from "expo-web-browser";
-import { uuidv4 } from "@firebase/util";
-
-import { Btn } from "../../../components/button/index";
-import { Input } from "../../../components/input/index";
-
-import * as SignInContent from "./style";
-import themes from "../../../styles/themes";
+import {
+  ButtonAccount,
+  ButtonLoginText,
+  ButtonLoginView,
+  ButtonText,
+  Container,
+  EmailInputText,
+  EmailInputView,
+  ErroLog,
+  ForguetPassWordText,
+  ForguetPassWordView,
+  ImageBackGround,
+  LeyoutLogin,
+  LoginComponent,
+  LoginText,
+  ModalsAnotherLogin,
+  PasswordInputText,
+  PasswordInputView,
+  SeePassword,
+  TextCreateAccount,
+} from "./style";
+import { logo } from "../../../styles/image.json";
 import { db } from "../../../configs/firebase";
 import { queryByEmail } from "../../../utils/querys";
 import { erroLogs } from "../../../utils/errors";
 
 import { GOOGLE_ID } from "../../../configs/google";
 import { FACEBOOK_ID } from "../../../configs/facebook";
+import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
+import themes from "../../../styles/themes";
 
 WebBrowser.maybeCompleteAuthSession();
 const authFirebase = getAuth();
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
+  const [secury, setSecury] = useState(true);
+
   const [errorMessage, setErrorMessage] = useState("");
 
   const [value, setValue] = useState({
@@ -62,11 +79,11 @@ const SignIn: React.FC = () => {
     try {
       await signInWithEmailAndPassword(
         authFirebase,
-
         value.email,
         value.password
       );
     } catch (error: any) {
+      console.log(error);
       error = erroLogs(error.code);
       setErrorMessage(error);
     }
@@ -112,6 +129,13 @@ const SignIn: React.FC = () => {
         .then(async (result) => {
           const prevUser = auth.currentUser;
           const user = result.user as UserResponse;
+          if (prevUser) {
+            updateProfile(prevUser, {
+              displayName: user.displayName,
+              photoURL: user.photoURL,
+            });
+            sendEmailVerification(prevUser);
+          }
           if (!(await queryByEmail(user.email))) {
             await setDoc(doc(db, `users/${String(prevUser?.uid)}`), {
               id: prevUser?.uid,
@@ -120,6 +144,7 @@ const SignIn: React.FC = () => {
               avatar: user.photoURL,
             });
           }
+          return setErrorMessage("Verifique seu email");
         })
         .catch((error: any) => {
           error = erroLogs(error.code);
@@ -132,109 +157,82 @@ const SignIn: React.FC = () => {
     navigation.navigate("SignUp");
   };
   return (
-    <SignInContent.Container>
-      <SafeAreaView>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <SignInContent.ContainerHeader>
-            <SignInContent.TitleHeader>Wellcome to</SignInContent.TitleHeader>
-            <SignInContent.NameApp>G-Witter</SignInContent.NameApp>
-            <SignInContent.DescriptionTextHeader>
-              If you want, you can login with one of the social networks below
-            </SignInContent.DescriptionTextHeader>
-            <SignInContent.ButtonsLoginSocial>
-              <Btn
-                IconName="google"
-                IconSize={RFValue(25)}
-                IconColor={themes.COLORS.WHITE_100}
-                title="Google"
-                fontColor={themes.COLORS.WHITE_100}
-                fontSize={RFValue(25)}
-                disabled={!requestGoogle}
-                style={{
-                  backgroundColor: themes.COLORS.GOOGLE.GREEN,
-                  borderColor: themes.COLORS.WHITE_100,
-                  justifyContent: "space-around",
-                  borderWidth: RFValue(3),
-                  width: RFValue(150),
-                  height: RFValue(75),
-                }}
-                onPress={() => {
-                  GoogleLogin();
-                }}
-              />
-              <Btn
-                IconName="facebook"
-                IconSize={RFValue(25)}
-                IconColor={themes.COLORS.WHITE}
-                title="Facebook"
-                fontSize={RFValue(25)}
-                fontColor={themes.COLORS.WHITE}
-                disabled={!requestFacebook}
-                style={{
-                  borderColor: themes.COLORS.WHITE,
-                  backgroundColor: themes.COLORS.BLUE4,
-                  width: RFValue(150),
-                  height: RFValue(75),
-                  borderWidth: RFValue(3),
-                }}
-                onPress={() => {
-                  FacebookLogin();
-                }}
-              />
-            </SignInContent.ButtonsLoginSocial>
-          </SignInContent.ContainerHeader>
-          <SignInContent.ContainerBody>
-            {errorMessage ? (
-              <SignInContent.TextError>{errorMessage}</SignInContent.TextError>
-            ) : null}
-            <Input
-              LeftIcon
-              iconSize={20}
-              iconName="mail"
-              width={325}
-              value={value.email}
+    <Container>
+      <ImageBackGround
+        source={{
+          uri: logo,
+        }}
+      />
+      <LoginComponent>
+        <LoginText>Login</LoginText>
+        {errorMessage ? <ErroLog>{errorMessage}</ErroLog> : null}
+        <LeyoutLogin>
+          <EmailInputView>
+            <EmailInputText
               onChangeText={(text) => setValue({ ...value, email: text })}
-              placeholder={"E-mail"}
-              secureTextEntry={false}
+              placeholderTextColor={themes.COLORS.GRAY4}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              underlineColorAndroid="transparent"
+              placeholder="Email"
+              value={value.email}
+              autoCorrect={false}
             />
-            <Input
-              LeftIcon
-              RightIcon
-              iconSize={20}
-              placeholder={"Password"}
-              iconName="lock-closed-outline"
-              value={value.password}
+          </EmailInputView>
+          <PasswordInputView>
+            <PasswordInputText
               onChangeText={(text) => setValue({ ...value, password: text })}
-              width={325}
-              marginTop={10}
+              placeholderTextColor={themes.COLORS.GRAY4}
+              underlineColorAndroid="transparent"
+              secureTextEntry={secury}
+              value={value.password}
+              placeholder="Password"
+              autoCapitalize="none"
+              autoCorrect={false}
             />
-            <Btn
-              title="Sign In"
-              variant="SmallButtonGoldBorded"
-              fontColor={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
-              style={{
-                margin: 10,
-                borderWidth: 3,
-                borderColor: themes.COLORS.HEXTECH_METAL_GOLD.GOLD4,
-                backgroundColor: themes.COLORS.TEXT_and_BACKGROUND.GRAY4,
+            <SeePassword onPress={() => setSecury(!secury)}>
+              <Ionicons
+                size={25}
+                color="white"
+                name={secury ? "eye" : "eye-off"}
+              />
+            </SeePassword>
+          </PasswordInputView>
+          <ForguetPassWordView>
+            <ForguetPassWordText>Forget the password?</ForguetPassWordText>
+          </ForguetPassWordView>
+          <ButtonLoginView onPress={signIn}>
+            <ButtonLoginText>Sign In</ButtonLoginText>
+          </ButtonLoginView>
+          <ModalsAnotherLogin>
+            <TextCreateAccount>
+              Choose one of the ways below to sign in if you don't have an
+              account
+            </TextCreateAccount>
+            <ButtonAccount onPress={handleSignUp}>
+              <Entypo name="new" size={30} color="white" />
+              <ButtonText>Sign Up</ButtonText>
+            </ButtonAccount>
+            <ButtonAccount
+              onPress={() => {
+                GoogleLogin();
               }}
-              onPress={signIn}
-            />
-          </SignInContent.ContainerBody>
-          <SignInContent.ContainerFooter>
-            <SignInContent.FooterDescription1>
-              Don't have a account?
-            </SignInContent.FooterDescription1>
-            <SignInContent.ButtonSignUp onPress={handleSignUp}>
-              <SignInContent.FooterDescription2>
-                Sign Up!
-              </SignInContent.FooterDescription2>
-            </SignInContent.ButtonSignUp>
-          </SignInContent.ContainerFooter>
-        </ScrollView>
-      </SafeAreaView>
-    </SignInContent.Container>
+            >
+              <AntDesign name="google" size={30} color="white" />
+              <ButtonText>Google</ButtonText>
+            </ButtonAccount>
+            <ButtonAccount
+              onPress={() => {
+                FacebookLogin();
+              }}
+            >
+              <AntDesign name="facebook-square" size={30} color="white" />
+              <ButtonText>FaceBook</ButtonText>
+            </ButtonAccount>
+          </ModalsAnotherLogin>
+        </LeyoutLogin>
+      </LoginComponent>
+    </Container>
   );
 };
-
 export { SignIn };

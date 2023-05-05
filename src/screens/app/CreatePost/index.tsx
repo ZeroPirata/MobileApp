@@ -44,6 +44,7 @@ import {
   FliesUpload,
   ImageArrayUpload,
   sendPost,
+  sendPostGrupos,
 } from "../../../utils/functions";
 
 const CreatePost = () => {
@@ -120,16 +121,28 @@ const CreatePost = () => {
       return;
     }
     setLoadingUpload(true);
-    const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
-    sendPost(
-      refDatabase,
-      String(user?.email),
-      value.title,
-      value.description,
-      images,
-      files,
-      String(user?.uid)
-    );
+    if (selectGrup == null) {
+      const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
+      sendPost(
+        refDatabase,
+        String(user?.email),
+        value.title,
+        value.description,
+        images,
+        files,
+        String(user?.uid)
+      );
+    } else {
+      sendPostGrupos(
+        String(user?.email),
+        value.title,
+        value.description,
+        images,
+        files,
+        String(user?.uid),
+        selectGrup
+      );
+    }
     navigation.navigate("TabsRoutes");
     setLoadingUpload(false);
     return;
@@ -143,10 +156,7 @@ const CreatePost = () => {
       querySnapshot.docs.map((docs) => {
         if (docs.data().grupos) {
           const user = docs.data();
-          const grupos = user.grupos.map((grups: any) => ({
-            ...grups,
-          }));
-          setGrupos(grupos);
+          setGrupos(user.grupos);
         }
       });
     } catch (error) {
@@ -159,6 +169,21 @@ const CreatePost = () => {
       gruposUser(user?.uid);
     }
   }, [user?.uid]);
+
+  const [gruposInfo, setGruposInfos] = useState<any[]>([]);
+
+  const setGruposInfo = useCallback(() => {
+    grupos.map((grups) => {
+      const RefRealTime = DataBase.ref(database, `grupos/${grups}`);
+      DataBase.onValue(RefRealTime, (snaphShot) => {
+        setGruposInfos([{ ...snaphShot.val(), id: grups }]);
+      });
+    });
+  }, [grupos]);
+
+  useEffect(() => {
+    setGruposInfo();
+  }, [grupos]);
 
   return !loadingUpload ? (
     <Container>
@@ -193,8 +218,8 @@ const CreatePost = () => {
             }}
           >
             <Item label="Feed normal" value={null} />
-            {grupos &&
-              grupos.map((gps) => {
+            {gruposInfo &&
+              gruposInfo.map((gps) => {
                 return <Item key={gps.id} value={gps.id} label={gps.nome} />;
               })}
           </Picker>

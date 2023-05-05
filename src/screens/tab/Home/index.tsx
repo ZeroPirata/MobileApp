@@ -90,7 +90,7 @@ const HomeTab = () => {
         .sort((a, b) => b.data - a.data);
       setPostInDataBase(PostList);
     });
-  }, []);
+  }, [setPostInDataBase, user?.uid, userInfo]);
 
   return (
     <Container>

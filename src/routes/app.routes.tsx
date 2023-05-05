@@ -1,5 +1,4 @@
 import React from "react";
-
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -10,8 +9,15 @@ import { SeePost } from "../screens/app/SeePost";
 import { EditPost } from "../screens/app/EditPost";
 import { ListSearchedUser } from "../screens/app/ListUsers";
 import { ChatBeetwen, CreateGrupo } from "../screens/app";
+import { useAuthentication } from "../hooks/useAuthentication";
+import { EmailVerifed } from "../screens/auth";
 
 const AppRoutes: React.FC = () => {
+  const { user } = useAuthentication();
+  console.log(user?.emailVerified, user?.email);
+  if (user?.emailVerified === false) {
+    return <EmailVerifed />;
+  }
   return (
     <Navigator
       initialRouteName="TabsRoutes"

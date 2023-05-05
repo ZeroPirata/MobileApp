@@ -1,5 +1,10 @@
 export default {
   COLORS: {
+    MAIN: "#14212E",
+    MAINBorder: "#c89b3c",
+    MAINFill: "#d8ae5e",
+    MAINLineCross: "#ecd5a6",
+
     TEXT: "#969CB2",
     GRAY: "#999591",
     BLACK: "#100C08",
@@ -139,16 +144,16 @@ export default {
       GRAY5: "#010A13",
     },
 
-    COLORS_CONSTRAT: { 
+    COLORS_CONSTRAT: {
       AZUL_MARINHO: "#0A2A5A",
       VERDE_AZULADO: "#008080",
       CINZA_CLARO: "#D3D3D3",
       ROXO_CLARO: "#663399",
       ROSA_CLARO: "#FFC0CB",
-      LARANJA:"#FFA500",
+      LARANJA: "#FFA500",
       MARRON: "#964B00",
       AMARELO_PALIDO: "#FFFF99",
-      VERDE_AZUL_CLARO: "#00CED1"
+      VERDE_AZUL_CLARO: "#00CED1",
     },
 
     GOOGLE: {

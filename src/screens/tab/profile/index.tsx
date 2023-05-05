@@ -73,7 +73,6 @@ import { UploadSingleImage } from "../../../utils/functions";
 const Profile = () => {
   const auth = getAuth();
   const { user } = useAuthentication();
-  console.log(user?.uid );
 
   const [userInfo, setUserInfo] = useState<DocumentData[]>([]);
   const [imageSelect, setImageSelect] = useState<ISendFiles>();
@@ -105,7 +104,7 @@ const Profile = () => {
       const queryRealTime = RealTimeQuery(
         refPostUser,
         orderByChild("user"),
-        equalTo(user.email),
+        equalTo(user.uid),
         limitToLast(100)
       );
       onValue(queryRealTime, (snapShot) => {
@@ -446,12 +445,10 @@ const Profile = () => {
           </SectionUserInfo>
         </ScrollView>
       </ContainerHead>
-      <ScrollView
+      {/* <ScrollView
         style={{
           backgroundColor: themes.COLORS.COLORS_CONSTRAT.ROSA_CLARO,
-          height: "100%",
         }}
-        horizontal={false}
       >
         <PostUserView
           style={{
@@ -477,7 +474,7 @@ const Profile = () => {
             ))
           )}
         </PostUserView>
-      </ScrollView>
+      </ScrollView> */}
     </MainContaienr>
   );
 };

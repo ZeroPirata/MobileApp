@@ -8,7 +8,15 @@ import { uuidv4 } from "@firebase/util";
 import { UploadSingleImage } from "../../../utils/functions";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 export const CreateGrupo = () => {
   const { user } = useAuthentication();
 
@@ -91,8 +99,17 @@ export const CreateGrupo = () => {
         id: imageUrl?.id,
         url: imageUrl?.url,
       },
-      membros: [{ id: user?.uid }],
+      membros: [{ id: user?.uid, role: "Dono" }],
     });
+    const usersRef = doc(db, "users", String(user?.uid));
+
+    await setDoc(
+      usersRef,
+      {
+        grupos: arrayUnion(GUID),
+      },
+      { merge: true }
+    );
     EnviarSolicataoParaEntrarNoGrupo(GUID, imageUrl);
   };
   return (

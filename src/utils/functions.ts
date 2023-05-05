@@ -1,4 +1,4 @@
-import { DatabaseReference, onValue, set } from "firebase/database";
+import { DatabaseReference, onValue, push, set } from "firebase/database";
 import { IFiles, ISendFiles } from "../interfaces/PostInterface";
 import {
   FirebaseStorage,
@@ -22,6 +22,56 @@ import {
   where,
 } from "firebase/firestore";
 import { User } from "firebase/auth";
+
+export const sendPostGrupos = async (
+  user: string,
+  title: string,
+  descricao: string | null,
+  images: ISendFiles[],
+  arquivos: ISendFiles | undefined | null,
+  user_id: string,
+  grupo_id: string
+): Promise<void> => {
+  const uploadedImages = await ImageArrayUpload(user, images);
+  const refDataBase = refRT(database, `grupos/${grupo_id}/posts`);
+  try {
+    if (arquivos == undefined) {
+      const postData = {
+        user_id: user_id,
+        data: Math.floor(Date.now() / 1000),
+        user: user,
+        title: title,
+        description: descricao,
+        images: uploadedImages?.map((img) => ({
+          id: img.id,
+          url: img.url,
+        })),
+      };
+      await push(refDataBase, postData);
+    } else {
+      const uploadFiles = await FliesUpload(user, arquivos);
+      const postData = {
+        data: Math.floor(Date.now() / 1000),
+        user_id: user_id,
+        user: user,
+        title: title,
+        description: descricao,
+        images: uploadedImages?.map((img) => ({
+          id: img.id,
+          url: img.url,
+        })),
+        arquivos: {
+          id: uploadFiles.id,
+          url: uploadFiles.url,
+          type: uploadFiles.type,
+        },
+      };
+      await push(refDataBase, postData);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const sendPost = async (
   ref: DatabaseReference,

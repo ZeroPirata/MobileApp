@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 import { Btn } from "../../../components/button";
@@ -19,6 +24,8 @@ import {
 } from "./style";
 import { db } from "../../../configs/firebase";
 import { uuidv4 } from "@firebase/util";
+
+import { avatar } from "../../../styles/image.json";
 
 import { erroLogs } from "../../../utils/errors";
 
@@ -52,12 +59,18 @@ const SignUp: React.FC = () => {
         .then(async (result) => {
           const prevUser = auth.currentUser;
           const usersRef = doc(db, "users", String(prevUser?.uid));
+          if (prevUser) {
+            updateProfile(prevUser, {
+              displayName: value.name,
+              photoURL: avatar,
+            });
+            sendEmailVerification(prevUser);
+          }
           await setDoc(usersRef, {
             id: String(prevUser?.uid),
             name: value.name,
             email: value.email,
-            avatar:
-              "https://imgs.search.brave.com/CdaS8i6ytuf3Fpumjswpqorq_K_Mfa_M6YOppDmFN0w/rs:fit:325:297:1/g:ce/aHR0cHM6Ly9lbS53/YXR0cGFkLmNvbS84/ZjE5YjQxMmYyMjIz/YWZlNDI4OGVkMDkw/NDEyMGE0OGI3YTM4/Y2UxLzY4NzQ3NDcw/NzMzYTJmMmY3MzMz/MmU2MTZkNjE3YTZm/NmU2MTc3NzMyZTYz/NmY2ZDJmNzc2MTc0/NzQ3MDYxNjQyZDZk/NjU2NDY5NjEyZDcz/NjU3Mjc2Njk2MzY1/MmY1Mzc0NmY3Mjc5/NDk2ZDYxNjc2NTJm/NTY1MDcyMmQzODQ2/NGUyZDc0NGE1MTUz/NDk2NzNkM2QyZDMy/MzQzMjM5MzEzNTM4/MzEzMDJlMzEzNDM0/MzM2NTM5NjMzMTYx/NjMzNzY0MzgzNDM3/NjUyZTZhNzA2Nz9z/PWZpdCZ3PTcyMCZo/PTcyMA",
+            avatar: avatar,
           })
             .then((res) => console.log(res))
             .catch((err) => console.log(err));

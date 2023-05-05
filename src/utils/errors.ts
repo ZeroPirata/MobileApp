@@ -10,4 +10,7 @@ export const erroLogs = (valueOfError: any) => {
   if (valueOfError === "auth/weak-password") {
     return (erroLog = "Enter a password with at least 6 characters");
   }
+  if (valueOfError === "auth/wrong-password") {
+    return (erroLog = "Email or password wrong");
+  }
 };
