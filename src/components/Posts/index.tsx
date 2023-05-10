@@ -1,59 +1,73 @@
 import { useNavigation } from "@react-navigation/native";
 import { ref, child, onValue, runTransaction, remove } from "firebase/database";
-import { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  Image,
+  ScrollView,
+  Text,
+  Dimensions,
+  Animated,
+  View,
+} from "react-native";
 import { database } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
-import { EvilIcons } from "@expo/vector-icons";
-import { IPost } from "../../interfaces/PostInterface";
+import { AntDesign, EvilIcons } from "@expo/vector-icons";
+import { IFiles, IPost } from "../../interfaces/PostInterface";
+
 import {
-  Container,
-  Description,
-  ImageConfig,
-  ImageSettings,
-  TitlePoster,
-  UserDomain,
-  ButtonSeeMore,
-  TextButtonSeeMore,
-  LikeAndDeslikeButton,
+  BodyContent,
   ButtonLike,
-  LikeCounts,
-  DataView,
-  DateTime,
+  ButtonSeeMore,
+  Container,
+  FooterPostSettings,
+  ImageViewControll,
+  ImagesRender,
+  ImagesRenderView,
+  LikeCount,
+  PostData,
+  TextButtonSeeMore,
+  UserName,
 } from "./style";
 import themes from "../../styles/themes";
 
 import { Modals } from "../Modals";
 import { Option } from "../../interfaces/ModalInterface";
+import { RenderImagesComponent } from "../RenderImage";
 
 export const PostView = ({ id, ...rest }: IPost) => {
   const { user } = useAuthentication();
-
-  const [deleteFocus, setIsDeleteFocused] = useState(false);
-  const [editFocus, setIsEditFocused] = useState(false);
-
   const [liked, setLiked] = useState(false);
 
+  const images: string[] = [];
   const [likesCount, setLikesCount] = useState(0);
+  const isCarousel = useRef(null);
 
   const navigation = useNavigation();
 
   function EditPost(
     id: string,
-    user: string,
-    title: string,
-    description?: string | undefined,
-    files?: string[] | undefined
+    user?: {
+      nome: string;
+      email: string;
+    },
+    body?: string,
+    data?: number,
+    images?: IFiles[],
+    arquivos?: IFiles
   ) {
     navigation.navigate("EditPost", { id: id, ...rest });
   }
 
   function SeePost(
     id: string,
-    user: string,
-    title: string,
-    description?: string | undefined,
-    files?: string[] | undefined
+    user?: {
+      nome: string;
+      email: string;
+    },
+    body?: string,
+    data?: number,
+    images?: IFiles[],
+    arquivos?: IFiles
   ) {
     navigation.navigate("SeePost", { id: id, ...rest });
   }
@@ -93,10 +107,15 @@ export const PostView = ({ id, ...rest }: IPost) => {
   const localeDate = date.toLocaleDateString();
   const localeHours = date.toLocaleTimeString();
 
+  const userinfo: { email: string; nome: string } = {
+    email: String(user?.email),
+    nome: String(user?.displayName),
+  };
+
   const options: Option[] = [
     {
       name: "Editar Postagem",
-      function: () => EditPost(id, rest.user, rest.title),
+      function: () => EditPost(id, userinfo, String(rest.body)),
     },
     { name: "Excluir Postagem", function: () => handleDeletePost(id) },
   ];
@@ -112,48 +131,40 @@ export const PostView = ({ id, ...rest }: IPost) => {
   return (
     <Container>
       <ScrollView>
-        <TitlePoster>{rest.title}</TitlePoster>
-        <DataView>
-          <DateTime>
-            {localeDate} - {localeHours}{" "}
-          </DateTime>
-          {user?.email == rest.user ? (
-            <Modals
-              options={options}
-              iconSize={15}
-              iconNameFeater={"settings"}
-            />
-          ) : null}
-        </DataView>
-        {rest.description && <Description>{rest.description}</Description>}
-        {rest.images && (
-          <ImageSettings>
-            {rest.images[0] ? (
-              <ImageConfig source={{ uri: rest.images[0].url }} />
-            ) : null}
-            {rest.images[1] ? (
-              <ImageConfig source={{ uri: rest.images[1].url }} />
-            ) : null}
-          </ImageSettings>
-        )}
-        <ButtonSeeMore onPress={() => SeePost(id, rest.title, rest.user)}>
-          <TextButtonSeeMore>See more</TextButtonSeeMore>
-        </ButtonSeeMore>
-        <UserDomain>By: {rest.user}</UserDomain>
-        <LikeAndDeslikeButton>
+        <UserName>{rest.user.nome}</UserName>
+        <PostData>
+          {localeDate} - {localeHours}
+        </PostData>
+        <BodyContent>{rest.body}</BodyContent>
+        {rest.images ? (
+          <RenderImagesComponent arrayImages={rest.images} />
+        ) : null}
+        {rest.arquivos ? <Text>Oi</Text> : null}
+        <FooterPostSettings>
           <ButtonLike onPress={handleLike}>
-            {liked ? (
-              <EvilIcons color="gold" name="like" size={25} />
-            ) : (
-              <EvilIcons
-                color={themes.COLORS.COLORS_CONSTRAT.ROSA_CLARO}
-                name="like"
-                size={25}
-              />
-            )}
+            <AntDesign
+              style={{ fontWeight: "bold" }}
+              color={liked ? themes.COLORS.RED : themes.COLORS.WHITE}
+              name="heart"
+              size={25}
+            />
+            <LikeCount
+              style={
+                liked
+                  ? { color: themes.COLORS.RED }
+                  : { color: themes.COLORS.WHITE }
+              }
+            >
+              {likesCount}
+            </LikeCount>
           </ButtonLike>
-          <LikeCounts>{likesCount}</LikeCounts>
-        </LikeAndDeslikeButton>
+          {rest.user.email == user?.email ? (
+            <Modals options={options} iconNameFeater="settings" iconSize={25} />
+          ) : null}
+          <ButtonSeeMore onPress={() => SeePost(id)}>
+            <TextButtonSeeMore>See more</TextButtonSeeMore>
+          </ButtonSeeMore>
+        </FooterPostSettings>
       </ScrollView>
     </Container>
   );

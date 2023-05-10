@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import {
   AlertText,
@@ -14,31 +14,35 @@ import {
   TextUserName,
 } from "./style";
 import { getAuth, sendEmailVerification, signOut } from "firebase/auth";
-import { useNavigation } from "@react-navigation/native";
-import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 const EmailVerifed: React.FC = () => {
   const { user } = useAuthentication();
   const [refresh, setRefreshing] = useState(false);
   const [message, setMessage] = useState("");
   const auth = getAuth();
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  }, []);
 
   const sendEmail = () => {
     try {
       if (user) {
         sendEmailVerification(user);
         setMessage("Email successfully sent");
-        onRefresh();
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    const refreshUser = setInterval(() => {
+      if (user?.emailVerified) {
+        console.log("Email Vereficado");
+      }else{
+        console.log('Verifique seu Email')
+      }
+    }, 10000);
+    return () => {
+      clearInterval(refreshUser);
+    };
+  }, [user]);
 
   return (
     <Container>

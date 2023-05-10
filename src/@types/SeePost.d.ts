@@ -4,10 +4,13 @@ type SeePost = {
   path?: string | undefined;
   params: {
     id: string;
-    user: string;
+    user: {
+      nome: string;
+      email: string;
+    };
+    body?: string;
     data: number;
-    title: string;
-    description?: string;
-    files?: string[];
+    images?: IFiles[];
+    arquivos?: IFiles;
   };
 };

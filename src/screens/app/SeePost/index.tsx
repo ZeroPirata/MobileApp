@@ -1,46 +1,46 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { FlatList } from "react-native";
+import { FlatList, SafeAreaView, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { database, db } from "../../../configs/firebase";
 import { doc, deleteDoc } from "firebase/firestore";
 
 import {
-  Container,
-  Description,
-  ImageConfig,
-  ImageSettings,
-  TitlePoster,
-  UserDomain,
-  PostPub,
-  EditPostButton,
-  TextButtons,
-  DeletePostButton,
-  ViewButtons,
-  CommentSection,
-  CreateComentario,
-  ImageUserComment,
+  Body,
+  BodyContent,
+  ButtonLike,
   ButtonSendComment,
-  TextButtonSend,
-  SessaoDeComentario,
-  Comentarios,
-  Textos,
-  TextSection,
+  Comment,
+  CommentSection,
+  CommentText,
+  CommentariosShow,
+  Container,
+  CreateComentario,
+  CreateCommentSection,
+  DataPost,
+  ImageUserComment,
   ImageUsersComment,
-  UsuarioComentarioEmail,
-  TempoDoComentario,
-  ImageFlatListConfig,
-  ListagemDeComentarioNaPostagem,
-  FooterPostagem,
-  LikeButtonPost,
-  LikeButtonPostView,
-  LikeCounts,
-  QuantidadeDeComentario,
-  ViewTitleEdit,
-  TouchDeleteComment,
+  LikeCount,
+  ListComment,
+  SafeAreaViewContent,
+  TextButtonSend,
+  TextCommentsSection,
+  TimeComment,
+  UserAndTime,
+  UserDeleteComment,
+  UserName,
+  UserNameName,
+  ViewRenderImages,
 } from "./style";
 import { HeaderProfile } from "../../../components/HeaderProfile";
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { EvilIcons, FontAwesome } from "@expo/vector-icons";
+import {
+  AntDesign,
+  EvilIcons,
+  FontAwesome,
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import {
   child,
   onValue,
@@ -53,6 +53,9 @@ import Comentario from "../../../interfaces/ComentarioInterface";
 import { Modals } from "../../../components/Modals";
 import { Option } from "../../../interfaces/ModalInterface";
 import themes from "../../../styles/themes";
+import { RenderImagesComponent } from "../../../components/RenderImage";
+import { ScrollView } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const SeePost = () => {
   const { user } = useAuthentication();
@@ -77,6 +80,7 @@ const SeePost = () => {
       `posts/${route.params.id}/coments`
     );
     const updates = {
+      name: user.displayName,
       userProfile: user.photoURL,
       email: user.email,
       comentario: values.comentario,
@@ -136,6 +140,7 @@ const SeePost = () => {
       for (const key in comentariosFirebase) {
         const comentario: Comentario = {
           id: key,
+          name: comentariosFirebase[key].name,
           userProfile: comentariosFirebase[key].userProfile,
           comentario: comentariosFirebase[key].comentario,
           data: comentariosFirebase[key].data,
@@ -167,97 +172,133 @@ const SeePost = () => {
     );
   };
 
+  const [openComments, setOpenComments] = useState(false);
+
   return (
-    <Container>
-      <HeaderProfile />
-      <PostPub>
-        <ViewTitleEdit>
-          <TitlePoster>{route.params.title}</TitlePoster>
-          {user?.email == route.params.user ? (
-            <Modals options={options} iconSize={20} />
-          ) : null}
-        </ViewTitleEdit>
-        {route.params.description && (
-          <Description>{route.params.description}</Description>
-        )}
-        {route.params.files && (
-          <ImageFlatListConfig>
-            <FlatList
-              data={route.params.files}
-              renderItem={({ item, index }) => {
-                return (
-                  <ImageSettings key={index}>
-                    <ImageConfig source={{ uri: item }} />
-                  </ImageSettings>
-                );
-              }}
-            />
-          </ImageFlatListConfig>
-        )}
-        <LikeButtonPostView>
-          <LikeButtonPost onPress={handleLike}>
-            {liked ? (
-              <EvilIcons color={"gold"} name="like" size={30} />
-            ) : (
-              <EvilIcons color={"white"} name="like" size={30} />
-            )}
-            <LikeCounts>{likesCount}</LikeCounts>
-          </LikeButtonPost>
-          <QuantidadeDeComentario>
-            <LikeCounts>{comentsCount}</LikeCounts>
-            <EvilIcons color={"white"} name="comment" size={30} />
-          </QuantidadeDeComentario>
-        </LikeButtonPostView>
-        <FooterPostagem>
-          <UserDomain>By: {route.params.user}</UserDomain>
-          <TempoDoComentario>
-            {localeDate} - {localeHours}
-          </TempoDoComentario>
-        </FooterPostagem>
-      </PostPub>
-      <ListagemDeComentarioNaPostagem>
-        <SessaoDeComentario>
+    <SafeAreaView>
+      <Container>
+        <HeaderProfile />
+        <ScrollView>
+          <Body>
+            <SafeAreaViewContent>
+              <UserNameName>{route.params.user.nome}</UserNameName>
+              <Modals
+                options={options}
+                iconNameFeater="settings"
+                iconSize={25}
+              />
+            </SafeAreaViewContent>
+            <DataPost>
+              {localeDate} - {localeHours}
+            </DataPost>
+            <BodyContent>{route.params.body}</BodyContent>
+            <ViewRenderImages>
+              {route.params.images ? (
+                <RenderImagesComponent arrayImages={route.params.images} />
+              ) : null}
+            </ViewRenderImages>
+          </Body>
+          <CommentSection>
+            <CommentariosShow onPress={() => setOpenComments(!openComments)}>
+              <FontAwesome
+                name="comment"
+                size={30}
+                color={themes.COLORS.MAINFill}
+              />
+              <Text
+                style={{ color: themes.COLORS.MAINFill, fontSize: RFValue(20) }}
+              >
+                Open Comments
+              </Text>
+            </CommentariosShow>
+            <ButtonLike onPress={handleLike}>
+              <AntDesign
+                style={{ fontWeight: "bold" }}
+                color={liked ? themes.COLORS.RED : themes.COLORS.WHITE}
+                name="heart"
+                size={25}
+              />
+              <LikeCount
+                style={
+                  liked
+                    ? { color: themes.COLORS.RED }
+                    : { color: themes.COLORS.WHITE }
+                }
+              >
+                {likesCount}
+              </LikeCount>
+            </ButtonLike>
+          </CommentSection>
+        </ScrollView>
+        <ListComment
+          style={openComments ? { display: "flex" } : { display: "none" }}
+        >
           <FlatList
+            scrollEnabled={true}
+            style={{ height: "100%", width: "100%" }}
             data={comment}
             renderItem={({ item }) => {
               const date = new Date(item.data * 1000);
               const localeDate = date.toLocaleDateString();
               const localeHours = date.toLocaleTimeString();
               return (
-                <Comentarios>
+                <Comment>
                   <ImageUsersComment
                     source={{ uri: String(item.userProfile) }}
                   />
-                  <TextSection>
-                    <UsuarioComentarioEmail>
-                      {item.email}
-                    </UsuarioComentarioEmail>
-                    <TempoDoComentario>
-                      {localeDate} - {localeHours}
-                    </TempoDoComentario>
-                    <Textos>{item.comentario}</Textos>
-                    {item.email == user?.email ? (
-                      <TouchDeleteComment
+                  <TextCommentsSection>
+                    <UserAndTime>
+                      <UserName>{item.name} </UserName>
+                      <TimeComment>
+                        {localeDate} - {localeHours}
+                      </TimeComment>
+                      <UserDeleteComment
                         onPress={() => deleteComment(item.id)}
+                        style={
+                          user?.email == item.email ||
+                          user?.email == route.params.user.email
+                            ? { display: "flex" }
+                            : { display: "none" }
+                        }
                       >
-                        <EvilIcons name="trash" size={24} color="white" />
-                      </TouchDeleteComment>
-                    ) : null || route.params.user == user?.email ? (
-                      <TouchDeleteComment
-                        onPress={() => deleteComment(item.id)}
-                      >
-                        <EvilIcons name="trash" size={24} color="white" />
-                      </TouchDeleteComment>
-                    ) : null}
-                  </TextSection>
-                </Comentarios>
+                        <MaterialCommunityIcons
+                          name="delete"
+                          size={20}
+                          color="red"
+                        />
+                      </UserDeleteComment>
+                    </UserAndTime>
+                    <CommentText>{item.comentario}</CommentText>
+                  </TextCommentsSection>
+                </Comment>
+              );
+            }}
+            ListHeaderComponent={() => {
+              return (
+                <CommentariosShow
+                  onPress={() => setOpenComments(!openComments)}
+                >
+                  <FontAwesome5
+                    name="comment-slash"
+                    size={30}
+                    color={themes.COLORS.MAINFill}
+                  />
+                  <Text
+                    style={{
+                      color: themes.COLORS.MAINFill,
+                      fontSize: RFValue(20),
+                    }}
+                  >
+                    Close Comments
+                  </Text>
+                </CommentariosShow>
               );
             }}
             keyExtractor={(item) => item.id}
           />
-        </SessaoDeComentario>
-      </ListagemDeComentarioNaPostagem>
-      <CommentSection>
+        </ListComment>
+      </Container>
+      <CreateCommentSection>
         <ImageUserComment source={{ uri: String(user?.photoURL) }} />
         <CreateComentario
           placeholderTextColor={themes.COLORS.COLORS_CONSTRAT.CINZA_CLARO}
@@ -266,10 +307,10 @@ const SeePost = () => {
           onChangeText={(text) => setValues({ ...values, comentario: text })}
         />
         <ButtonSendComment onPress={NewComentario}>
-          <TextButtonSend>Enviar</TextButtonSend>
+          <Ionicons name="send" size={24} color={themes.COLORS.MAINFill} />
         </ButtonSendComment>
-      </CommentSection>
-    </Container>
+      </CreateCommentSection>
+    </SafeAreaView>
   );
 };
 export { SeePost };

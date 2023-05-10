@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -14,7 +14,6 @@ import { EmailVerifed } from "../screens/auth";
 
 const AppRoutes: React.FC = () => {
   const { user } = useAuthentication();
-  console.log(user?.emailVerified, user?.email);
   if (user?.emailVerified === false) {
     return <EmailVerifed />;
   }

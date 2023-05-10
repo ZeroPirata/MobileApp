@@ -18,10 +18,13 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
   const { user } = useAuthentication();
   const FriendAccept = async () => {
     const getIdReference = collection(db, "users");
+
     const queryOne = query(getIdReference, where("id", "==", user?.uid));
-    const queryTwo = query(getIdReference, where("id", "==", rest.idUser));
+    const queryTwo = query(getIdReference, where("id", "==", String(rest.idUser)));
+
     const insertLoggedUser = await getDocs(queryOne);
     const InsertFriendRequest = await getDocs(queryTwo);
+
     if (insertLoggedUser) {
       const refCloudFireStore = doc(db, "users", insertLoggedUser.docs[0].id);
       await updateDoc(refCloudFireStore, {
@@ -30,12 +33,9 @@ export const FriendRequest = ({ ...rest }: IFriendRequest) => {
         }),
       });
     }
+    console.log(rest.idUser)
     if (InsertFriendRequest) {
-      const refCloudFireStore = doc(
-        db,
-        "users",
-        InsertFriendRequest.docs[0].id
-      );
+      const refCloudFireStore = doc(db, "users", InsertFriendRequest.docs[0].id);
       await updateDoc(refCloudFireStore, {
         friends: arrayUnion({
           id: user?.uid,

@@ -75,22 +75,23 @@ export const sendPostGrupos = async (
 
 export const sendPost = async (
   ref: DatabaseReference,
-  user: string,
-  title: string,
+  user: { nome: string; email: string },
   descricao: string | null,
   images: ISendFiles[],
   arquivos: ISendFiles | undefined,
   user_id: string
 ): Promise<void> => {
   try {
-    const uploadedImages = await ImageArrayUpload(user, images);
+    const uploadedImages = await ImageArrayUpload(user.email, images);
     if (arquivos == undefined) {
       const postData = {
         user_id: user_id,
         data: Math.floor(Date.now() / 1000),
-        user: user,
-        title: title,
-        description: descricao,
+        user: {
+          nome: user.nome,
+          email: user.email,
+        },
+        body: descricao,
         images: uploadedImages?.map((img) => ({
           id: img.id,
           url: img.url,
@@ -98,13 +99,15 @@ export const sendPost = async (
       };
       await set(ref, postData);
     } else {
-      const uploadFiles = await FliesUpload(user, arquivos);
+      const uploadFiles = await FliesUpload(user.email, arquivos);
       const postData = {
         data: Math.floor(Date.now() / 1000),
         user_id: user_id,
-        user: user,
-        title: title,
-        description: descricao,
+        user: {
+          nome: user.nome,
+          email: user.email,
+        },
+        body: descricao,
         images: uploadedImages?.map((img) => ({
           id: img.id,
           url: img.url,

@@ -1,70 +1,67 @@
 import { TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { StyleSheet } from "react-native";
 import styled from "styled-components/native";
 
 export const HeaderView = styled.View`
-  padding: 10px;
-  width: 100%;
-  min-height: 50px;
-  display: flex;
+  background-color: ${({ theme }) => theme.COLORS.MAIN};
+  border-color: ${({ theme }) => theme.COLORS.GRAY2};
+  border-bottom-width: ${RFValue(2.5)}px;
   flex-direction: row;
   align-items: center;
-  background-color: ${({ theme }) => theme.COLORS.TEXT_and_BACKGROUND.GRAY3};
-  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
-  border-bottom-width: 2.5px;
-  border-right-width: 1.5px;
-  border-left-width: 1.5px;
+  min-height: ${RFValue(50)}px;
+  padding: ${RFValue(10)}px;
+  display: flex;
+  width: 100%;
 `;
 export const NameUser = styled.Text`
-  font-size: ${RFValue(20)}px;
-  font-family: ${({ theme }) => theme.FONTS.DMSans_700Bold};
   color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
+  font-family: ${({ theme }) => theme.FONTS.DMSans_700Bold};
+  font-size: ${RFValue(20)}px;
 `;
 export const ContainerNicks = styled.View`
   width: 85%;
 `;
 export const ContainerPicture = styled.View`
-  width: 15%;
   align-items: center;
+  width: 15%;
 `;
 export const ContainerIcone = styled.View`
+  justify-content: flex-end;
+  flex-direction: row;
   align-items: center;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
   width: 85%;
 `;
 export const Photo = styled.Image`
-  width: 45px;
-  height: 45px;
-  border-radius: 150px;
   border-color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE4};
-  border-width: 2px;
+  border-radius: ${RFValue(150)}px;
+  border-width: ${RFValue(2)}px;
+  height: ${RFValue(45)}px;
+  width: ${RFValue(45)}px;
 `;
 export const SearchBarIcon = styled(TouchableOpacity)`
+  border-color: ${({ theme }) => theme.COLORS.MAINBorder};
+  border-width: ${RFValue(2.5)}px;
+  border-radius: ${RFValue(15)}px;
   justify-content: space-between;
-  display: flex;
-  flex-direction: row;
+  padding: 0 ${RFValue(15)}px;
+  height: ${RFValue(40)}px;
   align-items: center;
-  padding: 0 10px;
-  height: 40px;
-  border-color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE4};
-  border-width: 1.5px;
-  border-radius: 5px;
+  flex-direction: row;
+  display: flex;
   width: 70%;
 `;
 export const PlusIcon = styled(TouchableOpacity)`
   justify-content: center;
   justify-items: center;
-  display: flex;
   flex-direction: row;
+  display: flex;
   height: 100%;
   width: 25%;
 `;
 export const TextInputSearch = styled.TextInput`
-  height: 100%;
   color: ${({ theme }) => theme.COLORS.WHITE};
+  height: 100%;
   width: 75%;
 `;
 export const ButtonCreatePost = styled(TouchableOpacity)``;

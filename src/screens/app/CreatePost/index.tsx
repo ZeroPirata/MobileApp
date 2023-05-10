@@ -123,10 +123,13 @@ const CreatePost = () => {
     setLoadingUpload(true);
     if (selectGrup == null) {
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
+      const dataUser = {
+        email: String(user?.email),
+        nome: String(user?.displayName),
+      };
       sendPost(
         refDatabase,
-        String(user?.email),
-        value.title,
+        dataUser,
         value.description,
         images,
         files,

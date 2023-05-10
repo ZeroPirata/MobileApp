@@ -6,28 +6,17 @@ import {
   SearchBarIcon,
   PlusIcon,
   TextInputSearch,
-  ButtonCreatePost,
 } from "./style";
-import { TouchableOpacity } from "react-native";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { MaterialIcons } from "@expo/vector-icons";
 import themes from "../../styles/themes";
 import { uri } from "../../styles/image.json";
 import { useNavigation } from "@react-navigation/native";
-import { ModalsProps, Option } from "../../interfaces/ModalInterface";
+import { Option } from "../../interfaces/ModalInterface";
 import { Modals } from "../Modals";
 import { useState } from "react";
 import { db } from "../../configs/firebase";
-import {
-  collection,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
-import { IListSearchedUsers } from "../../interfaces/ListagemDeUsuario";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 export const HeaderProfile = () => {
   const { user } = useAuthentication();
@@ -53,8 +42,6 @@ export const HeaderProfile = () => {
   const [value, setValue] = useState({
     search: "",
   });
-
-  const [usuarios, setUsuarios] = useState<any[]>([]);
 
   const handleKeyPress = async (text: string) => {
     let letPostData: any[] = [];

@@ -1,36 +1,36 @@
 import React, { useState } from "react";
-import { ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { logo } from "../../../styles/image.json";
 import {
   createUserWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
   updateProfile,
 } from "firebase/auth";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
-import { Btn } from "../../../components/button";
-import { Input } from "../../../components/input";
-import themes from "../../../styles/themes";
 import {
+  BackGroundLogo,
   Container,
-  ContainerHeader,
-  TextContainerHeader,
-  DescriptionContainerHeader,
-  DescriptionContainerHeaderSocial,
-  ContainerBody,
-  ContainerHeaderButton,
-  TextError,
+  InputValues,
+  PasswordTextError,
+  RegisterLeyout,
+  ShowPassword,
+  ShowPasswordInput,
+  ShowPasswordText,
+  SignUpButtonText,
+  SignUpButtonView,
+  TextRegister,
 } from "./style";
 import { db } from "../../../configs/firebase";
-import { uuidv4 } from "@firebase/util";
-
 import { avatar } from "../../../styles/image.json";
-
 import { erroLogs } from "../../../utils/errors";
+import themes from "../../../styles/themes";
+import { Ionicons } from "@expo/vector-icons";
 
 const SignUp: React.FC = () => {
   const [password, setPassword] = useState("");
+  const [secury, setSecure] = useState(true);
   const [passwordErroStyle, setPasswordErroStyle] = useState(false);
   const auth = getAuth();
   const [passwordMessageErro, setPasswordMessageErro] = useState("");
@@ -88,92 +88,68 @@ const SignUp: React.FC = () => {
 
   return (
     <Container>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <ContainerHeader>
-          <ContainerHeaderButton>
-            <Btn
-              variant="SmallIconButton"
-              IconName="arrow-circle-o-left"
-              IconColor="white"
-              onPress={handleLogin}
-            />
-          </ContainerHeaderButton>
-          <TextContainerHeader>Sign Up</TextContainerHeader>
-          <DescriptionContainerHeader>
-            it's quick and easy (⌐■_■)
-          </DescriptionContainerHeader>
-          <DescriptionContainerHeaderSocial>
-            If you want, register with one of the social networks below
-          </DescriptionContainerHeaderSocial>
-        </ContainerHeader>
-        <ContainerBody>
-          {errorMessage ? <TextError>{errorMessage}</TextError> : null}
-          <Input
-            LeftIcon
-            iconSize={20}
-            placeholder={"Name"}
-            value={value.name}
-            onChangeText={(text) => setValue({ ...value, name: text })}
-            iconName="person-outline"
-            secureTextEntry={false}
-            width={325}
-          />
-          <Input
-            LeftIcon
-            iconSize={20}
-            placeholder={"Email"}
-            iconName="mail-outline"
-            value={value.email}
-            onChangeText={(text) => setValue({ ...value, email: text })}
-            secureTextEntry={false}
-            width={325}
-            marginTop={10}
-          />
-          <Input
-            LeftIcon
-            RightIcon
-            iconSize={20}
-            placeholder={"Password"}
-            iconName="lock-closed-outline"
-            value={password}
-            style={{ borderColor: passwordErroStyle ? "red" : "default" }}
-            onChangeText={(text) => {
-              setPassword(text), setValue({ ...value, password: text });
-            }}
-            width={325}
-            marginTop={10}
-          />
-          {passwordErroStyle ? (
-            <TextError>{passwordMessageErro}</TextError>
-          ) : null}
-          <Input
-            LeftIcon
-            RightIcon
-            iconSize={20}
-            placeholder={"Repeat password"}
-            iconName="lock-closed-outline"
-            value={confirmPassword}
-            onChangeText={(text) => setConfirmPassword(text)}
-            width={325}
-            marginTop={10}
-          />
-          {passwordErroStyle ? (
-            <TextError>{passwordMessageErro}</TextError>
-          ) : null}
-          <Btn
-            title="Sign Up"
-            variant="SmallButtonGoldBorded"
-            fontColor={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
-            style={{
-              margin: 10,
-              borderWidth: 3,
-              borderColor: themes.COLORS.HEXTECH_METAL_GOLD.GOLD4,
-              backgroundColor: themes.COLORS.TEXT_and_BACKGROUND.GRAY4,
-            }}
-            onPress={handleRegister}
-          />
-        </ContainerBody>
-      </ScrollView>
+      <BackGroundLogo source={{ uri: logo }} />
+      <RegisterLeyout>
+        <TextRegister>Sing Up</TextRegister>
+        <InputValues
+          placeholder="Email"
+          placeholderTextColor={themes.COLORS.GRAY4}
+          underlineColorAndroid="transparent"
+          keyboardType="email-address"
+          value={value.email}
+          onChangeText={(text) => setValue({ ...value, email: text })}
+        />
+        <InputValues
+          value={value.name}
+          placeholder="Name"
+          placeholderTextColor={themes.COLORS.GRAY4}
+          underlineColorAndroid="transparent"
+          keyboardType="email-address"
+          onChangeText={(text) => setValue({ ...value, name: text })}
+        />
+
+        <ShowPassword>
+          <ShowPasswordInput onPress={() => setSecure(!secury)}>
+            <ShowPasswordText>
+              {secury ? "Show Password" : "Hidden password"}
+            </ShowPasswordText>
+          </ShowPasswordInput>
+          <Ionicons size={25} color="white" name={secury ? "eye" : "eye-off"} />
+        </ShowPassword>
+        <InputValues
+          value={password}
+          placeholder="Password"
+          placeholderTextColor={themes.COLORS.GRAY4}
+          underlineColorAndroid="transparent"
+          secureTextEntry={secury}
+          onChangeText={(text) => {
+            setPassword(text), setValue({ ...value, password: text });
+          }}
+        />
+        <InputValues
+          value={confirmPassword}
+          placeholder="Repeat password"
+          underlineColorAndroid="transparent"
+          secureTextEntry={secury}
+          onChangeText={(text) => setConfirmPassword(text)}
+          placeholderTextColor={themes.COLORS.GRAY4}
+        />
+        {passwordErroStyle ? (
+          <PasswordTextError>{passwordMessageErro}</PasswordTextError>
+        ) : null}
+        {errorMessage ? (
+          <PasswordTextError>{errorMessage}</PasswordTextError>
+        ) : null}
+
+        <SignUpButtonView>
+          <SignUpButtonText onPress={handleRegister}>Sing Up</SignUpButtonText>
+        </SignUpButtonView>
+      </RegisterLeyout>
+      {/* <HaveAccountView>
+        <HaveAccountInput>
+          <HaveAccountText>Sing In</HaveAccountText>
+        </HaveAccountInput>
+      </HaveAccountView> */}
     </Container>
   );
 };

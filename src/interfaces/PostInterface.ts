@@ -19,9 +19,11 @@ export interface ICreatePost {
 }
 export interface IPost {
   id: string;
-  user: string;
-  title: string;
-  description?: string;
+  user: {
+    nome: string;
+    email: string;
+  };
+  body?: string;
   data: number;
   images?: IFiles[];
   arquivos?: IFiles;

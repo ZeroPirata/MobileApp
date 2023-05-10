@@ -108,8 +108,7 @@ const HomeTab = () => {
                   id={items.id}
                   key={items.id}
                   user={items.user}
-                  title={items.title}
-                  description={items.description}
+                  body={items.body}
                   images={items?.images}
                   data={items.data}
                 />

@@ -101,6 +101,13 @@ const SignIn: React.FC = () => {
         .then(async (result) => {
           const prevUser = auth.currentUser;
           const user = result.user as UserResponse;
+          if (prevUser) {
+            updateProfile(prevUser, {
+              displayName: user.displayName,
+              photoURL: user.photoURL,
+            });
+            sendEmailVerification(prevUser);
+          }
           if (!(await queryByEmail(user.email))) {
             await setDoc(doc(db, `users/${String(prevUser?.uid)}`), {
               id: prevUser?.uid,
