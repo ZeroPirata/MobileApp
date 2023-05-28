@@ -1,122 +1,139 @@
-import { TouchableOpacity, FlatList } from "react-native";
+import { TouchableOpacity, FlatList, TextInput, Image } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
 
-export const Container = styled.View`
-  display: flex;
-  flex-direction: row;
-  background-color: ${({ theme }) => theme.COLORS.TEXT_and_BACKGROUND.GRAY5};
-  justify-content: center;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-`;
-export const CreatePostHeader = styled.View`
-  align-self: center;
-  padding: 10px;
-  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
-  border-width: 1px;
-  border-radius: 10px;
-  width: 80%;
-`;
-export const CreatePostText = styled.TextInput`
-  height: 50px;
-  padding: 5px;
-  font-size: ${RFValue(35)}px;
-  color: white;
-  border-bottom-width: 1px;
-  border-bottom-color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE4};
-`;
-export const CreateBody = styled.TextInput`
-  color: white;
-  height: 150px;
-  margin-top: 15px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-color: ${({ theme }) => theme.COLORS.HEXTECH_MAGIC_BLUE.BLUE4};
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-  border-right-width: 1px;
-`;
-
-export const ButtonText = styled.Text`
-
-  font-size: ${RFValue(15)}px;
-  color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
-`;
-export const HeaderBackButton = styled.View`
-  position: absolute;
-  top: ${RFValue(25)}px;
-  bottom: 0;
-  right: 0;
-  left: 0;
-`;
-export const ButtonImage = styled.View`
-  margin-top: 10px;
-  height: 50px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 0 10px;
-`;
-export const ButtonUploadFile = styled(TouchableOpacity)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-
-export const ButtonArrowBack = styled(TouchableOpacity)`
-  display: flex;
-  justify-content: center;
+export const ButtonRemoveImage = styled(TouchableOpacity)``;
+export const ButtonAddImageText = styled.Text``;
+export const ButtonAddFileText = styled.Text``;
+export const TextLoading = styled.Text``;
+export const ViewLoading = styled.View``;
+/*  */
+export const FileName = styled.Text`
   color: ${({ theme }) => theme.COLORS.WHITE};
 `;
+
+export const FileSize = styled.Text`
+  color: ${({ theme }) => theme.COLORS.WHITE};
+`;
+
+export const FileType = styled.Text`
+  color: ${({ theme }) => theme.COLORS.WHITE};
+`;
+
 export const FlatListImage = styled(FlatList)`
   display: flex;
 `;
-export const ButtonRemoveImage = styled(TouchableOpacity)``;
-export const ViewLoading = styled.View`
-  margin: 0 auto;
-  align-self: center;
+
+export const TextSend = styled.Text`
+  font-size: ${RFValue(15)}px;
 `;
-export const TextLoading = styled.Text`
-  color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
-  font-family: ${({ theme }) => theme.FONTS.Poppins_600SemiBold_Italic};
-  font-size: ${RFValue(35)}px;
-`;
-export const ImageLeyoutUpload = styled.View`
-  margin-top: 15px;
-  height: ${RFValue(150)}px;
+/*  */
+export const FileSettings = styled.View`
+  margin: 0 ${RFValue(15)}px;
+  display: flex;
 `;
 
-export const ImageLoading = styled.Image`
-  margin: 0 10px;
-  width: 145px;
-  height: ${RFValue(147)}px;
+export const ImageLoading = styled(Image)`
+  width: 125px;
+  height: 125px;
 `;
-export const ImageLoadingView = styled.View``;
-export const ButtonSendPost = styled(TouchableOpacity)`
-  margin-top: 10px;
-  border-radius: 10px;
-  border-width: 1.5px;
-  border-color: ${({ theme }) => theme.COLORS.HEXTECH_METAL_GOLD.GOLD3};
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-self: center;
+
+export const CreatePostTextView = styled.View`
   align-items: center;
-  width: 150px;
-  height: 60px;
+  display: flex;
+  width: 100%;
 `;
-export const ButtonSendPostText = styled.Text`
-  text-align: center;
-  color: white;
-  font-size: ${RFValue(35)}px;
-  font-family: ${({ theme }) => theme.FONTS.DMSans_500Medium};
+
+export const ControllerButtonsFileImages = styled.View`
+  justify-content: space-around;
+  flex-direction: row;
+  display: flex;
+  width: 80%;
 `;
-/* 
-export const CreatePostText = styled.View``;
-*/
+
+export const CreatePostText = styled(TextInput)`
+  color: ${({ theme }) => theme.COLORS.WHITE};
+  border-color: ${({ theme }) => theme.COLORS.MAINBorder};
+  padding: ${RFValue(5)}px;
+  border-radius: 10px;
+  border-width: 2px;
+  width: 80%;
+`;
+
+export const SelectPickerView = styled.View`
+  border-color: ${({ theme }) => theme.COLORS.MAINBorder};
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 2px;
+  margin: 15px;
+  width: 80%;
+`;
+
+export const Container = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.MAIN};
+  padding-top: ${RFValue(25)}px;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  display: flex;
+  height: 100%;
+  width: 100%;
+`;
+
+export const ButtonAddImage = styled(TouchableOpacity)`
+  background-color: ${({ theme }) => theme.COLORS.MAINFill};
+  justify-content: space-evenly;
+  border-radius: 10px;
+  align-items: center;
+  flex-direction: row;
+  display: flex;
+  width: 40%;
+`;
+
+export const ButtonAddFile = styled(TouchableOpacity)`
+  background-color: ${({ theme }) => theme.COLORS.MAINFill};
+  justify-content: space-evenly;
+  height: ${RFValue(35)}px;
+  justify-content: center;
+  flex-direction: row;
+  border-radius: 10px;
+  align-items: center;
+  display: flex;
+  width: 40%;
+`;
+
+export const ControlleViewImageRender = styled.View`
+  background-color: ${({ theme }) => theme.COLORS.MAINBackground};
+  margin: ${RFValue(15)}px;
+  flex-direction: row;
+  border-radius: 15px;
+  display: flex;
+  height: 20%;
+  width: 90%;
+`;
+export const ImageLeyoutUpload = styled.View`
+  justify-content: center;
+  flex-direction: row;
+  align-self: center;
+  display: flex;
+  margin: 10px;
+`;
+
+export const ControllViewFilesRender = styled.View`
+  margin: ${RFValue(15)}px 0;
+  align-items: center;
+  flex-direction: row;
+  display: flex;
+  width: 80%;
+`;
+
+export const ButtonSend = styled(TouchableOpacity)`
+  background-color: ${({ theme }) => theme.COLORS.MAINFill};
+  margin-top: ${RFValue(10)}px;
+  width: ${RFValue(150)}px;
+  height: ${RFValue(35)}px;
+  justify-content: center;
+  border-radius: 35px;
+  align-items: center;
+  display: flex;
+`;

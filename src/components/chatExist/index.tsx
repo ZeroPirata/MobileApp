@@ -18,6 +18,7 @@ import { Entypo } from "@expo/vector-icons";
 import { User } from "firebase/auth";
 import { useIsFocused } from "@react-navigation/native";
 import { IChatExist } from "../../interfaces/ChatExist";
+import { RFValue } from "react-native-responsive-fontsize";
 export const ChatExist = ({ list, user, chats }: ValidateList) => {
   const [personas, setPersonas] = useState<any[]>([]);
   const navigate = useNavigation();
@@ -90,7 +91,7 @@ export const ChatExist = ({ list, user, chats }: ValidateList) => {
             }}
           />
           <View style={{ width: "70%" }}>
-            <Text>{data.user.name}</Text>
+            <Text style={{ fontSize: RFValue(20) }}>{data.user.name}</Text>
           </View>
           <View>
             <TouchableOpacity

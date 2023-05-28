@@ -4,6 +4,9 @@ export default {
     MAINBorder: "#c89b3c",
     MAINFill: "#d8ae5e",
     MAINLineCross: "#ecd5a6",
+    MAINBackground: "#363E4D",
+    MAINChat1: "#3F78EA",
+    MAINChat2: "#D9D9D9",
 
     TEXT: "#969CB2",
     GRAY: "#999591",

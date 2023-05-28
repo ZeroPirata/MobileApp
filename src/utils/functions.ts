@@ -23,6 +23,21 @@ import {
 } from "firebase/firestore";
 import { User } from "firebase/auth";
 
+export function getFileSize(fileSizeInBytes: number): string {
+  if (fileSizeInBytes < 1024) {
+    return fileSizeInBytes + " B";
+  } else if (fileSizeInBytes < 1024 * 1024) {
+    const fileSizeInKB = (fileSizeInBytes / 1024).toFixed(2);
+    return fileSizeInKB + " KB";
+  } else if (fileSizeInBytes < 1024 * 1024 * 1024) {
+    const fileSizeInMB = (fileSizeInBytes / (1024 * 1024)).toFixed(2);
+    return fileSizeInMB + " MB";
+  } else {
+    const fileSizeInGB = (fileSizeInBytes / (1024 * 1024 * 1024)).toFixed(2);
+    return fileSizeInGB + " GB";
+  }
+}
+
 export const sendPostGrupos = async (
   user: string,
   title: string,
@@ -64,6 +79,7 @@ export const sendPostGrupos = async (
           id: uploadFiles.id,
           url: uploadFiles.url,
           type: uploadFiles.type,
+          size: uploadFiles.size,
         },
       };
       await push(refDataBase, postData);
@@ -116,6 +132,7 @@ export const sendPost = async (
           id: uploadFiles.id,
           url: uploadFiles.url,
           type: uploadFiles.type,
+          size: uploadFiles.size,
         },
       };
       await set(ref, postData);
@@ -137,6 +154,7 @@ export const FliesUpload = async (email: string, file: ISendFiles) => {
     id,
     url: await getDownloadURL(snapshot.ref),
     type: file.mimeType,
+    size: file.size,
   };
 };
 

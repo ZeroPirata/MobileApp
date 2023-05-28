@@ -9,6 +9,8 @@ export interface IFriendRequest {
   email: string;
   data: string;
   avatar: string;
+  id: string;
+  name: string;
 }
 
 export interface IGrupo {

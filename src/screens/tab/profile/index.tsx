@@ -17,6 +17,8 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { Feather, MaterialIcons } from '@expo/vector-icons';
+
 import React, { useCallback, useEffect, useState } from "react";
 import { database, db, storage } from "../../../configs/firebase";
 import { useAuthentication } from "../../../hooks/useAuthentication";
@@ -30,32 +32,7 @@ import {
   onValue,
   limitToLast,
 } from "firebase/database";
-import {
-  ContainerHead,
-  BackGroundImage,
-  FeatherIcons,
-  MainContaienr,
-  SectionLeyoutUser,
-  EditBackGroundButton,
-  BackGroundIconView,
-  EditAvatarButton,
-  AvatarImage,
-  AvatarIconView,
-  SectionUserInfo,
-  UserInfo,
-  SectionEditNameUser,
-  UserTextInputName,
-  ButtonSettings,
-  TextButtons,
-  NameUser,
-  EmailUser,
-  EditUser,
-  SectionEditDescricaoUser,
-  UserTextInputDescription,
-  UserDescricao,
-  PostUserView,
-  SettingsButtonDescription,
-} from "./style";
+import { ButtonEditText, ButtonEditView, ButtonsView, CancelButton, Container, ContainerHeaderProfile, EditUserDescricao, EditUserDescricaoView, EditUserName, EditUserNameView, HeaderBackGround, HeaderBackGroundView, HeaderImagesView, HeaderProfile, HeaderProfileView, HeaderUserArroba, HeaderUserDescription, HeaderUserInfoView, HeaderUserName, SaveButton } from "./style";
 import { getAuth, updateProfile } from "firebase/auth";
 import {
   TouchableOpacity,
@@ -64,9 +41,9 @@ import {
   View,
   Button,
   Text,
+  ScrollView
 } from "react-native";
 import { PostView } from "../../../components/Posts";
-import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import themes from "../../../styles/themes";
 import { UploadSingleImage } from "../../../utils/functions";
 
@@ -91,11 +68,13 @@ const Profile = () => {
   const [newUserInfo, setNewUserInfo] = useState({
     nome: "",
     descricao: "",
+    arroba: ""
   });
 
   const [editUserInfo, setEditUserInfo] = useState({
     nome: false,
     descricao: false,
+    arroba: false
   });
 
   const getUserPost = async () => {
@@ -103,7 +82,7 @@ const Profile = () => {
       const refPostUser = RealTimeReference(database, "posts/");
       const queryRealTime = RealTimeQuery(
         refPostUser,
-        orderByChild("user"),
+        orderByChild("user_id"),
         equalTo(user.uid),
         limitToLast(100)
       );
@@ -207,23 +186,7 @@ const Profile = () => {
   };
 
   const updateUser = () => {
-    if (auth.currentUser != null) {
-      Alert.alert(
-        "Editar Informações",
-        "Selecione abaixo o que você deseja editar do perfil",
-        [
-          { text: "Cencel", style: "cancel" },
-          {
-            text: "Nome",
-            onPress: () => setEditUserInfo({ nome: true, descricao: false }),
-          },
-          {
-            text: "Descrição",
-            onPress: () => setEditUserInfo({ nome: false, descricao: true }),
-          },
-        ]
-      );
-    }
+
   };
   const editarUsuario = async () => {
     const getIdReference = collection(db, "users");
@@ -272,8 +235,32 @@ const Profile = () => {
           console.log(error);
         }
       }
+      if (editUserInfo.arroba && auth.currentUser != null) {
+        const refDatabase = doc(collection(db, "users"));
+        const documentSnapshot = await getDoc(refDatabase);
+        const updatedData = {
+          ...documentSnapshot.data(),
+          id: user?.uid,
+          arroba: newUserInfo.arroba,
+        };
+        try {
+          await setDoc(refCloudFireStore, updatedData, { merge: true })
+            .then((data) => {
+              console.log(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          Alert.alert(
+            "Concluido", '',
+            [{ text: "Ok", style: "destructive" }]
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
-    setEditUserInfo({ nome: false, descricao: false });
+    setEditUserInfo({ nome: false, descricao: false, arroba: false });
   };
 
   useEffect(() => {
@@ -301,181 +288,129 @@ const Profile = () => {
   };
 
   return (
-    <MainContaienr>
-      <ContainerHead>
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          <SectionLeyoutUser>
-            <EditBackGroundButton
-              onPress={() => {
-                pickImage();
-                setBackGround(true);
-              }}
-              onPressIn={() => setOnfocusBackGround(true)}
-              onPressOut={() => setOnfocusBackGround(false)}
-            >
-              {onFocusBackGround ? (
-                <BackGroundIconView>
-                  <FeatherIcons size={65} name={"edit"} />
-                </BackGroundIconView>
-              ) : null}
-              <BackGroundImage
-                source={{
-                  uri: String(
-                    userInfo[0]?.background
-                      ? userInfo[0]?.background.url
-                      : "https://pbs.twimg.com/media/FlmgV-4XwAMDm6j.jpg"
-                  ),
-                }}
-                style={{ resizeMode: "stretch" }}
-              />
-            </EditBackGroundButton>
-            <EditAvatarButton
-              onPress={() => {
-                pickImage();
-                setProfilePick(true);
-              }}
-              onPressIn={() => setOnfocusProfile(true)}
-              onPressOut={() => setOnfocusProfile(false)}
-            >
-              {onFocusProfile ? (
-                <AvatarIconView>
-                  <FeatherIcons size={35} name={"edit"} />
-                </AvatarIconView>
-              ) : null}
-              <AvatarImage
-                source={{
-                  uri: String(
-                    user?.photoURL
-                      ? user?.photoURL
-                      : "https://static-cdn.jtvnw.net/jtv_user_pictures/50a9a0bd-7f1a-4879-bd18-7f1d76db46aa-profile_image-300x300.png"
-                  ),
-                }}
-              />
-            </EditAvatarButton>
-          </SectionLeyoutUser>
-          <SectionUserInfo>
-            <UserInfo>
-              {editUserInfo.nome ? (
-                <SectionEditNameUser>
-                  <UserTextInputName
-                    maxLength={150}
-                    onChangeText={(text) =>
-                      setNewUserInfo({ ...newUserInfo, nome: text })
-                    }
-                    placeholder="Digite o novo nome"
-                  />
-                  <ButtonSettings
-                    style={{
-                      backgroundColor: "white",
-                    }}
-                    onPress={editarUsuario}
-                  >
-                    <TextButtons>Atualizar</TextButtons>
-                  </ButtonSettings>
-                  <ButtonSettings
-                    style={{
-                      backgroundColor: "red",
-                    }}
-                    onPress={() =>
-                      setEditUserInfo({ nome: false, descricao: false })
-                    }
-                  >
-                    <TextButtons style={{ color: "white" }}>
-                      Cancelar
-                    </TextButtons>
-                  </ButtonSettings>
-                </SectionEditNameUser>
-              ) : user?.displayName ? (
-                <NameUser>{user?.displayName} </NameUser>
-              ) : (
-                <EmailUser>{user?.email} </EmailUser>
-              )}
-              <EditUser onPress={updateUser}>
-                <FeatherIcons size={25} name={"edit"} />
-              </EditUser>
-            </UserInfo>
+    <Container>
+      <ScrollView style={{ height: "100%" }}>
 
-            {editUserInfo.descricao ? (
-              <SectionEditDescricaoUser>
-                <UserTextInputDescription
-                  numberOfLines={5}
-                  multiline={true}
+        <ContainerHeaderProfile>
+          <HeaderImagesView>
+            <HeaderBackGroundView onPress={() => {
+              pickImage();
+              setBackGround(true);
+            }}>
+              <HeaderBackGround source={{
+                uri: String(
+                  userInfo[0]?.background
+                    ? userInfo[0]?.background.url
+                    : "https://pbs.twimg.com/media/FlmgV-4XwAMDm6j.jpg"
+                )
+              }} />
+            </HeaderBackGroundView>
+            <HeaderProfileView onPress={() => {
+              pickImage();
+              setProfilePick(true);
+            }}>
+              <HeaderProfile source={{ uri: String(user?.photoURL) }} />
+            </HeaderProfileView>
+          </HeaderImagesView>
+          <HeaderUserInfoView>
+            {editUserInfo.nome ?
+              (<EditUserNameView>
+                <EditUserName
+                  onChangeText={(text) => setNewUserInfo({ ...newUserInfo, nome: text })}
+                  value={newUserInfo?.nome}
+                  placeholder="Change your name"
+                  placeholderTextColor={themes.COLORS.GRAY4}
                   textAlign={"left"}
-                  style={{ textAlignVertical: "top" }}
-                  maxLength={250}
-                  onChangeText={(text) =>
-                    setNewUserInfo({ ...newUserInfo, descricao: text })
-                  }
-                  placeholder="Digite o novo nome"
                 />
-                <SettingsButtonDescription>
-                  <ButtonSettings
-                    style={{
-                      backgroundColor: "white",
-                    }}
-                    onPress={editarUsuario}
-                  >
-                    <TextButtons>Atualizar</TextButtons>
-                  </ButtonSettings>
-                  <ButtonSettings
-                    style={{
-                      backgroundColor: "red",
-                    }}
-                    onPress={() =>
-                      setEditUserInfo({ nome: false, descricao: false })
-                    }
-                  >
-                    <TextButtons style={{ color: "white" }}>
-                      Cancelar
-                    </TextButtons>
-                  </ButtonSettings>
-                </SettingsButtonDescription>
-              </SectionEditDescricaoUser>
-            ) : userInfo[0] ? (
-              <UserDescricao>{userInfo[0]?.descricao}</UserDescricao>
-            ) : (
-              <UserDescricao>
-                ¯\_(ツ)_/¯ Personalize seu perfil adicionando uma descrição
-              </UserDescricao>
-            )}
-          </SectionUserInfo>
-        </ScrollView>
-      </ContainerHead>
-      {/* <ScrollView
-        style={{
-          backgroundColor: themes.COLORS.COLORS_CONSTRAT.ROSA_CLARO,
-        }}
-      >
-        <PostUserView
-          style={{
-            height: "100%",
-            flexGrow: 1,
-          }}
-        >
-          {loadingPostUser ? (
-            <View style={{ margin: 10 }}>
-              <Text>Carregando........................</Text>
-            </View>
-          ) : (
-            postUser.map((data, index) => (
-              <PostView
-                key={index}
-                data={data.data}
-                id={data.id}
-                title={data.title}
-                images={data.images}
-                user={data.user}
-                description={data.description}
-              />
-            ))
-          )}
-        </PostUserView>
-      </ScrollView> */}
-    </MainContaienr>
+                <ButtonsView>
+                  <CancelButton onPress={() => { setEditUserInfo({ ...editUserInfo, nome: false }), setNewUserInfo({ ...newUserInfo, nome: "" }) }}>
+                    <MaterialIcons name="cancel" size={24} color="red" />
+                  </CancelButton>
+                  <SaveButton onPress={editarUsuario}>
+                    <MaterialIcons name="verified" size={24} color="green" />
+                  </SaveButton>
+                </ButtonsView>
+              </EditUserNameView>) :
+              (<HeaderUserName>{user?.displayName}
+                <ButtonEditView>
+                  <ButtonEditText onPress={() => setEditUserInfo({ ...editUserInfo, nome: true })}>
+                    <Feather name="edit" size={15} color="white" />
+                  </ButtonEditText>
+                </ButtonEditView>
+              </HeaderUserName>)}
+            {editUserInfo.arroba ?
+              (<EditUserNameView>
+                <EditUserName
+                  onChangeText={(text) => setNewUserInfo({ ...newUserInfo, arroba: text })}
+                  value={newUserInfo?.arroba}
+                  placeholder="Create your new @"
+                  placeholderTextColor={themes.COLORS.GRAY4}
+                  textAlign={"left"} />
+                <ButtonsView>
+                  <CancelButton onPress={() => { setEditUserInfo({ ...editUserInfo, arroba: false }), setNewUserInfo({ ...newUserInfo, arroba: "" }) }}>
+                    <MaterialIcons name="cancel" size={24} color="red" />
+                  </CancelButton>
+                  <SaveButton onPress={editarUsuario}>
+                    <MaterialIcons name="verified" size={24} color="green" />
+                  </SaveButton>
+                </ButtonsView>
+              </EditUserNameView>) :
+              (<HeaderUserArroba>@{userInfo[0]?.arroba != undefined ? userInfo[0]?.arroba : "Não possui ainda"}
+                <ButtonEditView>
+                  <ButtonEditText onPress={() => { setEditUserInfo({ ...editUserInfo, arroba: true }) }}>
+                    <Feather name="edit" size={15} color="white" />
+                  </ButtonEditText>
+                </ButtonEditView>
+              </HeaderUserArroba>)}
+
+            {editUserInfo.descricao ?
+              (<EditUserDescricaoView>
+                <EditUserDescricao
+                  multiline={true}
+                  onChangeText={(text) => setNewUserInfo({ ...newUserInfo, descricao: text })}
+                  value={newUserInfo?.descricao}
+                  placeholder="Create your new description"
+                  textAlign={"left"}
+                  placeholderTextColor={themes.COLORS.GRAY4}
+                  numberOfLines={10}
+                  textAlignVertical="top"></EditUserDescricao>
+                <ButtonsView>
+                  <CancelButton onPress={() => { setEditUserInfo({ ...editUserInfo, descricao: false }), setNewUserInfo({ ...newUserInfo, descricao: "" }) }}>
+                    <MaterialIcons name="cancel" size={24} color="red" />
+                  </CancelButton>
+                  <SaveButton onPress={editarUsuario}>
+                    <MaterialIcons name="verified" size={24} color="green" />
+                  </SaveButton>
+                </ButtonsView>
+              </EditUserDescricaoView>) :
+              (<HeaderUserDescription>
+                {userInfo[0]?.descricao != undefined ? userInfo[0].descricao : "Ainda não possui nenhuma descrição, coloque uma: "}
+                <ButtonEditView>
+                  <ButtonEditText onPress={() => setEditUserInfo({ ...editUserInfo, descricao: true })}>
+                    <Feather name="edit" size={15} color="white" />
+                  </ButtonEditText>
+                </ButtonEditView>
+              </HeaderUserDescription>)}
+          </HeaderUserInfoView>
+          {postUser &&
+            postUser.map((items) => {
+              if (items != undefined) {
+                return (
+                  <PostView
+                    id={items.id}
+                    key={items.id}
+                    user={items.user}
+                    body={items.body}
+                    images={items?.images}
+                    arquivos={items.arquivos}
+                    data={items.data}
+                  />
+                );
+              }
+            })}
+        </ContainerHeaderProfile>
+      </ScrollView>
+    </Container>
   );
 };
 

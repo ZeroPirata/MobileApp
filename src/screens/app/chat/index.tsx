@@ -1,6 +1,6 @@
 import { useRoute } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, Image, ScrollView, TextInput } from "react-native";
+import { View, Text, Image, ScrollView, TextInput, TouchableOpacity } from "react-native";
 import { Usuario } from "../../../interfaces/UsuarioInterface";
 import { Entypo, Feather } from "@expo/vector-icons";
 import {
@@ -101,7 +101,7 @@ const ChatBeetwen = () => {
       <View style={{ paddingTop: 25 }}>
         <View
           style={{
-            backgroundColor: "white",
+            backgroundColor: themes.COLORS.MAINBackground,
             width: "100%",
             zIndex: 1,
             height: 75,
@@ -123,7 +123,7 @@ const ChatBeetwen = () => {
               borderTopRightRadius: 15,
             }}
           />
-          <Text style={{ fontSize: 35, color: "red", paddingLeft: 20 }}>
+          <Text style={{ fontSize: 35, color: themes.COLORS.MAINFill, paddingLeft: 20 }}>
             {userRoute[0]?.name}
           </Text>
         </View>
@@ -133,7 +133,7 @@ const ChatBeetwen = () => {
             height: "100%",
             paddingTop: 75,
             paddingBottom: 55,
-            backgroundColor: themes.COLORS.BACKGROUND,
+            backgroundColor: themes.COLORS.MAIN,
           }}
         >
           <ScrollView ref={ScrollViewRef}>
@@ -148,42 +148,44 @@ const ChatBeetwen = () => {
                     style={
                       user?.uid == history.user
                         ? {
-                            backgroundColor: themes.COLORS.GREEN3,
-                            alignItems: "flex-end",
-                            alignSelf: "flex-end",
-                            borderColor: "black",
-                            borderWidth: 1,
-                            marginTop: 5,
-                            marginBottom: 5,
-                            marginRight: 10,
-                          }
+                          backgroundColor: themes.COLORS.MAINChat1,
+                          alignItems: "flex-end",
+                          alignSelf: "flex-end",
+                          borderColor: "black",
+                          borderWidth: 1,
+                          marginTop: 5,
+                          marginBottom: 5,
+                          marginRight: 10,
+                          borderRadius: 15,
+                        }
                         : {
-                            backgroundColor: themes.COLORS.BLUE3,
-                            alignItems: "flex-start",
-                            borderColor: "black",
-                            borderWidth: 1,
-                            marginTop: 5,
-                            marginBottom: 5,
-                            marginLeft: 10,
-                            alignSelf: "flex-start",
-                          }
+                          backgroundColor: themes.COLORS.MAINChat2,
+                          alignItems: "flex-start",
+                          borderColor: "black",
+                          borderRadius: 15,
+                          borderWidth: 1,
+                          marginTop: 5,
+                          marginBottom: 5,
+                          marginLeft: 10,
+                          alignSelf: "flex-start",
+                        }
                     }
                   >
                     <View
                       style={
                         user?.uid == history.user
                           ? {
-                              alignItems: "flex-end",
-                              padding: 10,
-                            }
+                            alignItems: "flex-end",
+                            padding: 10,
+                          }
                           : {
-                              padding: 10,
-                              alignItems: "flex-start",
-                            }
+                            padding: 10,
+                            alignItems: "flex-start",
+                          }
                       }
                     >
-                      <Text style={{ maxWidth: "70%" }}>{history.msg}</Text>
-                      <Text>
+                      <Text style={user?.uid == history.user ? { maxWidth: "70%", color: "white" } : { maxWidth: "70%", color: "black" }}>{history.msg}</Text>
+                      <Text style={user?.uid == history.user ? { maxWidth: "70%", color: "white" } : { maxWidth: "70%", color: "black" }}>
                         {localeDate} - {localeHours}
                       </Text>
                     </View>
@@ -206,7 +208,7 @@ const ChatBeetwen = () => {
             bottom: 0,
             left: 0,
             justifyContent: "space-evenly",
-            backgroundColor: "white",
+            backgroundColor: themes.COLORS.MAINBackground,
           }}
         >
           <TextInput
@@ -215,27 +217,36 @@ const ChatBeetwen = () => {
               sendMsg(), setValue({ ...value, msg: "" });
             }}
             value={value.msg}
-            placeholder="msg"
+            placeholder="Message"
+            placeholderTextColor={"white"}
             style={{
+              color: "white",
               width: "80%",
               height: "100%",
-              borderColor: "black",
-              borderWidth: 1,
-              borderRadius: 35,
+              borderColor: themes.COLORS.MAINBorder,
+              borderWidth: 2,
+              borderRadius: 25,
               paddingLeft: 15,
             }}
           />
-          <Feather
-            style={{
-              textAlign: "center",
-              width: "20%",
+          <TouchableOpacity style={{
+            width: "20%",
+          }}
+            onPress={() => {
+              sendMsg(), setValue({ ...value, msg: "" });
             }}
-            name="send"
-            size={35}
-          />
+          >
+            <Feather
+              style={{ textAlign: "center", }}
+              name="send"
+              color={"white"}
+              size={35}
+            />
+          </TouchableOpacity>
+
         </View>
-      </View>
-    </View>
+      </View >
+    </View >
   );
 };
 export { ChatBeetwen };

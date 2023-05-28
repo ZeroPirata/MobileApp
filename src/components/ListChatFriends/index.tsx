@@ -1,38 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { Image, Text, View } from "react-native";
-import { IFriendRequest } from "../../interfaces/Notification";
-import { Entypo } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import {
-  collection,
-  endAt,
-  endBefore,
-  onSnapshot,
-  orderBy,
-  query,
-  startAfter,
-  where,
-} from "firebase/firestore";
-import { database, db } from "../../configs/firebase";
-import { TouchableOpacity } from "react-native";
-import themes from "../../styles/themes";
-import {
-  ref,
-  set,
-  query as queryRT,
-  orderByChild,
-  onValue,
-  equalTo,
-  orderByPriority,
-  startAt,
-  orderByKey,
-  orderByValue,
-} from "firebase/database";
-import { uuidv4 } from "@firebase/util";
+import { ref, set, query as queryRT, orderByChild, onValue, } from "firebase/database";
+import { collection, onSnapshot, query, where, } from "firebase/firestore";
+import { Image, Text, View, TouchableOpacity } from "react-native";
 import { Usuario } from "../../interfaces/UsuarioInterface";
-import { User } from "firebase/auth";
-import { ListUser } from "../../interfaces/ListUser";
+import { RFValue } from "react-native-responsive-fontsize";
+import { useNavigation } from "@react-navigation/native";
 import { InsertChatUser } from "../../utils/functions";
+import { database, db } from "../../configs/firebase";
+import { ListUser } from "../../interfaces/ListUser";
+import React, { useEffect, useState } from "react";
+import { Entypo } from "@expo/vector-icons";
+import themes from "../../styles/themes";
+import { uuidv4 } from "@firebase/util";
 
 export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
   const navigate = useNavigation();
@@ -129,7 +107,7 @@ export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
         }}
       />
       <View style={{ width: "70%" }}>
-        <Text>{user[0]?.name}</Text>
+        <Text style={{ fontSize: RFValue(20) }}>{user[0]?.name}</Text>
       </View>
       <View>
         <TouchableOpacity onPress={handleStartChatUsers}>

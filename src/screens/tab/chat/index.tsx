@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Container } from "./style";
+import { Container, ListChatHistory, NewChatButtonStld, NewChatText } from "./style";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import {
@@ -44,47 +44,18 @@ const Chat = () => {
   };
 
   return (
-    <Container style={{ paddingTop: 25 }}>
-      <View style={styles.headerChat}>
-        <TouchableOpacity style={styles.iconDisplay} onPress={handleListShow}>
-          <Text>Iniciar conversa</Text>
-          <MaterialCommunityIcons
-            name={showList ? "chat-minus" : "chat-plus"}
-            size={35}
-          />
-        </TouchableOpacity>
-        <View
-          style={{
-            backgroundColor: "white",
-            position: "absolute",
-            zIndex: 10,
-            top: "4.5%",
-            right: 0,
-          }}
-        >
-          {showList
-            ? listFriends.length > 0 && (
-                <ScrollView>
-                  <ValidarLista
-                    key={`validar-lista-${updateCounter}`}
-                    list={listFriends[0].friends}
-                    user={user}
-                  />
-                </ScrollView>
-              )
-            : null}
-        </View>
-
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          style={{
-            backgroundColor: themes.COLORS.COLORS_CONSTRAT.ROSA_CLARO,
-            height: "100%",
-          }}
-          horizontal={false}
-        >
+    <Container>
+      <NewChatButtonStld onPress={handleListShow}>
+        <NewChatText>{showList ? "Close new" : "New"} Chat</NewChatText>
+      </NewChatButtonStld>
+      {showList ? (
+        <ValidarLista
+          key={`validar-lista-${updateCounter}`}
+          list={listFriends[0].friends}
+          user={user}
+        />
+      ) : (
+        <ListChatHistory>
           {listFriends[0]?.chats && (
             <ValidarChat
               key={`validar-lista-${updateCounter}`}
@@ -92,8 +63,8 @@ const Chat = () => {
               user={user}
             />
           )}
-        </ScrollView>
-      </View>
+        </ListChatHistory>
+      )}
     </Container>
   );
 };

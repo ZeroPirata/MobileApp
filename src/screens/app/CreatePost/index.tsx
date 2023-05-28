@@ -1,75 +1,68 @@
-import { View, Text, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { View, Text, Alert, ActivityIndicator } from "react-native";
 import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import * as DataBase from "firebase/database";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 import { uuidv4 } from "@firebase/util";
 import { useCallback, useEffect, useState } from "react";
-
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { IFiles, ISendFiles } from "../../../interfaces/PostInterface";
-import { database, db, storage } from "../../../configs/firebase";
+import { ISendFiles } from "../../../interfaces/PostInterface";
+import { database, db } from "../../../configs/firebase";
 import themes from "../../../styles/themes";
-import {
-  ImageLeyoutUpload,
-  Container,
-  CreatePostHeader,
-  CreatePostText,
-  CreateBody,
-  ButtonImage,
-  ButtonText,
-  ButtonSendPost,
-  HeaderBackButton,
-  ButtonUploadFile,
-  ButtonArrowBack,
-  ImageLoading,
-  TextLoading,
-  ButtonRemoveImage,
-  ViewLoading,
-  FlatListImage,
-  ImageLoadingView,
-  ButtonSendPostText,
-} from "./style";
-import { set } from "firebase/database";
-import { TypeOfFiles } from "../../../components/TypeFile";
 import { Picker } from "@react-native-picker/picker";
-import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { GrupoInterface } from "../../../interfaces/GruposInterface";
-import { Usuario } from "../../../interfaces/UsuarioInterface";
-import { User } from "firebase/auth/react-native";
 import {
-  FliesUpload,
-  ImageArrayUpload,
+  getFileSize,
   sendPost,
   sendPostGrupos,
 } from "../../../utils/functions";
+import {
+  ButtonAddFile,
+  ButtonAddFileText,
+  ButtonAddImage,
+  ButtonAddImageText,
+  ButtonRemoveImage,
+  ButtonSend,
+  Container,
+  ControllViewFilesRender,
+  ControlleViewImageRender,
+  ControllerButtonsFileImages,
+  CreatePostText,
+  CreatePostTextView,
+  FileName,
+  FileSettings,
+  FileSize,
+  FileType,
+  FlatListImage,
+  ImageLeyoutUpload,
+  ImageLoading,
+  SelectPickerView,
+  TextLoading,
+  TextSend,
+  ViewLoading,
+} from "./style";
+
+const { Item } = Picker;
 
 const CreatePost = () => {
-  const [grupos, setGrupos] = useState<GrupoInterface[]>([]);
-  const [selectGrup, setSelectGrup] = useState();
-
-  const { Item } = Picker;
   const { user } = useAuthentication();
 
-  const navigation = useNavigation();
-
+  const [grupos, setGrupos] = useState<GrupoInterface[]>([]);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [gruposInfo, setGruposInfos] = useState<any[]>([]);
+  const [images, setImages] = useState<ISendFiles[]>([]);
+  const [isLoading, setIsLoagind] = useState(false);
+  const [files, setFiles] = useState<ISendFiles>();
+  const [selectGrup, setSelectGrup] = useState();
   const [value, setValue] = useState({
     title: "",
     description: "",
   });
 
-  const [loadingUpload, setLoadingUpload] = useState(false);
-  const [isLoading, setIsLoagind] = useState(false);
-
-  const [images, setImages] = useState<ISendFiles[]>([]);
-  const [files, setFiles] = useState<ISendFiles>();
-
-  const handleHomeNavigation = () => {
-    navigation.navigate("TabsRoutes");
-  };
+  const navigation = useNavigation();
 
   const pickFiles = async () => {
     setIsLoagind(true);
@@ -111,15 +104,6 @@ const CreatePost = () => {
   };
 
   const SendingPost = async () => {
-    if (value.title == "") {
-      Alert.alert("Titulo Vazio", "Escreva pelo menos o titulo ψ(._. )>", [
-        {
-          text: "Ok",
-          style: "cancel",
-        },
-      ]);
-      return;
-    }
     setLoadingUpload(true);
     if (selectGrup == null) {
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
@@ -167,13 +151,8 @@ const CreatePost = () => {
     }
   };
 
-  useEffect(() => {
-    if (user?.uid != null) {
-      gruposUser(user?.uid);
-    }
-  }, [user?.uid]);
 
-  const [gruposInfo, setGruposInfos] = useState<any[]>([]);
+
 
   const setGruposInfo = useCallback(() => {
     grupos.map((grups) => {
@@ -185,39 +164,50 @@ const CreatePost = () => {
   }, [grupos]);
 
   useEffect(() => {
+    if (user?.uid != null) {
+      gruposUser(user?.uid);
+    }
+  }, [user?.uid]);
+
+  useEffect(() => {
     setGruposInfo();
   }, [grupos]);
 
+  const RemoverFile = () => {
+    Alert.alert(
+      "Remover arquivo",
+      `Você tem certeza que deseja deletar: ${files?.name} ${fileSize}`,
+      [
+        { text: "Cencel", style: "cancel" },
+        {
+          text: "Remove",
+          onPress: () => setFiles(undefined),
+        },
+      ]
+    );
+  }
+
+  const fileSize = getFileSize(Number(files?.size))
   return !loadingUpload ? (
     <Container>
-      <HeaderBackButton>
-        <ButtonArrowBack onPress={handleHomeNavigation}>
-          <MaterialIcons name="arrow-back" size={50} color="white" />
-        </ButtonArrowBack>
-      </HeaderBackButton>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <CreatePostHeader>
-          <CreatePostText
-            placeholder="Title"
-            value={value?.title}
-            onChangeText={(text) => setValue({ ...value, title: text })}
-            placeholderTextColor={themes.COLORS.GRAY2}
-          />
-          <CreateBody
-            value={value?.description}
-            multiline={true}
-            style={{ textAlignVertical: "top" }}
-            onChangeText={(text) => setValue({ ...value, description: text })}
-            textAlign={"left"}
-            numberOfLines={5}
-            placeholder="Description"
-            placeholderTextColor={themes.COLORS.TEXT_and_BACKGROUND.GRAY2}
-          />
+      <CreatePostTextView>
+        <CreatePostText
+          multiline={true}
+          onChangeText={(text) => setValue({ ...value, description: text })}
+          value={value?.description}
+          placeholder="Type here"
+          placeholderTextColor={themes.COLORS.GRAY4}
+          numberOfLines={10}
+          textAlign={"left"}
+          textAlignVertical="top"
+        />
+        <SelectPickerView>
           <Picker
             selectedValue={selectGrup}
             onValueChange={(grupValue, itemIndex) => setSelectGrup(grupValue)}
             style={{
               color: "white",
+              width: "100%",
             }}
           >
             <Item label="Feed normal" value={null} />
@@ -226,71 +216,56 @@ const CreatePost = () => {
                 return <Item key={gps.id} value={gps.id} label={gps.nome} />;
               })}
           </Picker>
-          <ButtonImage>
-            <ButtonText>Images: {Number(images.length)} </ButtonText>
-            <ButtonUploadFile onPress={pickImage}>
-              <MaterialIcons
-                name="image-search"
-                size={24}
-                color={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
-              />
-              <ButtonText>Images</ButtonText>
-            </ButtonUploadFile>
-            <ButtonUploadFile onPress={pickFiles}>
-              <MaterialIcons
-                name="file-upload"
-                size={24}
-                color={themes.COLORS.HEXTECH_METAL_GOLD.GOLD3}
-              />
-              <ButtonText>Files</ButtonText>
-            </ButtonUploadFile>
-          </ButtonImage>
-          <ButtonText>
-            File: {files?.name} - Tamanho: {files?.size}{" "}
-          </ButtonText>
-          <ImageLoadingView>
-            {isLoading ? (
-              <ViewLoading>
-                <TextLoading>Loading...</TextLoading>
-                <ActivityIndicator size={"large"} />
-              </ViewLoading>
-            ) : null}
-            {images && (
-              <FlatListImage
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                data={images}
-                renderItem={({ index }) => (
-                  <ImageLeyoutUpload>
-                    <ButtonRemoveImage onPress={() => removeImage(index)}>
-                      <ImageLoading
-                        source={{ uri: images[index].uri }}
-                        key={index}
-                      />
-                    </ButtonRemoveImage>
-                  </ImageLeyoutUpload>
-                )}
-              />
+        </SelectPickerView>
+        <ControllerButtonsFileImages>
+          <ButtonAddFile onPress={pickFiles}>
+            <AntDesign name="addfile" size={24} color="black" />
+            <ButtonAddFileText>Add Files</ButtonAddFileText>
+          </ButtonAddFile>
+          <ButtonAddImage onPress={pickImage}>
+            <Entypo name="folder-images" size={24} color="black" />
+            <ButtonAddImageText>Add Images</ButtonAddImageText>
+          </ButtonAddImage>
+        </ControllerButtonsFileImages>
+        <ControlleViewImageRender style={
+          images.length > 0 ? { display: "flex", width: "90%", height: "20%" } : { display: "none" }
+        }>
+          {isLoading ? (
+            <ViewLoading>
+              <TextLoading>Loading...</TextLoading>
+              <ActivityIndicator size={"large"} />
+            </ViewLoading>
+          ) : null}
+          <FlatListImage
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            data={images}
+            renderItem={({ index }) => (
+              <ImageLeyoutUpload>
+                <ButtonRemoveImage onPress={() => removeImage(index)}>
+                  <ImageLoading
+                    source={{ uri: images[index].uri }}
+                    key={index}
+                  />
+                </ButtonRemoveImage>
+              </ImageLeyoutUpload>
             )}
-            {/* {files && (
-              <FlatListImage
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                data={files}
-                renderItem={({ index }) =>
-                  ComponentFilesType.typeOfFile(
-                    files[index].type,
-                    files[index].uri
-                  )
-                }
-              />
-            )} */}
-          </ImageLoadingView>
-          <ButtonSendPost onPress={SendingPost}>
-            <ButtonSendPostText>Post</ButtonSendPostText>
-          </ButtonSendPost>
-        </CreatePostHeader>
-      </ScrollView>
+          />
+        </ControlleViewImageRender>
+        {files ? <ControllViewFilesRender>
+          <FontAwesome name="file" size={24} color="white" />
+          <FileSettings>
+            <ButtonRemoveImage onPress={RemoverFile}>
+              <FileName>{files.name}</FileName>
+              <FileSize>{fileSize}</FileSize>
+              <FileType>{files.mimeType}</FileType>
+            </ButtonRemoveImage>
+          </FileSettings>
+        </ControllViewFilesRender> : null}
+        <ButtonSend onPress={SendingPost}>
+          <TextSend>Send</TextSend>
+        </ButtonSend>
+      </CreatePostTextView>
     </Container>
   ) : (
     <View

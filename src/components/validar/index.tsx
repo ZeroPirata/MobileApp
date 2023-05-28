@@ -8,14 +8,16 @@ export const ValidarLista = ({ list, user }: ValidateList) => {
   if (user != null && list != undefined) {
     return (
       <View>
-        {list?.map((friend, index) => (
-          <ListChatFriends
-            key={index}
-            userLogged={user.uid}
-            id={String(friend.id)}
-            name={String(friend.name)}
-          />
-        ))}
+        {list?.map((friend, index) => {
+          return (
+            <ListChatFriends
+              key={index}
+              userLogged={user.uid}
+              id={String(friend.id)}
+              name={String(friend.id)}
+            />
+          )
+        })}
       </View>
     );
   } else {
@@ -27,6 +29,7 @@ export const ValidarLista = ({ list, user }: ValidateList) => {
   }
 };
 export const ValidarChat = ({ chats, user }: ValidateList) => {
+  console.log(chats)
   if (user != null && chats != undefined) {
     return (
       <View>
