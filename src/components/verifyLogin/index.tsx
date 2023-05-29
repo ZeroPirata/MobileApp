@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
 import { ButtonCancel, ButtonConfirm, ButtonStld, ButtonText, Container, Modal, Text, TextInputStld, TextsInputs } from './style'
-import themes from '../../styles/themes'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { useAuthentication } from '../../hooks/useAuthentication'
-import { getAuth, signInWithCredential, signInWithEmailAndPassword } from 'firebase/auth'
 import { ScrollView } from 'react-native-gesture-handler'
+import themes from '../../styles/themes'
+import React, { useState } from 'react'
 
 interface ILogin {
     necessary: (verify: boolean) => void,

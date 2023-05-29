@@ -4,7 +4,7 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   padding-top: 20px;
-  background-color: ${({theme}) => theme.COLORS.MAINBackground};
+  background-color: ${({theme}) => theme.COLORS.MAIN};
   height: 100%;
 `;
 

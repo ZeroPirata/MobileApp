@@ -1,26 +1,19 @@
-import {
-  HeaderView,
-  ContainerPicture,
-  Photo,
-  ContainerIcone,
-  SearchBarIcon,
-  PlusIcon,
-  TextInputSearch,
-} from "./style";
+import { HeaderView, ContainerPicture, Photo, ContainerIcone, SearchBarIcon, PlusIcon, TextInputSearch, } from "./style";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useAuthentication } from "../../hooks/useAuthentication";
-import { MaterialIcons } from "@expo/vector-icons";
-import themes from "../../styles/themes";
-import { uri } from "../../styles/image.json";
 import { useNavigation } from "@react-navigation/native";
 import { Option } from "../../interfaces/ModalInterface";
+import { MaterialIcons } from "@expo/vector-icons";
+import { uri } from "../../styles/image.json";
+import { db } from "../../configs/firebase";
+import themes from "../../styles/themes";
 import { Modals } from "../Modals";
 import { useState } from "react";
-import { db } from "../../configs/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
 
 export const HeaderProfile = () => {
   const { user } = useAuthentication();
   const navigation = useNavigation();
+
   const postCreateButton = () => {
     navigation.navigate("CreatePost");
   };
@@ -50,7 +43,7 @@ export const HeaderProfile = () => {
       referenceCloudFiresStorage,
       text.includes("@")
         ? where("email", "==", text)
-        : where("name", "==", text)
+        : where("arroba", "==", text)
     );
     const getUserts = await getDocs(queryBuilder);
     getUserts.docs.map((itens) => {

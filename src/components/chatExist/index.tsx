@@ -1,24 +1,15 @@
+import { collection, getDocs, query, where, } from "firebase/firestore";
 import { Text, View, Image, TouchableOpacity } from "react-native";
-import { useEffect, useState } from "react";
 import { ValidateList } from "../../interfaces/ValidateList";
-import { FindUserChats } from "../../utils/functions";
-import { Usuario } from "../../interfaces/UsuarioInterface";
-import { useNavigation } from "@react-navigation/native";
-import {
-  Unsubscribe,
-  collection,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
-import { db } from "../../configs/firebase";
-import themes from "../../styles/themes";
-import { Entypo } from "@expo/vector-icons";
-import { User } from "firebase/auth";
-import { useIsFocused } from "@react-navigation/native";
-import { IChatExist } from "../../interfaces/ChatExist";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useNavigation } from "@react-navigation/native";
+import { IChatExist } from "../../interfaces/ChatExist";
+import { FindUserChats } from "../../utils/functions";
+import { useEffect, useState } from "react";
+import { db } from "../../configs/firebase";
+import { Entypo } from "@expo/vector-icons";
+import themes from "../../styles/themes";
+
 export const ChatExist = ({ list, user, chats }: ValidateList) => {
   const [personas, setPersonas] = useState<any[]>([]);
   const navigate = useNavigation();

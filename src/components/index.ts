@@ -1,4 +1,3 @@
-import {FriendRequest} from "./FrindRequest";
 import {HeaderProfile} from "./HeaderProfile";
 import {ListChatFriends} from "./ListChatFriends";
 import {ListUsersComponent} from "./ListUsersComponent";
@@ -9,13 +8,13 @@ import {Btn} from "./button";
 import {Input} from "./input";
 import {ValidarLista, ValidarChat} from "./validar";
 import {ChatExist} from "./chatExist";
-import {GrupRequest} from "./GrupRequest";
+import {RenderNotifications} from "./NotificationRender";
 import {VerifyLogin} from "./verifyLogin";
 
 export {
   Btn,
-  FriendRequest,
   HeaderProfile,
+  RenderNotifications,
   Input,
   ListChatFriends,
   ListUsersComponent,
@@ -25,6 +24,5 @@ export {
   ValidarLista,
   ValidarChat,
   ChatExist,
-  GrupRequest,
   VerifyLogin,
 };

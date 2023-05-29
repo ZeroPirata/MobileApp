@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
-import { ListChatFriends } from "../ListChatFriends";
-import React from "react";
 import { ValidateList } from "../../interfaces/ValidateList";
+import { ListChatFriends } from "../ListChatFriends";
+import { View, Text } from "react-native";
 import { ChatExist } from "../chatExist";
+import React from "react";
 
 export const ValidarLista = ({ list, user }: ValidateList) => {
   if (user != null && list != undefined) {

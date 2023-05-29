@@ -1,20 +1,7 @@
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRef, useState } from "react";
+import { ModalSettings, TextModal, TextModalClose, TextModalOptions, TouchModal, TouchModalClose, TouchModalOpen, TouchModalOptions, ViewModal, ViewModalInside, ViewModalInsideSettings, } from "./style";
 import { ModalsProps } from "../../interfaces/ModalInterface";
-import {
-  ModalSettings,
-  TextModal,
-  TextModalClose,
-  TextModalIcon,
-  TextModalOptions,
-  TouchModal,
-  TouchModalClose,
-  TouchModalOpen,
-  TouchModalOptions,
-  ViewModal,
-  ViewModalInside,
-  ViewModalInsideSettings,
-} from "./style";
+import { Feather, } from "@expo/vector-icons";
+import { useState } from "react";
 
 export const Modals = ({ options, iconSize, iconNameFeater }: ModalsProps) => {
   const [modalView, setModalView] = useState(false);

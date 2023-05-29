@@ -64,6 +64,7 @@ const HomeTab = () => {
       return unsubscribe;
     }
   }, [user?.uid]);
+  
   return (
     <Container>
       <HeaderProfile />

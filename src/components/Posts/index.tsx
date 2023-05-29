@@ -1,38 +1,17 @@
-import { useNavigation } from "@react-navigation/native";
+import { BodyContent, ButtonLike, ButtonSeeMore, Container, FooterPostSettings, LikeCount, PostData, TextButtonSeeMore, UserName, } from "./style";
 import { ref, child, onValue, runTransaction, remove } from "firebase/database";
-import { useEffect, useRef, useState } from "react";
-import {
-  Image,
-  ScrollView,
-  Text,
-  Dimensions,
-  Animated,
-  View,
-} from "react-native";
-import { database } from "../../configs/firebase";
 import { useAuthentication } from "../../hooks/useAuthentication";
-import { AntDesign, EvilIcons } from "@expo/vector-icons";
 import { IFiles, IPost } from "../../interfaces/PostInterface";
-
-import {
-  BodyContent,
-  ButtonLike,
-  ButtonSeeMore,
-  Container,
-  FooterPostSettings,
-  ImageViewControll,
-  ImagesRender,
-  ImagesRenderView,
-  LikeCount,
-  PostData,
-  TextButtonSeeMore,
-  UserName,
-} from "./style";
-import themes from "../../styles/themes";
-
-import { Modals } from "../Modals";
+import { useNavigation } from "@react-navigation/native";
 import { Option } from "../../interfaces/ModalInterface";
 import { RenderImagesComponent } from "../RenderImage";
+import { useEffect, useRef, useState } from "react";
+import { database } from "../../configs/firebase";
+import { ScrollView, Text, } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import themes from "../../styles/themes";
+import { Modals } from "../Modals";
+
 
 export const PostView = ({ id, ...rest }: IPost) => {
   const { user } = useAuthentication();

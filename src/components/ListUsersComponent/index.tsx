@@ -1,18 +1,19 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
 import { IListSearchedUsers } from "../../interfaces/ListagemDeUsuario";
-import { AntDesign } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import themes from "../../styles/themes";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { push, ref, set } from "firebase/database";
 import { database } from "../../configs/firebase";
+import { AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import themes from "../../styles/themes";
 
 export const ListUsersComponent = ({ ...rest }: IListSearchedUsers) => {
   const { user } = useAuthentication();
 
   const handlerAdicionarUsuario = (uid: string) => {
-    const refRealTime = ref(database, `user/${uid}/alerts/requestfriends`);
+    const refRealTime = ref(database, `user/${uid}/alerts`);
     push(refRealTime, {
+      type: "amigos",
       date: Math.floor(Date.now() / 1000),
       id: user?.uid,
       name: user?.displayName,

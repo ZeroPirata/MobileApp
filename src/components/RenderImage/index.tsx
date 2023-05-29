@@ -1,15 +1,9 @@
-import {
-  Image,
-  ScrollView,
-  Text,
-  Dimensions,
-  Animated,
-  View,
-} from "react-native";
-import React, { useRef } from "react";
 import { ImageViewControll, ImagesRender, ImagesRenderView } from "./style";
-import themes from "../../styles/themes";
+import { ScrollView, Dimensions, Animated, View, } from "react-native";
 import { IFiles } from "../../interfaces/PostInterface";
+import themes from "../../styles/themes";
+import React, { useRef } from "react";
+
 const { width } = Dimensions.get("window");
 
 interface IRenderImagesComponentProps {
@@ -37,41 +31,41 @@ export const RenderImagesComponent: React.FC<IRenderImagesComponentProps> = ({
         >
           {arrayImages
             ? arrayImages.map((image, index) => {
-                return (
-                  <ImagesRender
-                    key={index}
-                    source={{ uri: image.url }}
-                    style={{ width, height: width }}
-                  />
-                );
-              })
+              return (
+                <ImagesRender
+                  key={index}
+                  source={{ uri: image.url }}
+                  style={{ width, height: width }}
+                />
+              );
+            })
             : null}
         </ScrollView>
       </ImagesRenderView>
       <View style={{ flexDirection: "row" }}>
         {Number(arrayImages.length) > 1 && arrayImages
           ? arrayImages.map((_, i) => {
-              let opacity = position.interpolate({
-                inputRange: [i - 1, i, i + 1],
-                outputRange: [0.3, 1, 0.3],
-                extrapolate: "clamp",
-              });
-              return (
-                <Animated.View
-                  key={i}
-                  style={{
-                    opacity,
-                    height: 5,
-                    width: 15,
-                    backgroundColor: themes.COLORS.MAINFill,
-                    marginLeft: 8,
-                    marginTop: 8,
-                    marginRight: 8,
-                    borderRadius: 5,
-                  }}
-                />
-              );
-            })
+            let opacity = position.interpolate({
+              inputRange: [i - 1, i, i + 1],
+              outputRange: [0.3, 1, 0.3],
+              extrapolate: "clamp",
+            });
+            return (
+              <Animated.View
+                key={i}
+                style={{
+                  opacity,
+                  height: 5,
+                  width: 15,
+                  backgroundColor: themes.COLORS.MAINFill,
+                  marginLeft: 8,
+                  marginTop: 8,
+                  marginRight: 8,
+                  borderRadius: 5,
+                }}
+              />
+            );
+          })
           : null}
       </View>
     </ImageViewControll>

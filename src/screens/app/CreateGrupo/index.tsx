@@ -76,9 +76,10 @@ export const CreateGrupo = () => {
       getUserts.forEach((i) => {
         const refRealTime = ref(
           database,
-          `user/${i.data().id}/alerts/grupInvite`
+          `user/${i.data().id}/alerts`
         );
         push(refRealTime, {
+          type: "grupo",
           date: Math.floor(Date.now() / 1000),
           id: grupoId,
           name: values.nome,
@@ -161,15 +162,15 @@ export const CreateGrupo = () => {
         </TouchableOpacity>
         {emailUser.length > 0
           ? emailUser.map((emails, index) => {
-              return (
-                <Text>
-                  {emails}{" "}
-                  <TouchableOpacity onPress={() => removeUserList(index)}>
-                    <Text>Remover</Text>
-                  </TouchableOpacity>
-                </Text>
-              );
-            })
+            return (
+              <Text>
+                {emails}
+                <TouchableOpacity onPress={() => removeUserList(index)}>
+                  <Text>Remover</Text>
+                </TouchableOpacity>
+              </Text>
+            );
+          })
           : null}
         <TouchableOpacity>
           <FontAwesome name="address-card-o" size={35} />

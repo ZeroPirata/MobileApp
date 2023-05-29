@@ -46,7 +46,7 @@ const TabRoutes: React.FC = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Profile"
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
