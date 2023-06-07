@@ -26,17 +26,29 @@ export const CreateGrupo = () => {
   });
 
   const [emailUser, setEmailUser] = useState<string[]>([]);
+  const [grupoRules, setGrupoRules] = useState<string[]>([]);
   const [email, setEmail] = useState({
     email: "",
+  });
+  const [regras, setText] = useState({
+    text: "",
   });
   const handleAddEmail = () => {
     const newEmailUser = [...emailUser, email.email];
     setEmailUser(newEmailUser);
     setEmail({ email: "" });
   };
+  const handleAddRules = () => {
+    const newRule = [...grupoRules, regras.text];
+    setGrupoRules(newRule);
+    setText({ text: "" });
+  };
 
   const removeUserList = (index: number) => {
-    setEmailUser(emailUser.filter((email, i) => i !== index));
+    setEmailUser(emailUser.filter((__, i) => i !== index));
+  };
+  const removeRule = (index: number) => {
+    setGrupoRules(emailUser.filter((__, i) => i !== index));
   };
 
   const [imageSelect, setImageSelect] = useState<ISendFiles>();
@@ -101,6 +113,7 @@ export const CreateGrupo = () => {
         url: imageUrl?.url,
       },
       membros: [{ id: user?.uid, role: "Dono" }],
+      regras: grupoRules
     });
     const usersRef = doc(db, "users", String(user?.uid));
 
@@ -165,6 +178,27 @@ export const CreateGrupo = () => {
             return (
               <Text>
                 {emails}
+                <TouchableOpacity onPress={() => removeUserList(index)}>
+                  <Text>Remover</Text>
+                </TouchableOpacity>
+              </Text>
+            );
+          })
+          : null}
+        <Text>Adicionar Regra</Text>
+        <TextInput
+          value={regras.text}
+          onChangeText={(text) => setText({ ...regras, text: text })}
+          placeholder="Digite o Nome/Email"
+        />
+        <TouchableOpacity onPress={handleAddRules}>
+          <Text>Adicionar Regra</Text>
+        </TouchableOpacity>
+        {grupoRules.length > 0
+          ? grupoRules.map((rules, index) => {
+            return (
+              <Text>
+                {rules}
                 <TouchableOpacity onPress={() => removeUserList(index)}>
                   <Text>Remover</Text>
                 </TouchableOpacity>

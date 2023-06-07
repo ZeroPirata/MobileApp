@@ -3,7 +3,8 @@ import {Image} from "react-native";
 import {RFValue} from "react-native-responsive-fontsize";
 
 export const Container = styled.View`
-  padding: 25px 0;
+  width: 100%;
+  height: 100%;
 `;
 export const TypeView = styled.View`
   display: flex;
@@ -11,7 +12,6 @@ export const TypeView = styled.View`
   align-items: center;
 `;
 export const ContainerListRender = styled.View`
-  display: flex;
   margin: 5px 0;
   flex-direction: row;
   height: 75px;

@@ -56,10 +56,8 @@ const Profile = () => {
   const [postUser, setPostUser] = useState<IPost[]>([]);
 
   const [BackGround, setBackGround] = useState(false);
-  const [onFocusBackGround, setOnfocusBackGround] = useState(false);
 
   const [ProfilePick, setProfilePick] = useState(false);
-  const [onFocusProfile, setOnfocusProfile] = useState(false);
   const [loadingPostUser, setLoadingPostUser] = useState(true);
 
   const [loading, setLoading] = useState(false);
@@ -185,9 +183,6 @@ const Profile = () => {
     setTimeout(() => setRefreshing(false), 2000);
   };
 
-  const updateUser = () => {
-
-  };
   const editarUsuario = async () => {
     const getIdReference = collection(db, "users");
     const queryOne = query(getIdReference, where("id", "==", user?.uid));
@@ -245,9 +240,6 @@ const Profile = () => {
         };
         try {
           await setDoc(refCloudFireStore, updatedData, { merge: true })
-            .then((data) => {
-              console.log(data);
-            })
             .catch((err) => {
               console.log(err);
             });
@@ -282,15 +274,9 @@ const Profile = () => {
     getUserPost();
   }, [user?.uid]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 2000);
-  };
-
   return (
     <Container>
       <ScrollView style={{ height: "100%" }}>
-
         <ContainerHeaderProfile>
           <HeaderImagesView>
             <HeaderBackGroundView onPress={() => {

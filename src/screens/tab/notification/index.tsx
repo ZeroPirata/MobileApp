@@ -42,9 +42,6 @@ const Notification = (): JSX.Element => {
       }
     };
   }, [user?.uid]);
-
-
-  console.log(notification)
   return (
     <Container>
       <NotificationsStled>
