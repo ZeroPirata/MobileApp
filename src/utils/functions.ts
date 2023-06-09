@@ -1,16 +1,16 @@
-import { DatabaseReference, onValue, push, set } from "firebase/database";
-import { IFiles, ISendFiles } from "../interfaces/PostInterface";
+import {DatabaseReference, onValue, push, set} from "firebase/database";
+import {IFiles, ISendFiles} from "../interfaces/PostInterface";
 import {
   FirebaseStorage,
   getDownloadURL,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { ref as refRT, query as queryRT } from "firebase/database";
-import { database, db, storage } from "../configs/firebase";
-import { uuidv4 } from "@firebase/util";
-import { useEffect, useState } from "react";
-import { Usuario } from "../interfaces/UsuarioInterface";
+import {ref as refRT, query as queryRT} from "firebase/database";
+import {database, db, storage} from "../configs/firebase";
+import {uuidv4} from "@firebase/util";
+import {useEffect, useState} from "react";
+import {Usuario} from "../interfaces/UsuarioInterface";
 import {
   arrayUnion,
   collection,
@@ -21,7 +21,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { User } from "firebase/auth";
+import {User} from "firebase/auth";
 
 export function getFileSize(fileSizeInBytes: number): string {
   if (fileSizeInBytes < 1024) {
@@ -39,24 +39,25 @@ export function getFileSize(fileSizeInBytes: number): string {
 }
 
 export const sendPostGrupos = async (
-  user: string,
-  title: string,
+  grupo_id: string,
+  user: {nome: string; email: string},
   descricao: string | null,
   images: ISendFiles[],
-  arquivos: ISendFiles | undefined | null,
-  user_id: string,
-  grupo_id: string
+  arquivos: ISendFiles | undefined,
+  user_id: string
 ): Promise<void> => {
-  const uploadedImages = await ImageArrayUpload(user, images);
+  const uploadedImages = await ImageArrayUpload(user.email, images);
   const refDataBase = refRT(database, `grupos/${grupo_id}/posts`);
   try {
     if (arquivos == undefined) {
       const postData = {
         user_id: user_id,
         data: Math.floor(Date.now() / 1000),
-        user: user,
-        title: title,
-        description: descricao,
+        user: {
+          nome: user.nome,
+          email: user.email,
+        },
+        body: descricao,
         images: uploadedImages?.map((img) => ({
           id: img.id,
           url: img.url,
@@ -64,13 +65,15 @@ export const sendPostGrupos = async (
       };
       await push(refDataBase, postData);
     } else {
-      const uploadFiles = await FliesUpload(user, arquivos);
+      const uploadFiles = await FliesUpload(user.email, arquivos);
       const postData = {
         data: Math.floor(Date.now() / 1000),
         user_id: user_id,
-        user: user,
-        title: title,
-        description: descricao,
+        user: {
+          nome: user.nome,
+          email: user.email,
+        },
+        body: descricao,
         images: uploadedImages?.map((img) => ({
           id: img.id,
           url: img.url,
@@ -91,7 +94,7 @@ export const sendPostGrupos = async (
 
 export const sendPost = async (
   ref: DatabaseReference,
-  user: { nome: string; email: string },
+  user: {nome: string; email: string},
   descricao: string | null,
   images: ISendFiles[],
   arquivos: ISendFiles | undefined,

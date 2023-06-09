@@ -46,16 +46,17 @@ export const PostView = ({ id, ...rest }: IPost) => {
     body?: string,
     data?: number,
     images?: IFiles[],
-    arquivos?: IFiles
+    arquivos?: IFiles,
+    grupo?: { id: string, validacao: boolean }
   ) {
-    navigation.navigate("SeePost", { id: id, ...rest });
+    navigation.navigate("SeePost", { id: id, grupo: { id: String(rest.grupo?.id), validacao: true }, ...rest });
   }
 
   const handleLike = () => {
     if (!user) {
       return;
     }
-    const postLikesRef = ref(database, `posts/${id}/likes`);
+    const postLikesRef = !rest.grupo?.validacao ? ref(database, `posts/${id}/likes`) : ref(database, `grupos/${rest.grupo.id}/posts/${id}/likes`);
     const userLikeRef = child(postLikesRef, user.uid);
     const handleTransaction = (currentData: any) => {
       if (currentData === null) {
@@ -72,7 +73,7 @@ export const PostView = ({ id, ...rest }: IPost) => {
   };
 
   useEffect(() => {
-    const postLikesRef = ref(database, `posts/${id}/likes`);
+    const postLikesRef = !rest.grupo?.validacao ? ref(database, `posts/${id}/likes`) : ref(database, `grupos/${rest.grupo.id}/posts/${id}/likes`);
     const handleSnapshot = (snapshot: any) => {
       const likes = snapshot.val();
       const likesCount = likes ? Object.keys(likes).length : 0;
@@ -104,7 +105,7 @@ export const PostView = ({ id, ...rest }: IPost) => {
   };
 
   const deletePost = async (id: string) => {
-    await remove(ref(database, `posts/${id}`));
+    !rest.grupo?.validacao ? await remove(ref(database, `posts/${id}`)) : await remove(ref(database, `grupos/${rest.grupo.id}/posts/${id}`))
   };
 
   return (

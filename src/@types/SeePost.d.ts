@@ -3,6 +3,10 @@ type SeePost = {
   name: string;
   path?: string | undefined;
   params: {
+    grupo?: {
+      id: string;
+      validacao: boolean;
+    };
     id: string;
     user: {
       nome: string;

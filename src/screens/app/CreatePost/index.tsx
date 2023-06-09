@@ -105,12 +105,12 @@ const CreatePost = () => {
 
   const SendingPost = async () => {
     setLoadingUpload(true);
+    const dataUser = {
+      email: String(user?.email),
+      nome: String(user?.displayName),
+    };
     if (selectGrup == null) {
       const refDatabase = DataBase.ref(database, `posts/${uuidv4()}`);
-      const dataUser = {
-        email: String(user?.email),
-        nome: String(user?.displayName),
-      };
       sendPost(
         refDatabase,
         dataUser,
@@ -120,14 +120,14 @@ const CreatePost = () => {
         String(user?.uid)
       );
     } else {
+      const refDatabase = DataBase.ref(database, `grupos/${selectGrup}/${uuidv4()}`);
       sendPostGrupos(
-        String(user?.email),
-        value.title,
+        selectGrup,
+        dataUser,
         value.description,
         images,
         files,
-        String(user?.uid),
-        selectGrup
+        String(user?.uid)
       );
     }
     navigation.navigate("TabsRoutes");
@@ -156,9 +156,12 @@ const CreatePost = () => {
 
   const setGruposInfo = useCallback(() => {
     grupos.map((grups) => {
-      const RefRealTime = DataBase.ref(database, `grupos/${grups}`);
-      DataBase.onValue(RefRealTime, (snaphShot) => {
-        setGruposInfos([{ ...snaphShot.val(), id: grups }]);
+      const RefRealTime = DataBase.ref(database, `grupos/${grups.id}`);
+      DataBase.onValue(RefRealTime, (res) => {
+        const newGrupo = { ...res.val(), ...gruposInfo, id: grups.id };
+        if (!gruposInfo.some((grupo) => grupo.id === newGrupo.id)) {
+          setGruposInfos((oldList) => [...oldList, newGrupo]);
+        }
       });
     });
   }, [grupos]);

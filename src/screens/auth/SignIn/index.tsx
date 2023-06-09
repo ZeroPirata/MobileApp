@@ -114,6 +114,7 @@ const SignIn: React.FC = () => {
               name: user.displayName,
               email: user.email,
               avatar: user.photoURL,
+              grupos: [],
             });
           }
         })
@@ -149,6 +150,7 @@ const SignIn: React.FC = () => {
               name: user.displayName,
               email: user.email,
               avatar: user.photoURL,
+              grupos: [],
             });
           }
           return setErrorMessage("Verifique seu email");

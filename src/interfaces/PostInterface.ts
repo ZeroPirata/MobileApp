@@ -1,4 +1,4 @@
-import { IListSearchedUsers } from "./ListagemDeUsuario";
+import {IListSearchedUsers} from "./ListagemDeUsuario";
 
 export interface ISendFiles {
   mimeType: string;
@@ -18,6 +18,10 @@ export interface ICreatePost {
   file?: ISendFiles;
 }
 export interface IPost {
+  grupo?: {
+    validacao: boolean;
+    id: string;
+  };
   id: string;
   user: {
     nome: string;

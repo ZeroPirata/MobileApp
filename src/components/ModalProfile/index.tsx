@@ -52,7 +52,7 @@ export const ModalView = ({ open, item, accept, recuse }: ModalViewProps) => {
         handleCloseProfile()
     }
     const handleReject = () => {
-        accept()
+        recuse()
         handleCloseProfile()
     }
 

@@ -8,7 +8,7 @@ import { CreatePost } from "../screens/app/CreatePost";
 import { SeePost } from "../screens/app/SeePost";
 import { EditPost } from "../screens/app/EditPost";
 import { ListSearchedUser } from "../screens/app/ListUsers";
-import { ChatBeetwen, CreateGrupo } from "../screens/app";
+import { ChatBeetwen, CreateGrupo, SeeGrupo } from "../screens/app";
 import { useAuthentication } from "../hooks/useAuthentication";
 import { EmailVerifed } from "../screens/auth";
 
@@ -24,10 +24,11 @@ const AppRoutes: React.FC = () => {
         headerShown: false,
       }}
     >
+      <Screen name="TabsRoutes" component={TabRoutes} />
+      <Screen name="SeeGrupo" component={SeeGrupo} />
       <Screen name="SeePost" component={SeePost} />
       <Screen name="CreatePost" component={CreatePost} />
       <Screen name="CreateGrupo" component={CreateGrupo} />
-      <Screen name="TabsRoutes" component={TabRoutes} />
       <Screen name="EditPost" component={EditPost} />
       <Screen name="ChatBeetwen" component={ChatBeetwen} />
       <Screen name="ListSearchedUser" component={ListSearchedUser} />

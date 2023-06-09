@@ -29,6 +29,7 @@ export const RenderNotifications = ({ list }: RenderNotificationProps) => {
         const refRealTime = ref(database, `grupos/${idGrup}/membros`);
         push(refRealTime, {
             id: user?.uid,
+            role: "membro"
         });
         const collect = collection(db, "users");
         const queryOne = query(collect, where("id", "==", user?.uid));

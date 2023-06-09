@@ -120,7 +120,7 @@ export const CreateGrupo = () => {
     await setDoc(
       usersRef,
       {
-        grupos: arrayUnion(GUID),
+        grupos: arrayUnion({ id: GUID }),
       },
       { merge: true }
     );

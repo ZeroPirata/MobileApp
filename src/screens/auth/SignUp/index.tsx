@@ -56,7 +56,7 @@ const SignUp: React.FC = () => {
     }
     try {
       await createUserWithEmailAndPassword(auth, value.email, value.password)
-        .then(async (result) => {
+        .then(async () => {
           const prevUser = auth.currentUser;
           const usersRef = doc(db, "users", String(prevUser?.uid));
           if (prevUser) {
@@ -71,6 +71,7 @@ const SignUp: React.FC = () => {
             name: value.name,
             email: value.email,
             avatar: avatar,
+            grupos: [],
           })
             .then((res) => console.log(res))
             .catch((err) => console.log(err));

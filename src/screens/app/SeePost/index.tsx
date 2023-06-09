@@ -64,21 +64,17 @@ const SeePost = () => {
   });
   const route = useRoute<SeePost>();
   const navigation = useNavigation();
-  const [editFocus, setIsEditFocused] = useState(false);
-  const [deleteFocus, setIsDeleteFocused] = useState(false);
+
   const deletePost = async (id: string) => {
-    await deleteDoc(doc(db, "post", id));
-    navigation.navigate("TabsRoutes");
+    route.params.grupo?.validacao ? await remove(ref(database, `grupos/${String(route.params.grupo.id)}/posts/${id}`)).catch((err) => console.log(err)) : await remove(ref(database, `posts/${id}`)).catch((err) => console.log(err))
+    navigation.goBack();
   };
 
   const NewComentario = () => {
     if (!user) {
       return;
     }
-    const createComentarioRef = ref(
-      database,
-      `posts/${route.params.id}/coments`
-    );
+    const createComentarioRef = route.params.grupo?.validacao ? ref(database, `grupos/${route.params.grupo?.id}/posts/${route.params.id}/coments/`) : ref(database, `posts/${route.params.id}/coments/`);
     const updates = {
       name: user.displayName,
       userProfile: user.photoURL,
@@ -106,7 +102,7 @@ const SeePost = () => {
     if (!user) {
       return;
     }
-    const postLikesRef = ref(database, `posts/${route.params.id}/likes`);
+    const postLikesRef = route.params.grupo?.validacao ? ref(database, `grupos/${route.params.grupo?.id}/posts/${route.params.id}/likes`) : ref(database, `posts/${route.params.id}/likes`);
     const userLikeRef = child(postLikesRef, user.uid);
     const handleTransaction = (currentData: any) => {
       if (currentData === null) {
@@ -123,7 +119,7 @@ const SeePost = () => {
   };
 
   useEffect(() => {
-    const postLikesRef = ref(database, `posts/${route.params.id}/likes`);
+    const postLikesRef = route.params.grupo?.validacao ? ref(database, `grupos/${route.params.grupo?.id}/posts/${route.params.id}/likes`) : ref(database, `posts/${route.params.id}/likes`);
     const handleSnapshot = (snapshot: any) => {
       const likes = snapshot.val();
       const likesCount = likes ? Object.keys(likes).length : 0;
@@ -132,7 +128,7 @@ const SeePost = () => {
     };
     onValue(postLikesRef, handleSnapshot);
 
-    const comentariosRef = ref(database, `posts/${route.params.id}/coments/`);
+    const comentariosRef = route.params.grupo?.validacao ? ref(database, `grupos/${route.params.grupo?.id}/posts/${route.params.id}/coments/`) : ref(database, `posts/${route.params.id}/coments/`);
     onValue(comentariosRef, (snapshot) => {
       const comentariosFirebase = snapshot.val();
       const comentariosArray = [];
@@ -163,13 +159,11 @@ const SeePost = () => {
       name: "Editar Postagem",
       function: () => console.log("Pão"),
     },
-    { name: "Excluir Postagem", function: () => console.log("Pão") },
+    { name: "Excluir Postagem", function: () => deletePost(route.params.id) },
   ];
 
   const deleteComment = async (idComment: string) => {
-    await remove(
-      ref(database, `posts/${route.params.id}/coments/${idComment}`)
-    );
+    route.params.grupo?.validacao ? await remove(ref(database, `grupos/${route.params.grupo?.id}/posts/${route.params.id}/coments`)) : await remove(ref(database, `posts/${route.params.id}/coments/${idComment}`));
   };
 
   const [openComments, setOpenComments] = useState(false);
@@ -256,7 +250,7 @@ const SeePost = () => {
                         onPress={() => deleteComment(item.id)}
                         style={
                           user?.email == item.email ||
-                          user?.email == route.params.user.email
+                            user?.email == route.params.user.email
                             ? { display: "flex" }
                             : { display: "none" }
                         }
