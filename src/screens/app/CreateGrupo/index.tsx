@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 import { ISendFiles } from "../../../interfaces/PostInterface";
@@ -17,9 +17,13 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
+import { AddImageGrupo, AddImageStld, AddMembroGrupo, AddMembroGrupoInput, ButtonAddMembro, ButtonsImageStld, Container, ContainerGrupo, CreateGrupoBtn, ImageSelect, TextInputDescStld, TextInputNameStld, ViewListMembros } from "./style";
+import themes from "../../../styles/themes";
+import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
 export const CreateGrupo = () => {
   const { user } = useAuthentication();
-
+  const navigation = useNavigation()
   const [values, setValues] = useState({
     nome: "",
     descricao: "",
@@ -48,7 +52,11 @@ export const CreateGrupo = () => {
     setEmailUser(emailUser.filter((__, i) => i !== index));
   };
   const removeRule = (index: number) => {
-    setGrupoRules(emailUser.filter((__, i) => i !== index));
+    setGrupoRules((prevRules) => {
+      const updatedRules = [...prevRules];
+      updatedRules.splice(index, 1);
+      return updatedRules;
+    });
   };
 
   const [imageSelect, setImageSelect] = useState<ISendFiles>();
@@ -109,8 +117,8 @@ export const CreateGrupo = () => {
       nome: values?.nome,
       descricao: values?.descricao,
       image: {
-        id: imageUrl?.id,
-        url: imageUrl?.url,
+        id: imageUrl?.id || "NoNe",
+        url: imageUrl?.url || "https://imgs.search.brave.com/bn5WFs_Hg5tycrgOvw_QL367onF5GR5fxUoWMOVjt1g/rs:fit:1024:1024:1/g:ce/aHR0cHM6Ly9jZG4x/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvbGluZS1kZXNp/Z24tYnVzaW5lc3Mt/c2V0LTQvMjEvcGVv/cGxlLWN1c3RvbWVy/LXVua25vd24tMTAy/NC5wbmc",
       },
       membros: [{ id: user?.uid, role: "Dono" }],
       regras: grupoRules
@@ -123,97 +131,121 @@ export const CreateGrupo = () => {
         grupos: arrayUnion({ id: GUID }),
       },
       { merge: true }
-    );
+    ).then(() => navigation.navigate("TabsRoutes"));
     EnviarSolicataoParaEntrarNoGrupo(GUID, imageUrl);
   };
-  return (
-    <View style={{ paddingTop: 25 }}>
-      <View>
-        <Text>Nome</Text>
-        <TextInput
-          placeholder="Nome do Grupo"
-          value={values.nome}
-          onChangeText={(text) => setValues({ ...values, nome: text })}
-        />
-        <Text>Descrição do grupo</Text>
-        <TextInput
-          placeholder="Descrição do grupo"
-          numberOfLines={5}
-          textAlignVertical="top"
-          value={values.descricao}
-          onChangeText={(text) => setValues({ ...values, descricao: text })}
-        />
-        <Text>Imagem do grupo</Text>
-        <TouchableOpacity
-          onPress={pickImage}
-          style={{
-            backgroundColor: "red",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            width: 150,
-            height: 150,
-          }}
-        >
-          {imageSelect?.uri != null ? (
-            <Image
-              style={{ width: "100%", height: "100%" }}
-              source={{ uri: imageSelect?.uri }}
-            />
-          ) : (
-            <FontAwesome name="image" size={35} />
-          )}
-        </TouchableOpacity>
-        <Text>Adicionar Membro</Text>
-        <TextInput
-          value={email.email}
-          onChangeText={(text) => setEmail({ ...email, email: text })}
-          placeholder="Digite o Nome/Email"
-        />
-        <TouchableOpacity onPress={handleAddEmail}>
-          <Text>Adicionar</Text>
-        </TouchableOpacity>
-        {emailUser.length > 0
-          ? emailUser.map((emails, index) => {
-            return (
-              <Text>
-                {emails}
-                <TouchableOpacity onPress={() => removeUserList(index)}>
-                  <Text>Remover</Text>
-                </TouchableOpacity>
-              </Text>
-            );
-          })
-          : null}
-        <Text>Adicionar Regra</Text>
-        <TextInput
-          value={regras.text}
-          onChangeText={(text) => setText({ ...regras, text: text })}
-          placeholder="Digite o Nome/Email"
-        />
-        <TouchableOpacity onPress={handleAddRules}>
-          <Text>Adicionar Regra</Text>
-        </TouchableOpacity>
-        {grupoRules.length > 0
-          ? grupoRules.map((rules, index) => {
-            return (
-              <Text>
-                {rules}
-                <TouchableOpacity onPress={() => removeUserList(index)}>
-                  <Text>Remover</Text>
-                </TouchableOpacity>
-              </Text>
-            );
-          })
-          : null}
-        <TouchableOpacity>
-          <FontAwesome name="address-card-o" size={35} />
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={createGrupo}>
-          <Text>Criar Grupo</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+  const handleDeleteImageIndex = () => {
+    setImageSelect(undefined)
+  }
+  return (
+    <Container>
+      <ContainerGrupo>
+        <ScrollView>
+          <CreateGrupoBtn onPress={createGrupo}>
+            <Text style={{ fontSize: 25, alignItems: "center", textAlign: "center", alignContent: "center", }}>Criar Grupo</Text>
+          </CreateGrupoBtn>
+          <TextInputNameStld
+            placeholder="Nome do Grupo"
+            value={values.nome}
+            maxLength={30}
+            onChangeText={(text) => setValues({ ...values, nome: text })}
+            placeholderTextColor={themes.COLORS.GRAY5}
+          />
+          <TextInputDescStld
+            placeholder="Descrição do grupo"
+            numberOfLines={5}
+            textAlignVertical="top"
+            value={values.descricao}
+            placeholderTextColor={themes.COLORS.GRAY5}
+            onChangeText={(text) => setValues({ ...values, descricao: text })}
+          />
+          <AddImageStld>
+            <ButtonsImageStld>
+              <AddImageGrupo onPress={pickImage}>
+                <Text>Add Image</Text>
+              </AddImageGrupo>
+              {imageSelect?.uri != null ? (
+                <AddImageGrupo onPress={handleDeleteImageIndex} >
+                  <Text>Remove</Text>
+                </AddImageGrupo>
+              ) : (
+                null
+              )}
+            </ButtonsImageStld>
+            {imageSelect?.uri != null ? (
+              <ImageSelect
+                source={{ uri: imageSelect?.uri }}
+              />
+            ) : (
+              null
+            )}
+          </AddImageStld>
+          <AddMembroGrupo>
+            <AddMembroGrupoInput
+              value={email.email}
+              onChangeText={(text) => setEmail({ ...email, email: text })}
+              placeholder="Digite Email"
+              placeholderTextColor={themes.COLORS.GRAY5}
+            />
+            <ButtonAddMembro onPress={handleAddEmail}>
+              <Text>Adicionar</Text>
+            </ButtonAddMembro>
+          </AddMembroGrupo>
+          {emailUser.length > 0 &&
+            <ViewListMembros>
+              {emailUser.map((emails, index) => {
+                return (
+                  <View key={index} style={{ alignContent: "center", alignItems: "center", justifyContent: "space-between", display: "flex", flexDirection: "row", borderBottomColor: themes.COLORS.MAINFill, borderBottomWidth: 1, marginTop: 5, marginBottom: 5 }}>
+                    <Text style={{ color: "white" }}>{emails}</Text>
+                    <TouchableOpacity onPress={() => removeUserList(index)}>
+                      <Text style={{ color: "white" }} >Remover</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </ViewListMembros>
+          }
+          <AddMembroGrupo>
+            <AddMembroGrupoInput
+              placeholderTextColor={themes.COLORS.GRAY5}
+              value={regras.text}
+              onChangeText={(text) => setText({ ...regras, text: text })}
+              placeholder="Digite a Regra"
+            />
+            <ButtonAddMembro onPress={handleAddRules}>
+              <Text>Adicionar</Text>
+            </ButtonAddMembro>
+          </AddMembroGrupo>
+          {grupoRules.length > 0 &&
+            <ViewListMembros>
+              {grupoRules.map((rules, index) => {
+                return (
+                  <View
+                    key={rules} // Usando o valor do item como chave única
+                    style={{
+                      alignContent: "center",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      display: "flex",
+                      flexDirection: "row",
+                      borderBottomColor: themes.COLORS.MAINFill,
+                      borderBottomWidth: 1,
+                      marginTop: 5,
+                      marginBottom: 5
+                    }}
+                  >
+                    <Text style={{ color: "white" }}>{index + " " + rules}</Text>
+                    <TouchableOpacity onPress={() => removeRule(index)}>
+                      <Text style={{ color: "white" }}>Remover</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </ViewListMembros>
+          }
+        </ScrollView >
+      </ContainerGrupo>
+    </Container >
   );
 };

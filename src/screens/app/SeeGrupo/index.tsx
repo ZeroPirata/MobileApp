@@ -1,23 +1,38 @@
 import { View, Text, RefreshControl, Alert, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput } from "react-native"
-import { limitToLast, off, onValue, orderByChild, push, query, ref, remove, update } from "firebase/database";
-import { collection, doc, getDoc, getDocs, query as Query, updateDoc, where } from "firebase/firestore";
+import { limitToLast, off, onValue, orderByChild, push, query, ref, remove, set, update } from "firebase/database";
+import { collection, doc, getDoc, getDocs, query as Query, snapshotEqual, updateDoc, where } from "firebase/firestore";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState, useCallback } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { IPost } from "../../../interfaces/PostInterface";
+import { Entypo, FontAwesome, Foundation, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { IPost, ISendFiles } from "../../../interfaces/PostInterface";
 import { database, db } from "../../../configs/firebase";
 import { Picker } from "@react-native-picker/picker";
 import { PostView } from "../../../components";
 import { AntDesign } from "@expo/vector-icons";
 import themes from "../../../styles/themes";
 import { Container } from "./style"
+import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
 
 const { Item } = Picker;
 
 const Tab = createBottomTabNavigator();
+
+interface IGrupo {
+    descricao: string,
+    image: { id: string, url: string },
+    membros: {
+        [key: string]: {
+            id: string,
+            role: string
+        }
+    },
+    nome: string,
+    regras: string[],
+    posts: IPost[]
+}
 
 interface IMembros {
     key: string, id: string; role: string;
@@ -229,8 +244,9 @@ const GrupoMembrosScreen = ({ params }: SeeGrupos) => {
                                 openedMenu[index] ? (
                                     <View style={{ width: "100%", marginTop: 5, marginBottom: 5, flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
                                         <Picker style={styles.picker} itemStyle={styles.item} onValueChange={(newRole, itemIndex) => setValue(newRole)} selectedValue={value} >
-                                            <Item key={select.adm} value={"Administrador"} label={select.adm} />
-                                            <Item key={select.mem} value={"Membro"} label={select.mem} />
+                                            <Item key={null} value={null} label={"Selecione uma opção"} enabled={false} />
+                                            <Item key={"Administrador"} value={"Administrador"} label={select.adm} />
+                                            <Item key={"Membro"} value={"Membro"} label={select.mem} />
                                         </Picker>
                                         <TouchableOpacity onPress={() => handleEditUserRole(users.key, index)}>
                                             <Entypo name="save" size={35} color="green" />
@@ -264,6 +280,236 @@ const GrupoMembrosScreen = ({ params }: SeeGrupos) => {
         </Container >
     );
 };
+
+const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
+    const { id } = params.Home
+    const [grupo, setGrupos] = useState<IGrupo>()
+    const { user } = useAuthentication()
+    const [verify, setVerify] = useState(false)
+    useEffect(() => {
+        const refDataBase = ref(database, `grupos/${id}`)
+        const queryDate = query(refDataBase, orderByChild("data"),)
+        const returnValues = onValue(queryDate, resData => {
+            if (resData.exists()) {
+                const data = resData.val();
+                return setGrupos(data);
+            }
+        })
+        return () => { off(refDataBase, "child_changed", returnValues) }
+    }, [id, setGrupos]);
+
+    useEffect(() => {
+        if (grupo?.membros) {
+            let verifyFlag = false;
+            Object.keys(grupo.membros).forEach(key => {
+                if ((grupo.membros[key].id === user?.uid && grupo.membros[key].role === "Dono") || grupo.membros[key].role === "Administrador") {
+                    verifyFlag = true;
+                }
+            });
+            setVerify(verifyFlag);
+        }
+    }, [grupo, user, setVerify]);
+
+    const [nome, setNome] = useState("")
+    const [desc, setDesc] = useState()
+    const [profile, setProfile] = useState<ISendFiles>()
+    const [rules, setRules] = useState("")
+    const [booleanNome, setBooleanNome] = useState(false)
+    const [booleanDesc, setBooleanDesc] = useState(false)
+    const [booleanAddRule, setBooleanAddRule] = useState(false)
+    const [booleanRules, setBooleanRules] = useState(false)
+
+    const UpdateDescricaoGrupo = () => { }
+    const DeleteGrupoInUsers = () => { }
+    const UpdateNomeGrupo = () => { }
+    const DeleteGrupo = () => { }
+    const UpdateRules = () => { }
+
+    const UpdateProfilePicture = () => { }
+
+    const pickImage = async () => {
+        let result: any = await launchImageLibraryAsync({
+            mediaTypes: MediaTypeOptions.Images,
+            videoQuality: 1,
+            allowsMultipleSelection: false,
+            allowsEditing: true,
+            quality: 1,
+        });
+        if (result.canceled) {
+            return;
+        } else {
+            setProfile(result.assets[0]);
+        }
+    };
+
+
+    const handleAddRules = () => {
+        setBooleanAddRule(!booleanAddRule)
+    }
+
+    const handleRemoveImage = () => {
+        setProfile(undefined)
+    }
+    const handleChangeNameState = () => {
+        setBooleanNome(!booleanNome)
+    }
+    const handleChangeDescState = () => {
+        setBooleanDesc(!booleanDesc)
+    }
+    const handleChangeRuleState = () => {
+        setBooleanRules(!booleanRules)
+    }
+
+    const HandleAddRegra = async () => {
+        const refDataBase = ref(database, `grupos/${id}/regras/`)
+        const len = Number(grupo?.regras?.length) + 1 || 0
+        if (grupo?.regras) {
+            await set(refDataBase, [...grupo?.regras, rules],)
+        } else {
+            await set(refDataBase, [rules],)
+        }
+    }
+    const handleDeleteRule = async (index: number) => {
+        const refDataBase = ref(database, `grupos/${id}/regras/${index}/`)
+        await remove(refDataBase)
+        handleChangeRuleState()
+    }
+    return (
+        <Container>
+            <View style={{ margin: 15, alignContent: "center", alignItems: "center", justifyContent: "center" }} >
+                <View>
+                    {
+                        verify ?
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <View>
+                                    <Image source={{ uri: profile ? profile.uri : grupo?.image.url }} style={{ height: 100, width: 100, borderRadius: 35, borderColor: themes.COLORS.MAINFill, borderWidth: 2 }} />
+                                    {
+                                        profile ?
+                                            <View style={{ flexDirection: "row", justifyContent: "space-around" }} >
+                                                <TouchableOpacity>
+                                                    <Foundation name="check" size={24} color="yellow" />
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={handleRemoveImage}>
+                                                    <FontAwesome name="remove" size={30} color="red" />
+                                                </TouchableOpacity>
+                                            </View>
+                                            :
+                                            null
+                                    }
+                                </View>
+                                <TouchableOpacity style={{ marginLeft: 15 }} onPress={pickImage}>
+                                    <FontAwesome name="edit" size={30} color="green" />
+                                </TouchableOpacity>
+                            </View>
+                            :
+                            <View>
+                                <Image source={{ uri: grupo?.image.url }} style={{ height: 100, width: 100, borderRadius: 35, borderColor: themes.COLORS.MAINFill, borderWidth: 2 }} />
+                            </View>
+                    }
+                </View>
+                <View style={{ width: "100%", justifyContent: "center", alignContent: "center", alignItems: "center" }}>
+                    {
+                        verify ?
+                            <View style={{ width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center" }} >
+                                {
+                                    booleanNome ?
+                                        <TextInput style={{ color: "white", fontSize: 25 }} placeholderTextColor={"grey"} value={nome} onChangeText={(text) => setNome(text)} placeholder="Digite o novo Nome" />
+                                        :
+                                        <Text style={{ color: themes.COLORS.WHITE, fontSize: 25 }}>{grupo?.nome}</Text>
+                                }
+                                {
+                                    booleanNome ?
+                                        <View style={{ flexDirection: "row", width: "20%", justifyContent: "space-evenly", alignContent: "center", alignItems: "center" }}>
+                                            <TouchableOpacity>
+                                                <Foundation name="check" size={20} color="yellow" />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={handleChangeNameState}>
+                                                <FontAwesome name="remove" size={20} color="red" />
+                                            </TouchableOpacity>
+                                        </View> :
+                                        <TouchableOpacity style={{ marginLeft: 15 }} onPress={handleChangeNameState}>
+                                            <FontAwesome name="edit" size={20} color="green" />
+                                        </TouchableOpacity>
+                                }
+                            </View>
+                            :
+                            <Text style={{ color: themes.COLORS.WHITE, fontSize: 25, width: "100%", textAlign: "center" }}>{grupo?.nome}</Text>
+                    }
+                    {
+                        verify ?
+                            <View style={{ width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center" }} >
+                                {
+                                    booleanDesc ?
+                                        <TextInput style={{ color: "white", fontSize: 15, width: "60%", borderColor: themes.COLORS.MAINLineCross, borderWidth: 1 }} multiline={true} numberOfLines={5} textAlignVertical="top" placeholderTextColor={"grey"} value={nome} onChangeText={(text) => setNome(text)} placeholder="Digite a descrição" />
+                                        :
+                                        <Text style={{ color: themes.COLORS.WHITE, fontSize: 15, textAlign: "center" }}>{grupo?.descricao}</Text>
+                                }
+                                {
+                                    booleanDesc ?
+                                        <View style={{ flexDirection: "row", width: "20%", justifyContent: "space-evenly", alignContent: "center", alignItems: "center" }}>
+                                            <TouchableOpacity>
+                                                <Foundation name="check" size={20} color="yellow" />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={handleChangeDescState}>
+                                                <FontAwesome name="remove" size={20} color="red" />
+                                            </TouchableOpacity>
+                                        </View> :
+                                        <TouchableOpacity style={{ marginLeft: 15 }} onPress={handleChangeDescState}>
+                                            <FontAwesome name="edit" size={20} color="green" />
+                                        </TouchableOpacity>
+                                }
+                            </View>
+                            :
+                            <Text style={{ color: themes.COLORS.WHITE, fontSize: 15, width: "100%", textAlign: "center" }}>{grupo?.descricao}</Text>
+                    }
+                    <View style={{ flexDirection: "row" }}>
+                        <Text style={{ color: themes.COLORS.MAINChat2, fontSize: 15, textAlign: "center" }}>Membros: {grupo?.membros ? Object.keys(grupo?.membros).length : 0} ||</Text>
+                        <Text style={{ color: themes.COLORS.MAINChat2, fontSize: 15, textAlign: "center" }}>{"  "}Postagens: {grupo?.posts ? Object.keys(grupo?.posts).length : 0} </Text>
+                    </View>
+                </View>
+            </View>
+
+            <View>
+                <View style={{ flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ color: themes.COLORS.WHITE, fontSize: 25, textAlign: "center" }}>Regras</Text>
+                    <TouchableOpacity style={{ marginLeft: 15 }} onPress={handleAddRules}>
+                        <Ionicons name="add" size={25} color="green" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{ marginLeft: 15 }} onPress={handleChangeRuleState}>
+                        <Ionicons name="remove" size={25} color="red" />
+                    </TouchableOpacity>
+                </View>
+                {booleanAddRule ? <TextInput style={{ color: "white", fontSize: 25 }} placeholderTextColor={"grey"} value={rules} onChangeText={(text) => setRules(text)} placeholder="Digite o novo Nome" onSubmitEditing={() => HandleAddRegra()} /> : null}
+                <View >
+                    {
+                        grupo?.regras && grupo?.regras.length > 0 ? grupo?.regras?.map((rules, index) => {
+                            return (
+                                booleanRules ?
+                                    (
+                                        <View key={index} >
+                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                <Text style={{ color: themes.COLORS.WHITE, fontSize: 15, margin: 5 }}>{rules}</Text>
+                                                <TouchableOpacity onPress={() => handleDeleteRule(index)}>
+                                                    <FontAwesome name="remove" size={20} color="red" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    )
+                                    :
+                                    (
+                                        <View key={index}>
+                                            <Text style={{ color: themes.COLORS.WHITE, fontSize: 15, width: "100%", margin: 5 }}>{index + 1} - {rules}</Text>
+                                        </View>
+                                    )
+                            )
+                        }) :
+                            null}
+                </View>
+            </View>
+        </Container>
+    )
+}
+
 const GrupoRakingScreen = ({ params }: SeeGrupos) => {
     const { id } = params.Home
     const [postInDataBase, setPostInDataBase] = useState<IPost[]>([]);
@@ -323,7 +569,7 @@ export const SeeGrupo = () => {
     ) => (
         <View style={[styles.view, focused && styles.focus]}>
             <AntDesign name={name} size={20} color={focused ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3 : themes.COLORS.GRAY4} />
-            <Text style={{ color: focused ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3 : themes.COLORS.GRAY4 }}>
+            <Text style={{ fontSize: 10, color: focused ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3 : themes.COLORS.GRAY4 }}>
                 {nameScreen}
             </Text>
         </View>
@@ -358,6 +604,9 @@ export const SeeGrupo = () => {
             </Tab.Screen>
             <Tab.Screen name="Rank" options={{ tabBarIcon: ({ focused }: TabBarIconProps) => renderTabBarIcon("dashboard", focused, "Ranking") }}>
                 {() => <GrupoRakingScreen params={{ ...route.params }} key={route.key} name={route.name} />}
+            </Tab.Screen>
+            <Tab.Screen name="Informações" options={{ tabBarIcon: ({ focused }: TabBarIconProps) => renderTabBarIcon("infocirlce", focused, "Informações") }}>
+                {() => <GrupoInformacoesScreen params={{ ...route.params }} key={route.key} name={route.name} />}
             </Tab.Screen>
         </Tab.Navigator >
     );

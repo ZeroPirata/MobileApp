@@ -64,7 +64,7 @@ const HomeTab = () => {
       return unsubscribe;
     }
   }, [user?.uid]);
-  
+
   return (
     <Container>
       <HeaderProfile />
@@ -85,6 +85,7 @@ const HomeTab = () => {
                   images={items?.images}
                   arquivos={items.arquivos}
                   data={items.data}
+                  grupo={{ id: "", validacao: false }}
                 />
               );
             }

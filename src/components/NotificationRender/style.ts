@@ -21,7 +21,7 @@ export const ContainerListRender = styled.View`
   border-bottom-color: ${({theme}) => theme.COLORS.MAINLineCross};
 `;
 export const Texts = styled.Text`
-  font-size: ${RFValue(20)}px;
+  font-size: ${RFValue(15)}px;
   color: white;
 `;
 export const TextsDate = styled.Text`
