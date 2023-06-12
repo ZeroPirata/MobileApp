@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:339065098005:android:11d54fd46465ef97d9e31c",
         "android_client_info": {
-          "package_name": "ZeroLeague.App"
+          "package_name": "com.zeropirata.ZeroLeagueApp"
         }
       },
       "oauth_client": [],
