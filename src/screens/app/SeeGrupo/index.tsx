@@ -1,6 +1,6 @@
 import { View, Text, RefreshControl, Alert, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput } from "react-native"
 import { limitToLast, off, onValue, orderByChild, push, query, ref, remove, set, update } from "firebase/database";
-import { collection, doc, getDoc, getDocs, query as Query, snapshotEqual, updateDoc, where } from "firebase/firestore";
+import { arrayRemove, collection, doc, getDoc, getDocs, query as Query, snapshotEqual, updateDoc, where, deleteField, setDoc } from "firebase/firestore";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -15,6 +15,7 @@ import { AntDesign } from "@expo/vector-icons";
 import themes from "../../../styles/themes";
 import { Container } from "./style"
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
+import { UploadSingleImage } from "../../../utils/functions";
 
 const { Item } = Picker;
 
@@ -136,7 +137,7 @@ const GrupoMembrosScreen = ({ params }: SeeGrupos) => {
                         user?.uid === settings.id ?
                             await remove(ref(database, `grupos/${id}/membros/${settings.key}`)).then(() => {
                                 handleDeleteGrupo(settings)
-                                navigate.navigate("TabsRoutes")
+                                navigate.navigate("TabsRoutes", { screen: "Home" })
                             }) :
                             remove(ref(database, `grupos/${id}/membros/${settings.key}`)).then(() => {
                                 handleDeleteGrupo(settings)
@@ -286,6 +287,9 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
     const [grupo, setGrupos] = useState<IGrupo>()
     const { user } = useAuthentication()
     const [verify, setVerify] = useState(false)
+
+    const navigation = useNavigation()
+
     useEffect(() => {
         const refDataBase = ref(database, `grupos/${id}`)
         const queryDate = query(refDataBase, orderByChild("data"),)
@@ -311,7 +315,7 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
     }, [grupo, user, setVerify]);
 
     const [nome, setNome] = useState("")
-    const [desc, setDesc] = useState()
+    const [desc, setDesc] = useState("")
     const [profile, setProfile] = useState<ISendFiles>()
     const [rules, setRules] = useState("")
     const [booleanNome, setBooleanNome] = useState(false)
@@ -319,13 +323,73 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
     const [booleanAddRule, setBooleanAddRule] = useState(false)
     const [booleanRules, setBooleanRules] = useState(false)
 
-    const UpdateDescricaoGrupo = () => { }
-    const DeleteGrupoInUsers = () => { }
-    const UpdateNomeGrupo = () => { }
-    const DeleteGrupo = () => { }
-    const UpdateRules = () => { }
+    const UpdateDescricaoGrupo = async () => {
+        const refDataBase = ref(database, `grupos/${id}`)
+        await update(refDataBase, { descricao: desc })
+        setBooleanDesc(!booleanDesc)
+        setDesc("")
+    }
+    const UpdateNomeGrupo = async () => {
+        const refDataBase = ref(database, `grupos/${id}`)
+        await update(refDataBase, { nome: nome })
+        setBooleanNome(!booleanNome)
+        setNome("")
+    }
 
-    const UpdateProfilePicture = () => { }
+    const DeleteGrupoInUsers = () => {
+        try {
+            const userIdString: string[] = []
+            if (grupo?.membros) {
+                const object = grupo?.membros
+                Object.keys(object).map(key => {
+                    const id = object[key].id
+                    userIdString.push(id)
+                })
+            }
+            userIdString.map(ids => {
+                const refDataBase = collection(db, `users`)
+                const queryBuilder = Query(refDataBase, where("id", "==", ids))
+                getDocs(queryBuilder).then((res) => {
+                    res.docs.map(async itens => {
+                        const gruposachado = itens.data().grupos
+                        const find = Object.keys(gruposachado).filter((i) => {
+                            if (gruposachado[i].id === id) {
+                                return i
+                            }
+                        })
+                        find.forEach((index) => {
+                            updateDoc(itens.ref, {
+                                grupos: arrayRemove(gruposachado[index])
+                            });
+                        });
+                    })
+                })
+            })
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    const UpdateProfilePicture = async () => {
+        const refDataBase = ref(database, `grupos/${id}/image`)
+        if (profile) {
+            const uploadedImage = await UploadSingleImage(
+                `grupos-${id}`,
+                profile
+            );
+            await update(refDataBase, {
+                id: uploadedImage.id,
+                url: uploadedImage.url
+            })
+
+        }
+    }
+
+    const HandleDeleteGrupo = async () => {
+        navigation.navigate('TabsRoutes', { screen: "Home" });
+        const refDataBase = ref(database, `grupos/${id}`)
+        DeleteGrupoInUsers()
+        await remove(refDataBase)
+    }
 
     const pickImage = async () => {
         let result: any = await launchImageLibraryAsync({
@@ -374,8 +438,19 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
         await remove(refDataBase)
         handleChangeRuleState()
     }
-    return (
+    return grupo ?
         <Container>
+            {
+                verify ?
+                    <View style={{ width: "100%", alignItems: "center", paddingTop: 5 }}>
+                        <TouchableOpacity onPress={HandleDeleteGrupo} style={{ borderColor: themes.COLORS.MAINFill, borderWidth: 1, flexDirection: "row", justifyContent: "space-evenly", width: "50%", alignItems: "center" }} >
+                            <Text style={{ color: "white" }}>Deletar grupo</Text>
+                            <Foundation name="x" size={24} color="red" />
+                        </TouchableOpacity>
+                    </View>
+                    :
+                    null
+            }
             <View style={{ margin: 15, alignContent: "center", alignItems: "center", justifyContent: "center" }} >
                 <View>
                     {
@@ -386,7 +461,7 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
                                     {
                                         profile ?
                                             <View style={{ flexDirection: "row", justifyContent: "space-around" }} >
-                                                <TouchableOpacity>
+                                                <TouchableOpacity onPress={UpdateProfilePicture}>
                                                     <Foundation name="check" size={24} color="yellow" />
                                                 </TouchableOpacity>
                                                 <TouchableOpacity onPress={handleRemoveImage}>
@@ -420,7 +495,7 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
                                 {
                                     booleanNome ?
                                         <View style={{ flexDirection: "row", width: "20%", justifyContent: "space-evenly", alignContent: "center", alignItems: "center" }}>
-                                            <TouchableOpacity>
+                                            <TouchableOpacity onPress={UpdateNomeGrupo}>
                                                 <Foundation name="check" size={20} color="yellow" />
                                             </TouchableOpacity>
                                             <TouchableOpacity onPress={handleChangeNameState}>
@@ -440,14 +515,14 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
                             <View style={{ width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center" }} >
                                 {
                                     booleanDesc ?
-                                        <TextInput style={{ color: "white", fontSize: 15, width: "60%", borderColor: themes.COLORS.MAINLineCross, borderWidth: 1 }} multiline={true} numberOfLines={5} textAlignVertical="top" placeholderTextColor={"grey"} value={nome} onChangeText={(text) => setNome(text)} placeholder="Digite a descrição" />
+                                        <TextInput style={{ color: "white", fontSize: 15, width: "70%", borderColor: themes.COLORS.MAINLineCross, borderWidth: 1, paddingLeft: 10, paddingRight: 10 }} multiline={true} numberOfLines={5} textAlignVertical="top" placeholderTextColor={"grey"} value={desc} onChangeText={(text) => setDesc(text)} placeholder="Digite a descrição" />
                                         :
-                                        <Text style={{ color: themes.COLORS.WHITE, fontSize: 15, textAlign: "center" }}>{grupo?.descricao}</Text>
+                                        <Text style={{ width: "90%", color: themes.COLORS.WHITE, fontSize: 15, textAlign: "center" }}>{grupo?.descricao}</Text>
                                 }
                                 {
                                     booleanDesc ?
                                         <View style={{ flexDirection: "row", width: "20%", justifyContent: "space-evenly", alignContent: "center", alignItems: "center" }}>
-                                            <TouchableOpacity>
+                                            <TouchableOpacity onPress={UpdateDescricaoGrupo}>
                                                 <Foundation name="check" size={20} color="yellow" />
                                             </TouchableOpacity>
                                             <TouchableOpacity onPress={handleChangeDescState}>
@@ -479,8 +554,18 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
                         <Ionicons name="remove" size={25} color="red" />
                     </TouchableOpacity>
                 </View>
-                {booleanAddRule ? <TextInput style={{ color: "white", fontSize: 25 }} placeholderTextColor={"grey"} value={rules} onChangeText={(text) => setRules(text)} placeholder="Digite o novo Nome" onSubmitEditing={() => HandleAddRegra()} /> : null}
-                <View >
+                {
+                    booleanAddRule ?
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }} >
+                            <TextInput style={{ color: "white", fontSize: 15, borderColor: themes.COLORS.MAINLineCross, borderWidth: 1, height: 35, marginLeft: 15, marginRight: 15, paddingLeft: 15, paddingRight: 15, width: "75%" }} placeholderTextColor={"grey"} value={rules} onChangeText={(text) => setRules(text)} placeholder="Digite o novo Nome" onSubmitEditing={HandleAddRegra} />
+                            <TouchableOpacity onPress={HandleAddRegra}>
+                                <Foundation name="check" size={24} color="yellow" />
+                            </TouchableOpacity>
+                        </View>
+                        :
+                        null
+                }
+                <View style={{ margin: 10 }} >
                     {
                         grupo?.regras && grupo?.regras.length > 0 ? grupo?.regras?.map((rules, index) => {
                             return (
@@ -507,7 +592,7 @@ const GrupoInformacoesScreen = ({ params }: SeeGrupos) => {
                 </View>
             </View>
         </Container>
-    )
+        : null
 }
 
 const GrupoRakingScreen = ({ params }: SeeGrupos) => {
@@ -560,7 +645,7 @@ export const SeeGrupo = () => {
     const route = useRoute<SeeGrupos>();
     const navigate = useNavigation()
     const handleNavigate = () => {
-        navigate.navigate("TabsRoutes")
+        navigate.navigate("TabsRoutes", { screen: "Home" })
     }
     const renderTabBarIcon = (
         name: keyof typeof AntDesign.glyphMap,

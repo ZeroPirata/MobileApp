@@ -15,7 +15,7 @@ export const VerifyLogin = ({ necessary, acceptLogin }: ILogin) => {
     const auth = getAuth()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [secury, setSecury] = useState(false)
+    const [secury, setSecury] = useState(true)
 
     const handleVerifyLogin = () => {
         if (user?.email !== email) return

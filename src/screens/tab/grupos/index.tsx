@@ -13,8 +13,8 @@ const Grupos = () => {
   const { user } = useAuthentication()
   const navigate = useNavigation()
   const [_u, setUserInfo] = useState()
-  const [idGrups, setIdGrups] = useState([] as InterfaceGrupo[])
-  const [gruposListInfo, setGrupoListInfo] = useState([] as InterfaceGrupoList[])
+  const [idGrups, setIdGrups] = useState<InterfaceGrupo[]>([])
+  const [gruposListInfo, setGrupoListInfo] = useState<InterfaceGrupoList[]>([])
   const [finishLoading, setFinishLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false);
 
@@ -46,25 +46,30 @@ const Grupos = () => {
   }, [setUserInfo, user])
 
   const handleRoute = ({ ...item }: InterfaceGrupoList) => {
+    setGrupoListInfo([])
+    setIdGrups([])
     navigate.navigate("SeeGrupo", { Home: { ...item } })
   }
-
   useEffect(() => {
-    idGrups.map((ids) => {
-      const refDataBase = ref(database, `grupos/${ids.id}`)
-      const returnValue = onValue(refDataBase, (res) => {
-        const newGrupo = { ...res.val(), ...gruposListInfo, id: ids.id };
-        if (!gruposListInfo.find((grupo) => grupo.id === newGrupo.id)) {
-          setGrupoListInfo((oldList) => [...oldList, newGrupo]);
+    if (idGrups !== undefined) {
+      idGrups.map((ids) => {
+        const refDataBase = ref(database, `grupos/${ids.id}`)
+        const returnValue = onValue(refDataBase, (res) => {
+          const newGrupo = { ...res.val(), ...gruposListInfo, id: ids.id };
+          if (!gruposListInfo.find((grupo) => grupo.id === newGrupo.id)) {
+            setGrupoListInfo((oldList) => [...oldList, newGrupo]);
+          }
+        })
+        return () => {
+          off(refDataBase, "child_changed", returnValue)
         }
       })
-      return () => {
-        off(refDataBase, "child_changed", returnValue)
-      }
-    })
-  }, [finishLoading === true, idGrups.length !== 0])
+    }
+  }, [finishLoading === true, idGrups.length !== 0, idGrups !== undefined])
 
-  useEffect(() => { GetUserGrupos() }, [user])
+  useEffect(() => {
+    GetUserGrupos()
+  }, [user])
   return (
     <Container>
       <Text

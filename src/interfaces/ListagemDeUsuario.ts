@@ -3,4 +3,5 @@ export interface IListSearchedUsers {
   email: string;
   avatar: string;
   name: string;
+  open?: (value: boolean) => void;
 }

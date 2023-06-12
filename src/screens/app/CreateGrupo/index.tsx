@@ -75,10 +75,10 @@ export const CreateGrupo = () => {
     }
   };
 
-  const SendImage = async () => {
+  const SendImage = async (id: string) => {
     if (imageSelect) {
       const uploadedImage = await UploadSingleImage(
-        String(user?.email),
+        `grupos-${id}`,
         imageSelect
       );
       return uploadedImage;
@@ -111,7 +111,7 @@ export const CreateGrupo = () => {
 
   const createGrupo = async () => {
     const GUID = uuidv4();
-    const imageUrl = await SendImage();
+    const imageUrl = await SendImage(GUID);
     const refRealTime = ref(database, `grupos/${GUID}`);
     await set(refRealTime, {
       nome: values?.nome,
@@ -131,7 +131,7 @@ export const CreateGrupo = () => {
         grupos: arrayUnion({ id: GUID }),
       },
       { merge: true }
-    ).then(() => navigation.navigate("TabsRoutes"));
+    ).then(() => navigation.navigate("TabsRoutes", { screen: "Home" }));
     EnviarSolicataoParaEntrarNoGrupo(GUID, imageUrl);
   };
 

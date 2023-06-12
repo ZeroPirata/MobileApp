@@ -8,7 +8,15 @@ export declare global {
       SignIn: undefined;
       SignUp: undefined;
       CreatePost: undefined;
-      TabsRoutes: undefined;
+      TabsRoutes: {
+        screen:
+          | "Home"
+          | "Notifications"
+          | "Settings"
+          | "Grupos"
+          | "Chat"
+          | "Profile";
+      };
       CreateGrupo: undefined;
       SeePost: IPost;
       SeeGrupo: {

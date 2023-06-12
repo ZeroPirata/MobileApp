@@ -10,8 +10,6 @@ import { AntDesign } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 const Settings = () => {
 
-  const [deleteAccount, setDeleteAccount] = useState(false)
-
   const auth = getAuth();
   const userFireBase = auth.currentUser
 
@@ -71,16 +69,12 @@ const Settings = () => {
   }, [changePassword, verifyLoggin])
 
 
-  const handleSecuryChangeState = () => {
-    setSecure(!secury)
-  }
-
+  const [deleteAccount, setDeleteAcccount] = useState(false)
   const handleDeleteAccount = () => {
-    if (!userFireBase) return
     Alert.alert("Delete Account", `${auth.currentUser?.displayName}, you wanna delete your account?`, [
       {
         text: "Delete", onPress: () => {
-          deleteUser(userFireBase).then(() => console.log("Deleteado com sucesso")).catch((err) => console.log(err))
+          setLogin(true)
         }, style: "destructive"
       },
       {
@@ -88,6 +82,14 @@ const Settings = () => {
       }
     ])
   }
+
+  useEffect(() => {
+    if (!userFireBase) return
+    if (deleteAccount && verifyLoggin) {
+      deleteUser(userFireBase).then(() => console.log("Deleteado com sucesso")).catch((err) => console.log(err))
+    }
+  }, [deleteAccount, verifyLoggin])
+
 
   return (
     <Container>

@@ -120,7 +120,6 @@ const CreatePost = () => {
         String(user?.uid)
       );
     } else {
-      const refDatabase = DataBase.ref(database, `grupos/${selectGrup}/${uuidv4()}`);
       sendPostGrupos(
         selectGrup,
         dataUser,
@@ -130,7 +129,7 @@ const CreatePost = () => {
         String(user?.uid)
       );
     }
-    navigation.navigate("TabsRoutes");
+    navigation.navigate("TabsRoutes", { screen: "Home" });
     setLoadingUpload(false);
     return;
   };
@@ -151,19 +150,20 @@ const CreatePost = () => {
     }
   };
 
-
-
-
   const setGruposInfo = useCallback(() => {
-    grupos.map((grups) => {
-      const RefRealTime = DataBase.ref(database, `grupos/${grups.id}`);
-      DataBase.onValue(RefRealTime, (res) => {
-        const newGrupo = { ...res.val(), ...gruposInfo, id: grups.id };
-        if (!gruposInfo.some((grupo) => grupo.id === newGrupo.id)) {
-          setGruposInfos((oldList) => [...oldList, newGrupo]);
-        }
+    if (grupos === undefined) {
+      return setGruposInfos([])
+    } else {
+      grupos.map((grups) => {
+        const RefRealTime = DataBase.ref(database, `grupos/${grups.id}`);
+        DataBase.onValue(RefRealTime, (res) => {
+          const newGrupo = { ...res.val(), ...gruposInfo, id: grups.id };
+          if (!gruposInfo.some((grupo) => grupo.id === newGrupo.id)) {
+            setGruposInfos((oldList) => [...oldList, newGrupo]);
+          }
+        });
       });
-    });
+    }
   }, [grupos]);
 
   useEffect(() => {
@@ -214,10 +214,10 @@ const CreatePost = () => {
             }}
           >
             <Item label="Feed normal" value={null} />
-            {gruposInfo &&
+            {gruposInfo.length > 0 && gruposInfo !== undefined ?
               gruposInfo.map((gps) => {
                 return <Item key={gps.id} value={gps.id} label={gps.nome} />;
-              })}
+              }) : null}
           </Picker>
         </SelectPickerView>
         <ControllerButtonsFileImages>

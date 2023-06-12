@@ -1,16 +1,19 @@
 import { BodyContent, ButtonLike, ButtonSeeMore, Container, FooterPostSettings, LikeCount, PostData, TextButtonSeeMore, UserName, } from "./style";
 import { ref, child, onValue, runTransaction, remove } from "firebase/database";
+import { getStorage, ref as Sref, getDownloadURL } from 'firebase/storage';
+import * as FileSystem from 'expo-file-system';
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { IFiles, IPost } from "../../interfaces/PostInterface";
 import { useNavigation } from "@react-navigation/native";
 import { Option } from "../../interfaces/ModalInterface";
 import { RenderImagesComponent } from "../RenderImage";
 import { useEffect, useRef, useState } from "react";
-import { database } from "../../configs/firebase";
-import { ScrollView, Text, } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { database, storage } from "../../configs/firebase";
+import { ScrollView, Text, View, TouchableOpacity, Linking } from "react-native";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import themes from "../../styles/themes";
 import { Modals } from "../Modals";
+import { getFileSize } from "../../utils/functions";
 
 
 export const PostView = ({ id, ...rest }: IPost) => {
@@ -108,6 +111,17 @@ export const PostView = ({ id, ...rest }: IPost) => {
     !rest.grupo?.validacao ? await remove(ref(database, `posts/${id}`)) : await remove(ref(database, `grupos/${rest.grupo.id}/posts/${id}`))
   };
 
+  const handleDownload = async () => {
+    const downloadUrl = await getDownloadURL(Sref(storage, `arquivos/${rest.user.email}/${rest.arquivos?.id}`));
+    const fileInfo = await FileSystem.getInfoAsync(String(FileSystem.documentDirectory));
+    const fileUri = `${fileInfo.uri}`
+    console.log(fileUri)
+    await FileSystem.downloadAsync(downloadUrl, fileUri).then(({ uri }) => console.log(uri)).catch((err) => console.log(err));
+  };
+
+
+  const fileSize = getFileSize(Number(rest.arquivos?.size))
+
   return (
     <Container>
       <ScrollView>
@@ -119,7 +133,16 @@ export const PostView = ({ id, ...rest }: IPost) => {
         {rest.images ? (
           <RenderImagesComponent arrayImages={rest.images} />
         ) : null}
-        {rest.arquivos ? <Text>Oi</Text> : null}
+        {
+          rest.arquivos ?
+            <View>
+              <TouchableOpacity style={{ flexDirection: "row" }} onPress={handleDownload}>
+                <Text style={{ fontSize: 20, color: "white" }}>{fileSize}</Text>
+                <Ionicons name="download" size={24} color="yellow" />
+              </TouchableOpacity>
+            </View>
+            : null
+        }
         <FooterPostSettings>
           <ButtonLike onPress={handleLike}>
             <AntDesign
