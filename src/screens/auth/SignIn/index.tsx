@@ -236,7 +236,7 @@ const SignIn: React.FC = () => {
               }}
             >
               <AntDesign name="facebook-square" size={30} color="white" />
-              <ButtonText>FaceBook</ButtonText>
+              <ButtonText>Facebook</ButtonText>
             </ButtonAccount>
           </ModalsAnotherLogin>
         </LeyoutLogin>

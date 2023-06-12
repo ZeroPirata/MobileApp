@@ -1,16 +1,11 @@
-import { View, Text } from "react-native";
-import { useCallback, useEffect, useState } from "react";
 import { useAuthentication } from "../../../hooks/useAuthentication";
-import { off, onValue, ref } from "firebase/database";
-import { database } from "../../../configs/firebase";
-import {
-  IAlertas,
-  IFriendRequest,
-  IGrupo,
-} from "../../../interfaces/Notification";
 import { RenderNotifications } from "../../../components/";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
-import { Container, NotificationsStled } from './style'
+import { off, onValue, ref } from "firebase/database";
+import { Container, NotificationsStled } from './style';
+import { database } from "../../../configs/firebase";
+import { useEffect, useState } from "react";
+import { Text } from "react-native";
+
 const Notification = (): JSX.Element => {
 
   const { user } = useAuthentication();

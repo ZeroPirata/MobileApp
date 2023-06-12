@@ -88,10 +88,7 @@ export const CreateGrupo = () => {
   const EnviarSolicataoParaEntrarNoGrupo = (grupoId: string, imageUrl: any) => {
     const referenceCloudFiresStorage = collection(db, "users");
     emailUser.map(async (emails) => {
-      const queryBuilder = query(
-        referenceCloudFiresStorage,
-        where("email", "==", emails)
-      );
+      const queryBuilder = query(referenceCloudFiresStorage, emails.includes("@") ? where("email", "==", emails) : where("arroba", "==", emails));
       const getUserts = await getDocs(queryBuilder);
       getUserts.forEach((i) => {
         const refRealTime = ref(
@@ -103,7 +100,7 @@ export const CreateGrupo = () => {
           date: Math.floor(Date.now() / 1000),
           id: grupoId,
           name: values.nome,
-          avatar: imageUrl?.url,
+          avatar: imageUrl?.url || "https://imgs.search.brave.com/bn5WFs_Hg5tycrgOvw_QL367onF5GR5fxUoWMOVjt1g/rs:fit:1024:1024:1/g:ce/aHR0cHM6Ly9jZG4x/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvbGluZS1kZXNp/Z24tYnVzaW5lc3Mt/c2V0LTQvMjEvcGVv/cGxlLWN1c3RvbWVy/LXVua25vd24tMTAy/NC5wbmc",
         });
       });
     });
@@ -114,8 +111,8 @@ export const CreateGrupo = () => {
     const imageUrl = await SendImage(GUID);
     const refRealTime = ref(database, `grupos/${GUID}`);
     await set(refRealTime, {
-      nome: values?.nome,
-      descricao: values?.descricao,
+      nome: values?.nome || "",
+      descricao: values?.descricao || "",
       image: {
         id: imageUrl?.id || "NoNe",
         url: imageUrl?.url || "https://imgs.search.brave.com/bn5WFs_Hg5tycrgOvw_QL367onF5GR5fxUoWMOVjt1g/rs:fit:1024:1024:1/g:ce/aHR0cHM6Ly9jZG4x/Lmljb25maW5kZXIu/Y29tL2RhdGEvaWNv/bnMvbGluZS1kZXNp/Z24tYnVzaW5lc3Mt/c2V0LTQvMjEvcGVv/cGxlLWN1c3RvbWVy/LXVua25vd24tMTAy/NC5wbmc",
@@ -185,7 +182,7 @@ export const CreateGrupo = () => {
             <AddMembroGrupoInput
               value={email.email}
               onChangeText={(text) => setEmail({ ...email, email: text })}
-              placeholder="Digite Email"
+              placeholder="Email ou Nick"
               placeholderTextColor={themes.COLORS.GRAY5}
             />
             <ButtonAddMembro onPress={handleAddEmail}>

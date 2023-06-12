@@ -20,10 +20,9 @@ interface ListRender {
 
 interface RenderNotificationProps {
     list: ListRender[]
-    open: () => void
 }
 
-export const RenderNotifications = ({ list, open }: RenderNotificationProps) => {
+export const RenderNotifications = ({ list }: RenderNotificationProps) => {
     const { user } = useAuthentication()
 
     const AcceptGrupRequest = async (idGrup: string, request: string) => {

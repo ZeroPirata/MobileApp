@@ -68,30 +68,15 @@ const HomeTab = () => {
   return (
     <Container>
       <HeaderProfile />
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {postInDataBase &&
           postInDataBase.map((items) => {
             if (items != undefined) {
-              return (
-                <PostView
-                  id={items.id}
-                  key={items.id}
-                  user={items.user}
-                  body={items.body}
-                  images={items?.images}
-                  arquivos={items.arquivos}
-                  data={items.data}
-                  grupo={{ id: "", validacao: false }}
-                />
-              );
+              return (<PostView id={items.id} key={items.id} user={items.user} body={items.body} images={items?.images} arquivos={items.arquivos} data={items.data} grupo={{ id: "", validacao: false }} />);
             }
           })}
       </ScrollView>
-    </Container>
+    </Container >
   );
 };
 

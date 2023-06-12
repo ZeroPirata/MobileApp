@@ -55,46 +55,18 @@ export const ChatExist = ({ list, user, chats }: ValidateList) => {
   return (
     <View>
       {userFriend.map((data, index) => (
-        <View
-          key={index}
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-evenly",
-            width: "90%",
-            alignSelf: "center",
-            marginTop: 10,
-            marginBottom: 10,
-            height: 65,
-            borderBottomRightRadius: 35,
-            borderTopRightRadius: 35,
-            backgroundColor: themes.COLORS.BACKGROUND,
-          }}
-        >
-          <Image
-            source={{ uri: String(data.user.avatar) }}
-            style={{
-              height: 50,
-              width: 50,
-              borderBottomLeftRadius: 15,
-              borderTopRightRadius: 15,
-            }}
-          />
-          <View style={{ width: "70%" }}>
-            <Text style={{ fontSize: RFValue(20) }}>{data.user.name}</Text>
-          </View>
-          <View>
-            <TouchableOpacity
-              onPress={() =>
-                handleNavigation(data.id, data.user.id, data.user.name)
-              }
-            >
+        <TouchableOpacity onPress={() => handleNavigation(data.id, data.user.id, data.user.name)}>
+          <View key={index} style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-evenly", width: "90%", alignSelf: "center", marginTop: 10, marginBottom: 10, height: 65, borderBottomRightRadius: 35, borderTopRightRadius: 35, backgroundColor: themes.COLORS.BACKGROUND }}>
+            <Image source={{ uri: String(data.user.avatar) }} style={{ height: 50, width: 50, borderBottomLeftRadius: 15, borderTopRightRadius: 15, }} />
+            <View style={{ width: "70%" }}>
+              <Text style={{ fontSize: RFValue(20) }}>{data.user.name}</Text>
+            </View>
+            <View>
               <Entypo name="chat" size={25} />
-            </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
       ))}
-    </View>
+    </View >
   );
 };

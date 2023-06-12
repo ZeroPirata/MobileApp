@@ -81,39 +81,12 @@ export const ListChatFriends = ({ id, name, userLogged }: ListUser) => {
     }
   };
   return (
-    <View
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-evenly",
-        width: "90%",
-        alignSelf: "center",
-        marginTop: 10,
-        marginBottom: 10,
-        height: 65,
-        borderBottomRightRadius: 35,
-        borderTopRightRadius: 35,
-        backgroundColor: themes.COLORS.BACKGROUND,
-      }}
-    >
-      <Image
-        source={{ uri: String(user[0]?.avatar) }}
-        style={{
-          height: 50,
-          width: 50,
-          borderBottomLeftRadius: 15,
-          borderTopRightRadius: 15,
-        }}
-      />
-      <View style={{ width: "70%" }}>
-        <Text style={{ fontSize: RFValue(20) }}>{user[0]?.name}</Text>
+    <TouchableOpacity onPress={handleStartChatUsers}>
+      <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-evenly", width: "90%", alignSelf: "center", marginTop: 10, marginBottom: 10, height: 65, borderBottomRightRadius: 35, borderTopRightRadius: 35, backgroundColor: themes.COLORS.BACKGROUND, }}>
+        <Image source={{ uri: String(user[0]?.avatar) }} style={{ height: 50, width: 50, borderBottomLeftRadius: 15, borderTopRightRadius: 15 }} />
+        <View style={{ width: "70%" }}><Text style={{ fontSize: RFValue(20) }}>{user[0]?.name}</Text></View>
+        <View><Entypo name="chat" size={25} /></View>
       </View>
-      <View>
-        <TouchableOpacity onPress={handleStartChatUsers}>
-          <Entypo name="chat" size={25} />
-        </TouchableOpacity>
-      </View>
-    </View>
+    </TouchableOpacity >
   );
 };

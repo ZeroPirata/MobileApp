@@ -19,9 +19,10 @@ export const VerifyLogin = ({ necessary, acceptLogin }: ILogin) => {
 
     const handleVerifyLogin = () => {
         if (user?.email !== email) return
-        signInWithEmailAndPassword(auth, email, password)
-        acceptLogin(true)
-        necessary(false)
+        signInWithEmailAndPassword(auth, email, password).then(() => {
+            acceptLogin(true)
+            necessary(false)
+        }).catch((err) => console.log(err))
     }
     return (
         <Container>
@@ -45,6 +46,7 @@ export const VerifyLogin = ({ necessary, acceptLogin }: ILogin) => {
                         />
                         <TextInputStld
                             value={password}
+                            style={{ color: "white" }}
                             placeholder="password"
                             placeholderTextColor={themes.COLORS.GRAY4}
                             underlineColorAndroid="transparent"

@@ -28,6 +28,7 @@ const TabRoutes: React.FC = () => {
       <AntDesign
         name={name}
         size={20}
+        style={name == 'notification' ? { transform: [{ rotateY: '180deg' }] } : null}
         color={
           focused ? themes.COLORS.HEXTECH_METAL_GOLD.GOLD3 : themes.COLORS.GRAY4
         }
@@ -67,7 +68,7 @@ const TabRoutes: React.FC = () => {
         component={HomeTab}
         options={{
           tabBarIcon: ({ focused }: TabBarIconProps) =>
-            renderTabBarIcon("home", focused, "home"),
+            renderTabBarIcon("home", focused, "Home"),
         }}
       />
       <Tab.Screen
@@ -75,7 +76,7 @@ const TabRoutes: React.FC = () => {
         component={Profile}
         options={{
           tabBarIcon: ({ focused }: TabBarIconProps) =>
-            renderTabBarIcon("profile", focused, "profile"),
+            renderTabBarIcon("profile", focused, "Perfil"),
         }}
       />
       <Tab.Screen
@@ -84,7 +85,7 @@ const TabRoutes: React.FC = () => {
         component={Chat}
         options={{
           tabBarIcon: ({ focused }: TabBarIconProps) =>
-            renderTabBarIcon("message1", focused, "chat"),
+            renderTabBarIcon("message1", focused, "Chat"),
         }}
       />
       <Tab.Screen
@@ -93,7 +94,7 @@ const TabRoutes: React.FC = () => {
         component={Grupos}
         options={{
           tabBarIcon: ({ focused }: TabBarIconProps) =>
-            renderTabBarIcon("notification", focused, "grups"),
+            renderTabBarIcon("notification", focused, "Grupos"),
           unmountOnBlur: true,
         }}
       />
@@ -103,7 +104,7 @@ const TabRoutes: React.FC = () => {
         component={Notification}
         options={{
           tabBarIcon: ({ focused }: TabBarIconProps) =>
-            renderTabBarIcon("heart", focused, "alerts"),
+            renderTabBarIcon("heart", focused, "Alertas"),
         }}
       />
       <Tab.Screen
@@ -112,7 +113,7 @@ const TabRoutes: React.FC = () => {
         component={Settings}
         options={{
           tabBarIcon: ({ focused }: TabBarIconProps) =>
-            renderTabBarIcon("setting", focused, "Config"),
+            renderTabBarIcon("setting", focused, "Configs"),
         }}
       />
     </Tab.Navigator>
@@ -123,18 +124,9 @@ export { TabRoutes };
 
 const style = StyleSheet.create({
   view: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
   },
   focus: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    borderTopWidth: 1.5,
-    borderColor: themes.COLORS.HEXTECH_METAL_GOLD.GOLD3,
-    height: "100%",
+    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderTopWidth: 1.5, borderColor: themes.COLORS.HEXTECH_METAL_GOLD.GOLD3, height: "100%",
   },
 });

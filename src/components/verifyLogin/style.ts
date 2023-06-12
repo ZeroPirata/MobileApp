@@ -35,7 +35,7 @@ export const TextsInputs = styled.View`
 
 export const TextInputStld = styled.TextInput`
   width: 90%;
-  color: "white";
+  color: white;
   margin: 10px 0;
   height: ${RFValue(35)}px;
   border: 1px solid;

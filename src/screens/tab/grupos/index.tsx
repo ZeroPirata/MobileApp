@@ -81,20 +81,20 @@ const Grupos = () => {
         <GruposListaemStyle>
           {gruposListInfo && gruposListInfo.map((gps, index) => {
             return (
-              <GruposUnitarios key={index}>
-                <GrupoImg source={
-                  gps.image.url !== undefined && gps.image ?
-                    { uri: gps.image.url } : { uri: "" }}
-                />
-                <GrupoInfo>
-                  <GrupoNome>{gps.nome}</GrupoNome>
-                </GrupoInfo>
-                <GrupoSettings>
-                  <TouchableOpacity onPress={() => handleRoute(gps)}>
+              <TouchableOpacity key={index} onPress={() => handleRoute(gps)}>
+                <GruposUnitarios >
+                  <GrupoImg source={
+                    gps.image.url !== undefined && gps.image ?
+                      { uri: gps.image.url } : { uri: "" }}
+                  />
+                  <GrupoInfo>
+                    <GrupoNome>{gps.nome}</GrupoNome>
+                  </GrupoInfo>
+                  <GrupoSettings>
                     <MaterialIcons name="exit-to-app" size={35} color="black" />
-                  </TouchableOpacity>
-                </GrupoSettings>
-              </GruposUnitarios>
+                  </GrupoSettings>
+                </GruposUnitarios>
+              </TouchableOpacity>
             )
           })}
         </GruposListaemStyle>

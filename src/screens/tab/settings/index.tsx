@@ -8,10 +8,13 @@ import { authFirebase } from "../../../configs/firebase";
 import { VerifyLogin } from '../../../components/index'
 import { AntDesign } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useNavigation } from "@react-navigation/native";
 const Settings = () => {
 
   const auth = getAuth();
   const userFireBase = auth.currentUser
+
+  const navigation = useNavigation()
 
   const [login, setLogin] = useState(false)
   const handleLoginNecessary = () => {
@@ -30,6 +33,11 @@ const Settings = () => {
       updatePassword(userFireBase, password).then(() => {
         setPassword("")
         setConfirmPassword("")
+        setChangePassword({
+          onPress: false,
+          render: false
+        })
+        setverifyLoggin(false)
       }).catch((err) => {
         console.log(err)
       })
@@ -47,7 +55,13 @@ const Settings = () => {
       console.log("Email não esta correto")
       return
     }
-    updateEmail(userFireBase, newEmail).then(() => console.log("Email atualizado")).catch((err) => console.log(err))
+    updateEmail(userFireBase, newEmail).then(() => {
+      setChangeEmail({
+        onPress: false,
+        render: false
+      })
+      setverifyLoggin(false)
+    }).catch((err) => console.log(err))
   }
 
   const [verifyLoggin, setverifyLoggin] = useState(false)
@@ -75,6 +89,7 @@ const Settings = () => {
       {
         text: "Delete", onPress: () => {
           setLogin(true)
+          setDeleteAcccount(true)
         }, style: "destructive"
       },
       {
@@ -86,7 +101,7 @@ const Settings = () => {
   useEffect(() => {
     if (!userFireBase) return
     if (deleteAccount && verifyLoggin) {
-      deleteUser(userFireBase).then(() => console.log("Deleteado com sucesso")).catch((err) => console.log(err))
+      deleteUser(userFireBase).then(() => navigation.navigate("SignIn")).catch((err) => console.log(err))
     }
   }, [deleteAccount, verifyLoggin])
 
@@ -101,6 +116,7 @@ const Settings = () => {
                 <TextInputStld
                   value={password}
                   placeholder="New password"
+                  style={{ color: "white" }}
                   placeholderTextColor={themes.COLORS.GRAY4}
                   underlineColorAndroid="transparent"
                   secureTextEntry={secury}
@@ -110,6 +126,7 @@ const Settings = () => {
                 />
                 <TextInputStld
                   value={confirmPassword}
+                  style={{ color: "white" }}
                   placeholder="Repeat new password"
                   underlineColorAndroid="transparent"
                   secureTextEntry={secury}
@@ -137,6 +154,7 @@ const Settings = () => {
                   value={oldEmail}
                   placeholder="Your actualy email"
                   placeholderTextColor={themes.COLORS.GRAY4}
+                  style={{ color: "white" }}
                   underlineColorAndroid="transparent"
                   onChangeText={(text) => {
                     setOldEmail(text)
@@ -145,6 +163,7 @@ const Settings = () => {
                 <TextInputStld
                   value={newEmail}
                   placeholder="Your new email"
+                  style={{ color: "white" }}
                   placeholderTextColor={themes.COLORS.GRAY4}
                   underlineColorAndroid="transparent"
                   onChangeText={(text) => {

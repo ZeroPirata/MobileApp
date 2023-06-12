@@ -1,47 +1,26 @@
 import { View, Text, RefreshControl, Alert, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput } from "react-native"
+import { arrayRemove, collection, doc, getDoc, getDocs, query as Query, updateDoc, where } from "firebase/firestore";
 import { limitToLast, off, onValue, orderByChild, push, query, ref, remove, set, update } from "firebase/database";
-import { arrayRemove, collection, doc, getDoc, getDocs, query as Query, snapshotEqual, updateDoc, where, deleteField, setDoc } from "firebase/firestore";
+import { Entypo, FontAwesome, Foundation, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { IGrupo, IMembros, TabBarIconProps } from "../../../interfaces/GruposInterface";
+import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { IPost, ISendFiles } from "../../../interfaces/PostInterface";
 import { useAuthentication } from "../../../hooks/useAuthentication";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState, useCallback } from "react";
+import { UploadSingleImage } from "../../../utils/functions";
 import { RFValue } from "react-native-responsive-fontsize";
-import { Entypo, FontAwesome, Foundation, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { IPost, ISendFiles } from "../../../interfaces/PostInterface";
 import { database, db } from "../../../configs/firebase";
 import { Picker } from "@react-native-picker/picker";
 import { PostView } from "../../../components";
 import { AntDesign } from "@expo/vector-icons";
 import themes from "../../../styles/themes";
 import { Container } from "./style"
-import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
-import { UploadSingleImage } from "../../../utils/functions";
 
 const { Item } = Picker;
 
 const Tab = createBottomTabNavigator();
-
-interface IGrupo {
-    descricao: string,
-    image: { id: string, url: string },
-    membros: {
-        [key: string]: {
-            id: string,
-            role: string
-        }
-    },
-    nome: string,
-    regras: string[],
-    posts: IPost[]
-}
-
-interface IMembros {
-    key: string, id: string; role: string;
-}
-
-interface TabBarIconProps {
-    focused: boolean;
-}
 
 const GrupoHomeScreen = ({ params }: SeeGrupos) => {
     const { id } = params.Home
@@ -66,17 +45,31 @@ const GrupoHomeScreen = ({ params }: SeeGrupos) => {
     }, []);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
+        setPostInDataBase([])
+        const refDataBase = ref(database, `grupos/${id}/posts`)
+        const queryDate = query(refDataBase, orderByChild("data"),)
+        const returnValues = onValue(queryDate, resData => {
+            if (resData.exists()) {
+                const data = resData.val();
+                const PostList = Object.keys(data)
+                    .map((key) => {
+                        const post = data[key];
+                        return { id: key, ...post, };
+                    })
+                    .sort((a, b) => b.data - a.data);
+                setPostInDataBase(PostList);
+            }
+        })
         setTimeout(() => {
             setRefreshing(false);
+            off(refDataBase, "child_changed", returnValues)
         }, 1000);
     }, []);
     return (
         <Container >
             <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                 {postInDataBase && postInDataBase.map((items, index) => {
-                    return (
-                        <PostView grupo={{ id: id, validacao: true }} id={items.id} key={items.id + index} user={items.user} body={items.body} images={items?.images} arquivos={items.arquivos} data={items.data} />
-                    );
+                    return (<PostView grupo={{ id: id, validacao: true }} id={items.id} key={items.id + index} user={items.user} body={items.body} images={items?.images} arquivos={items.arquivos} data={items.data} />);
                 })}
             </ScrollView>
         </Container>
@@ -159,7 +152,7 @@ const GrupoMembrosScreen = ({ params }: SeeGrupos) => {
 
     const EnviarSolicataoParaEntrarNoGrupo = async () => {
         const referenceCloudFiresStorage = collection(db, "users");
-        const queryBuilder = Query(referenceCloudFiresStorage, where("email", "==", emailUser));
+        const queryBuilder = Query(referenceCloudFiresStorage, emailUser.includes("@") ? where("email", "==", emailUser) : where("arroba", "==", emailUser));
         const getUserts = await getDocs(queryBuilder);
         getUserts.forEach((i) => {
             const refRealTime = ref(database, `user/${i.data().id}/alerts`)
@@ -263,7 +256,7 @@ const GrupoMembrosScreen = ({ params }: SeeGrupos) => {
             {
                 addUser ?
                     <View style={{ position: "absolute", top: "90%", left: "5%", backgroundColor: themes.COLORS.MAINBorder, width: 270, height: 50, alignContent: "center", alignItems: "center", justifyContent: "center" }}>
-                        <TextInput style={{ color: "white" }} value={emailUser} onChangeText={(text) => setEmailUser(text)} placeholder="Digite o Nome/Email" />
+                        <TextInput style={{ color: "white" }} value={emailUser} onChangeText={(text) => setEmailUser(text)} placeholder="Digite o Nick/Email" />
                     </View> :
                     null
             }
