@@ -7,7 +7,7 @@ import { getDatabase } from "firebase/database";
 // Firebase
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDh3STJd0L1NtGjUHZwLuiLcDBcReWatHQ",
+  apiKey: "",
   authDomain: "leagueofzero-da338.firebaseapp.com",
   projectId: "leagueofzero-da338",
   storageBucket: "leagueofzero-da338.appspot.com",
